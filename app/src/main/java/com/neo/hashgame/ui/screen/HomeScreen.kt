@@ -19,7 +19,8 @@ import com.neo.hashgame.ui.theme.HashGameTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    score: Score
+    score: Score,
+    onPlayClick : () -> Unit
 ) = Column(
     modifier = modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -33,7 +34,7 @@ fun HomeScreen(
         score = score
     )
 
-    Button(onClick = { /*TODO*/ }) {
+    Button(onClick = onPlayClick) {
         Text(text = "JOGAR")
     }
 }
@@ -48,6 +49,8 @@ fun HomeScreenPreview() {
                 hasWon = 2,
                 lost = 1
             )
-        )
+        ) {
+
+        }
     }
 }
