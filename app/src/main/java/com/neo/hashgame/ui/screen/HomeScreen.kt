@@ -12,26 +12,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.neo.hashgame.model.Score
-import com.neo.hashgame.ui.components.ScoreComponent
+import com.neo.hashgame.model.Scores
+import com.neo.hashgame.ui.components.ScoresTable
 import com.neo.hashgame.ui.theme.HashGameTheme
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    score: Score,
+    scores: Scores,
     onPlayClick : () -> Unit
 ) = Column(
     modifier = modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
 ) {
-    ScoreComponent(
+    ScoresTable(
         modifier =
         Modifier
             .fillMaxWidth()
             .padding(16.dp),
-        score = score
+        scores = scores
     )
 
     Button(onClick = onPlayClick) {
@@ -44,7 +44,7 @@ fun HomeScreen(
 fun HomeScreenPreview() {
     HashGameTheme {
         HomeScreen(
-            score = Score(
+            scores = Scores(
                 plays = 3,
                 hasWon = 2,
                 lost = 1

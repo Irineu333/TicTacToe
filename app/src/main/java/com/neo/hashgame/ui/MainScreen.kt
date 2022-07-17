@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.neo.hashgame.model.Score
+import com.neo.hashgame.model.Scores
 import com.neo.hashgame.model.Screen
 import com.neo.hashgame.ui.screen.HomeScreen
 import com.neo.hashgame.ui.theme.HashGameTheme
@@ -36,7 +36,7 @@ fun MainScreen() {
         ) {
             HomeScreen(
                 // TODO: mock
-                score = Score(
+                scores = Scores(
                     plays = 3,
                     hasWon = 2,
                     lost = 1
