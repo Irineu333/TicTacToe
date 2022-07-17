@@ -10,6 +10,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.neo.hashgame.model.Score
+import com.neo.hashgame.ui.screen.HomeScreen
 import com.neo.hashgame.ui.theme.HashGameTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,22 +24,31 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    Greeting("Android")
+                    HomeScreen(
+                        // TODO: mock
+                        score = Score(
+                            plays = 3,
+                            hasWon = 2,
+                            lost = 1
+                        )
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
     HashGameTheme {
-        Greeting("Android")
+        HomeScreen(
+            // TODO: mock
+            score = Score(
+                plays = 3,
+                hasWon = 2,
+                lost = 1
+            )
+        )
     }
 }
