@@ -20,7 +20,7 @@ import com.neo.hashgame.ui.theme.HashGameTheme
 fun HomeScreen(
     modifier: Modifier = Modifier,
     scores: Scores,
-    onPlayClick : () -> Unit
+    onPlayClick : () -> Unit = { }
 ) = Column(
     modifier = modifier.fillMaxSize(),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,8 +49,6 @@ fun HomeScreenPreview() {
                 hasWon = 2,
                 lost = 1
             )
-        ) {
-
-        }
+        )
     }
 }
