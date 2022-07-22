@@ -1,8 +1,11 @@
 package com.neo.hashgame.ui.screen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -13,28 +16,46 @@ import com.neo.hashgame.HashGameBackground
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier
+) = Box(
+    modifier = modifier.fillMaxSize(),
+    contentAlignment = Alignment.Center
 ) {
-    Canvas(modifier = Modifier.size(100.dp)) {
+    HashTable(
+        modifier = Modifier.size(200.dp)
+    )
+}
 
-        val rowsSize = size.height / 3
-        val columnsSize = size.width / 3
+@Composable
+private fun HashTable(
+    modifier: Modifier
+) = Canvas(modifier = modifier) {
 
-        fun drawRow(position: Int) = drawLine(
-            color = Color.Red,
-            start = Offset(0f, rowsSize * position),
-            end = Offset(size.height, rowsSize * position)
-        )
+    val rowsSize = size.height / 3
+    val columnsSize = size.width / 3
 
-        fun drawColumn(position: Int) = drawLine(
-            color = Color.Red,
-            start = Offset(columnsSize * position, 0f),
-            end = Offset(columnsSize * position, size.height)
-        )
+    fun drawLine(
+        start: Offset,
+        end: Offset
+    ) = drawLine(
+        color = Color.Red,
+        strokeWidth = 2.dp.toPx(),
+        start = start,
+        end = end
+    )
 
-        for (index in 1..3) {
-            drawRow(index)
-            drawColumn(index)
-        }
+    fun drawRow(position: Int) = drawLine(
+        start = Offset(0f, rowsSize * position),
+        end = Offset(size.height, rowsSize * position),
+    )
+
+    fun drawColumn(position: Int) = drawLine(
+        start = Offset(columnsSize * position, 0f),
+        end = Offset(columnsSize * position, size.height),
+    )
+
+    for (index in 1..2) {
+        drawRow(index)
+        drawColumn(index)
     }
 }
 
