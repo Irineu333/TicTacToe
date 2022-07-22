@@ -1,13 +1,17 @@
 package com.neo.hashgame.ui.screen
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -20,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.neo.hashgame.HashGameBackground
 import com.neo.hashgame.model.Hash
 import kotlin.math.min
+import kotlin.random.Random
 
 @Composable
 fun GameScreen(
@@ -28,25 +33,29 @@ fun GameScreen(
     modifier = modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
+
+    var hash by remember { mutableStateOf(Hash()) }
+
     HashTable(
+        onClick = {
+            hash = hash.update {
+                set(if (Random.nextBoolean()) Hash.Player.X else Hash.Player.O, it.row, it.column)
+            }
+        },
         modifier = Modifier.size(200.dp),
-        hash = Hash().apply {
-            set(Hash.Player.O, 1, 1)
-            set(Hash.Player.X, 3, 3)
-        }
+        hash = hash
     )
 }
 
 @Composable
 private fun HashTable(
+    onClick: (Hash.Block) -> Unit,
     modifier: Modifier,
     hash: Hash
 ) = Box(modifier = modifier) {
     DrawBackground(modifier)
     DrawForeground(
-        onClick = {
-
-        },
+        onClick = onClick,
         modifier = modifier,
         hash = hash
     )
@@ -91,20 +100,20 @@ private fun Block(
     onClick: (Hash.Block) -> Unit,
     modifier: Modifier,
     block: Hash.Block
-) = IconButton(
-    onClick = {
+) = Box(
+    modifier = modifier.clickable {
         onClick(block)
     },
-    modifier = modifier
+    contentAlignment = Alignment.Center
 ) {
-    val player = block.player ?: return@IconButton
-
-    Player(
-        player = player,
-        modifier = Modifier.fillMaxSize(
-            fraction = 0.6f
+    if (block.player != null) {
+        Player(
+            player = block.player,
+            modifier = Modifier.fillMaxSize(
+                fraction = 0.5f
+            )
         )
-    )
+    }
 }
 
 @Composable
@@ -117,14 +126,14 @@ fun Player(
 
             val radius = min(size.height, size.height) / 2f
 
-            roundedDrawPlayer1(
+            roundedDrawPlayerO(
                 color = Color.Blue,
                 radius = radius,
                 center = center
             )
         }
         Hash.Player.X -> {
-            roundedDrawPlayer2(
+            roundedDrawPlayerX(
                 color = Color.Blue
             )
         }
@@ -184,7 +193,7 @@ fun DrawScope.roundedDrawLine(
     cap = StrokeCap.Round
 )
 
-fun DrawScope.roundedDrawPlayer1(
+fun DrawScope.roundedDrawPlayerO(
     color: Color,
     center: Offset,
     radius: Float,
@@ -198,20 +207,18 @@ fun DrawScope.roundedDrawPlayer1(
     )
 )
 
-private fun DrawScope.roundedDrawPlayer2(color: Color) {
+private fun DrawScope.roundedDrawPlayerX(color: Color) {
 
-    fun drawPlayer2(
+    fun drawPlayerX(
         start: Offset,
         end: Offset
-    ) = drawLine(
+    ) = roundedDrawLine(
         color = color,
         start = start,
-        end = end,
-        strokeWidth = 2.dp.toPx(),
-        cap = StrokeCap.Round
+        end = end
     )
 
-    drawPlayer2(
+    drawPlayerX(
         start = Offset(
             x = 0f,
             y = 0f
@@ -222,7 +229,7 @@ private fun DrawScope.roundedDrawPlayer2(color: Color) {
         )
     )
 
-    drawPlayer2(
+    drawPlayerX(
         start = Offset(
             x = size.width,
             y = 0f

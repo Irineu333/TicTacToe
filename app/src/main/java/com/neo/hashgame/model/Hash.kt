@@ -1,14 +1,20 @@
 package com.neo.hashgame.model
 
-class Hash {
-
-    private val data = mutableMapOf<String, Player>()
-
+data class Hash(
+    private val data: MutableMap<String, Player> = mutableMapOf()
+) {
     fun set(
         player: Player,
         row: Int,
         column: Int
-    ) = data.put(key(row, column), player)
+    ) = data.set(key(row, column), player)
+
+    fun set(
+        block: Block
+    ) {
+        requireNotNull(block.player) { "player cannot be null" }
+        set(block.player, block.row, block.column)
+    }
 
     fun get(
         row: Int,
@@ -22,6 +28,14 @@ class Hash {
 
         return "($row,$column)"
     }
+
+    fun update(function: Hash.() -> Unit) = copy().apply(function)
+
+    override fun equals(
+        other: Any?
+    ) = if (other is Hash) {
+        other === this
+    } else false
 
     data class Block(
         val player: Player? = null,
