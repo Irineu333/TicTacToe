@@ -1,12 +1,15 @@
 package com.neo.hashgame.ui.screen
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
@@ -34,7 +37,15 @@ fun HomeScreen(
     verticalArrangement = Arrangement.Center,
 ) {
 
-    SquareBox {
+    SquareBox(
+        modifier = Modifier
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(16.dp)
+    ) {
         HashTable(
             hash = Hash().apply {
                 set(Hash.Player.X, 1, 3)

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -17,21 +18,28 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.neo.hashgame.model.Hash
 import kotlin.math.min
 
 typealias OnBlockClick = (Hash.Block) -> Unit
 
+private val Density.DEFAULT_LINE_WIDTH
+    get() = 4.dp.toPx()
+
 @Composable
 fun HashTable(
     modifier: Modifier = Modifier,
     onBlockClick: OnBlockClick? = null,
+    lineHashColor: Color = MaterialTheme.colors.onBackground,
+    linePlayersColors: Color = MaterialTheme.colors.primary,
     hash: Hash
 ) = Box(modifier = modifier) {
-    DrawBackground()
+    DrawBackground(lineHashColor)
     DrawForeground(
         onBlockClick = onBlockClick,
+        linePlayersColors = linePlayersColors,
         hash = hash
     )
 }
@@ -39,6 +47,7 @@ fun HashTable(
 @Composable
 private fun DrawForeground(
     onBlockClick: OnBlockClick? = null,
+    linePlayersColors: Color,
     hash: Hash
 ) = BoxWithConstraints {
 
@@ -49,12 +58,13 @@ private fun DrawForeground(
         for (column in Hash.KEY_RANGE) {
 
             Block(
-                onClick = onBlockClick,
                 block = Hash.Block(
                     row = row,
                     column = column,
                     player = hash.get(row, column)
                 ),
+                linePlayersColors = linePlayersColors,
+                onClick = onBlockClick,
                 modifier = Modifier
                     .size(
                         width = columnsSize,
@@ -71,9 +81,10 @@ private fun DrawForeground(
 
 @Composable
 private fun Block(
+    block: Hash.Block,
     onClick: OnBlockClick? = null,
     modifier: Modifier,
-    block: Hash.Block
+    linePlayersColors: Color
 ) = Box(
     modifier = onClick?.let {
         modifier.clickable {
@@ -85,6 +96,7 @@ private fun Block(
     if (block.player != null) {
         Player(
             player = block.player,
+            linePlayersColors = linePlayersColors,
             modifier = Modifier.fillMaxSize(
                 fraction = 0.5f
             )
@@ -95,7 +107,8 @@ private fun Block(
 @Composable
 private fun Player(
     player: Hash.Player,
-    modifier: Modifier
+    modifier: Modifier,
+    linePlayersColors: Color
 ) = Canvas(modifier = modifier) {
     when (player) {
         Hash.Player.O -> {
@@ -103,7 +116,7 @@ private fun Player(
             val radius = min(size.height, size.width) / 2f
 
             drawRoundedDrawCircle(
-                color = Color.Blue,
+                color = linePlayersColors,
                 radius = radius,
                 center = center
             )
@@ -114,7 +127,7 @@ private fun Player(
                 start: Offset,
                 end: Offset
             ) = drawRoundedLine(
-                color = Color.Blue,
+                color = linePlayersColors,
                 start = start,
                 end = end
             )
@@ -145,7 +158,9 @@ private fun Player(
 }
 
 @Composable
-private fun DrawBackground() = Canvas(
+private fun DrawBackground(
+    lineHashColor: Color
+) = Canvas(
     modifier = Modifier.fillMaxSize()
 ) {
 
@@ -156,7 +171,7 @@ private fun DrawBackground() = Canvas(
         start: Offset,
         end: Offset
     ) = drawRoundedLine(
-        color = Color.Red,
+        color = lineHashColor,
         start = start,
         end = end,
     )
@@ -185,7 +200,7 @@ fun DrawScope.drawRoundedLine(
     color = color,
     start = start,
     end = end,
-    strokeWidth = 2.dp.toPx(),
+    strokeWidth = DEFAULT_LINE_WIDTH,
     cap = StrokeCap.Round
 )
 
@@ -198,7 +213,7 @@ fun DrawScope.drawRoundedDrawCircle(
     radius = radius,
     center = center,
     style = Stroke(
-        width = 2.dp.toPx(),
+        width = DEFAULT_LINE_WIDTH,
         cap = StrokeCap.Round
     )
 )
