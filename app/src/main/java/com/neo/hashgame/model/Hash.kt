@@ -1,49 +1,48 @@
 package com.neo.hashgame.model
 
 data class Hash(
-    private val data: MutableMap<String, Player> = mutableMapOf()
+    private val symbols: Array<Array<Symbol?>> = Array(KEY_RANGE.last) {
+        Array(KEY_RANGE.last) { null }
+    }
 ) {
     fun set(
-        player: Player,
+        symbol: Symbol,
         row: Int,
         column: Int
-    ) = data.set(key(row, column), player)
-
-    fun set(
-        block: Block
     ) {
-        requireNotNull(block.player) { "player cannot be null" }
-        set(block.player, block.row, block.column)
+        symbols[row - 1][column - 1] = symbol
     }
 
     fun get(
         row: Int,
         column: Int
-    ) = data[key(row, column)]
+    ) = symbols[row - 1][column - 1]
 
-    private fun key(row: Int, column: Int): String {
+    override fun equals(other: Any?): Boolean {
+        if (other is Hash) {
+            for (row in KEY_RANGE) {
+                for (column in KEY_RANGE) {
+                    if (other.get(row, column) != get(row, column)) {
+                        return false
+                    }
+                }
+            }
+        }
 
-        require(KEY_RANGE.contains(row)) { "invalid row $row" }
-        require(KEY_RANGE.contains(column)) { "invalid column $column" }
-
-        return "($row,$column)"
+        return false
     }
 
-    fun update(function: Hash.() -> Unit) = copy().apply(function)
-
-    override fun equals(
-        other: Any?
-    ) = if (other is Hash) {
-        other === this
-    } else false
+    override fun hashCode(): Int {
+        return symbols.contentDeepHashCode()
+    }
 
     data class Block(
-        val player: Player? = null,
+        val symbol: Symbol? = null,
         val row: Int,
         val column: Int
     )
 
-    enum class Player {
+    enum class Symbol {
         O,
         X
     }

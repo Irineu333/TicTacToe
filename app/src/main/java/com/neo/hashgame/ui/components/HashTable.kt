@@ -61,7 +61,7 @@ private fun DrawForeground(
                 block = Hash.Block(
                     row = row,
                     column = column,
-                    player = hash.get(row, column)
+                    symbol = hash.get(row, column)
                 ),
                 linePlayersColors = linePlayersColors,
                 onClick = onBlockClick,
@@ -85,43 +85,44 @@ private fun Block(
     onClick: OnBlockClick? = null,
     modifier: Modifier,
     linePlayersColors: Color
-) = Box(
-    modifier = onClick?.let {
-        modifier.clickable {
-            it(block)
-        }
-    } ?: modifier,
-    contentAlignment = Alignment.Center
 ) {
-    if (block.player != null) {
-        Player(
-            player = block.player,
-            linePlayersColors = linePlayersColors,
-            modifier = Modifier.fillMaxSize(
-                fraction = 0.5f
+    Box(
+        modifier = onClick?.let onClick@ {
+            if (block.symbol != null) return@onClick modifier
+            modifier.clickable { it(block) }
+        } ?: modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        if (block.symbol != null) {
+            Player(
+                symbol = block.symbol,
+                linePlayersColors = linePlayersColors,
+                modifier = Modifier.fillMaxSize(
+                    fraction = 0.5f
+                )
             )
-        )
+        }
     }
 }
 
 @Composable
 private fun Player(
-    player: Hash.Player,
+    symbol: Hash.Symbol,
     modifier: Modifier,
     linePlayersColors: Color
 ) = Canvas(modifier = modifier) {
-    when (player) {
-        Hash.Player.O -> {
+    when (symbol) {
+        Hash.Symbol.O -> {
 
             val radius = min(size.height, size.width) / 2f
 
-            drawRoundedDrawCircle(
+            drawRoundedCircle(
                 color = linePlayersColors,
                 radius = radius,
                 center = center
             )
         }
-        Hash.Player.X -> {
+        Hash.Symbol.X -> {
 
             fun drawLine(
                 start: Offset,
@@ -204,7 +205,7 @@ fun DrawScope.drawRoundedLine(
     cap = StrokeCap.Round
 )
 
-fun DrawScope.drawRoundedDrawCircle(
+fun DrawScope.drawRoundedCircle(
     color: Color,
     center: Offset,
     radius: Float,
@@ -224,9 +225,9 @@ fun HashTablePreview() {
     SquareBox {
         HashTable(
             hash = Hash().apply {
-                set(Hash.Player.X, 2, 2)
-                set(Hash.Player.O, 1, 1)
-                set(Hash.Player.O, 3, 3)
+                set(Hash.Symbol.X, 2, 2)
+                set(Hash.Symbol.O, 1, 1)
+                set(Hash.Symbol.O, 3, 3)
             }
         )
     }

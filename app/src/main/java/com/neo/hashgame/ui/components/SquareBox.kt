@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.min
 
@@ -12,12 +13,14 @@ import androidx.compose.ui.unit.min
 fun SquareBox(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
-) = BoxWithConstraints {
+) = Box(modifier = modifier) {
+    BoxWithConstraints {
 
-    val size = min(maxHeight, maxWidth)
+        val size = remember { min(maxHeight, maxWidth) }
 
-    Box(
-        modifier = modifier.size(size),
-        content = content
-    )
+        Box(
+            modifier = Modifier.size(size),
+            content = content
+        )
+    }
 }

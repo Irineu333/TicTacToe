@@ -8,8 +8,8 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.neo.hashgame.model.Screen
-import com.neo.hashgame.ui.screen.GameScreen
 import com.neo.hashgame.ui.screen.HomeScreen
+import com.neo.hashgame.ui.screen.game.GameScreen
 import com.neo.hashgame.util.extensions.enterToLeftTransition
 import com.neo.hashgame.util.extensions.enterToRightTransition
 import com.neo.hashgame.util.extensions.exitToLeftTransition
@@ -21,14 +21,18 @@ fun MainScreen() {
 
     AnimatedNavHost(
         navController = controller,
-        startDestination = Screen.HomeScreen.route
+        startDestination = Screen.HomeScreen.route,
     ) {
         composable(
             route = Screen.HomeScreen.route,
             exitTransition = { exitToLeftTransition },
             popEnterTransition = { enterToRightTransition }
         ) {
-            HomeScreen()
+            HomeScreen(
+                onPlayPeople = { 
+                    controller.navigate(Screen.GameScreen.route)
+                }
+            )
         }
 
         composable(
@@ -36,7 +40,11 @@ fun MainScreen() {
             enterTransition = { enterToLeftTransition },
             popExitTransition = { exitToRightTransition }
         ) {
-            GameScreen()
+            GameScreen(
+                onHomeClick = {
+                    controller.popBackStack()
+                }
+            )
         }
     }
 }
