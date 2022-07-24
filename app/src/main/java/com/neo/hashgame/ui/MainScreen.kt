@@ -64,4 +64,4 @@ fun MainScreen() {
 
 infix fun NavHostController.isCurrent(
     stack: NavBackStackEntry
-): Boolean = currentDestination?.id == stack.destination.id
+) = currentDestination?.id == stack.destination.id

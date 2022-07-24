@@ -4,18 +4,18 @@ sealed class Player {
 
     abstract val symbol: Hash.Symbol
     abstract val name: String
-    abstract var windsCount : Int
+    abstract val windsCount : Int
 
-    class Phone(
+    data class Phone(
         override val symbol: Hash.Symbol,
-        override var windsCount: Int = 0
+        override val windsCount: Int = 0
     ) : Player() {
         override val name: String = "Smartphone"
     }
 
-    class Person(
+    data class Person(
         override val name: String,
         override val symbol: Hash.Symbol,
-        override var windsCount: Int = 0
+        override val windsCount: Int = 0
     ) : Player()
 }
