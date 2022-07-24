@@ -46,6 +46,6 @@ class GameViewModel : ViewModel() {
         val symbol = state.hash.get(row, column)
         val playing = state.playing
 
-        return symbol == null && playing !is Player.Phone
+        return symbol == null && playing is Player.Person
     }
 }

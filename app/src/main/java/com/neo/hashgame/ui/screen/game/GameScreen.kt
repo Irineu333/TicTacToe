@@ -46,7 +46,6 @@ fun GameScreen(
 ) {
 
     val state = viewModel.uiState.collectAsState().value
-
     Players(
         players = state.players,
         modifier = Modifier
@@ -76,11 +75,16 @@ fun GameScreen(
         Text(text = "Home".uppercase())
     }
 
-    if (state.players.isEmpty()) {
+    var finishing by remember { mutableStateOf(false) }
+
+    if (state.players.isEmpty() && !finishing) {
         InsertPlayersDialog(
             viewModel = viewModel,
             smartphone = isPhone,
-            onDismissRequest = onHomeClick
+            onDismissRequest = {
+                finishing = true
+                onHomeClick()
+            }
         )
     }
 }

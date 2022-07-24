@@ -4,6 +4,8 @@ package com.neo.hashgame.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -29,10 +31,12 @@ fun MainScreen() {
             route = Screen.HomeScreen.route,
             exitTransition = { exitToLeftTransition },
             popEnterTransition = { enterToRightTransition }
-        ) {
+        ) { backStackEntry ->
             HomeScreen(
                 onPlayClick = { vsPhone ->
-                    controller.navigate(Screen.GameScreen.route(vsPhone))
+                    if (controller isCurrent backStackEntry) {
+                        controller.navigate(Screen.GameScreen.route(vsPhone))
+                    }
                 }
             )
         }
@@ -46,10 +50,18 @@ fun MainScreen() {
 
             GameScreen(
                 onHomeClick = {
-                    controller.popBackStack()
+                    if (controller isCurrent  backStackEntry) {
+                        controller.popBackStack()
+                    }
                 },
-                isPhone = backStackEntry.arguments!!.getBoolean(Screen.GameScreen.isPhone)
+                isPhone = backStackEntry.arguments!!.getBoolean(
+                    Screen.GameScreen.isPhone
+                )
             )
         }
     }
 }
+
+infix fun NavHostController.isCurrent(
+    stack: NavBackStackEntry
+): Boolean = currentDestination?.id == stack.destination.id
