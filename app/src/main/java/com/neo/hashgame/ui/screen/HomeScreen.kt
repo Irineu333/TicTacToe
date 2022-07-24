@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -29,7 +30,7 @@ import com.neo.hashgame.ui.theme.HashGameTheme
 
 @Composable
 fun HomeScreen(
-    onPlayPeople: () -> Unit,
+    onPlayClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) = Column(
     modifier = modifier
@@ -40,7 +41,7 @@ fun HomeScreen(
 
     SquareBox(
         modifier = Modifier
-            .padding(horizontal = 36.dp)
+            .fillMaxWidth(0.6f)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colors.primary,
@@ -63,7 +64,9 @@ fun HomeScreen(
 
     Spacer(modifier = Modifier.padding(16.dp))
 
-    GameButton(onClick = {}) {
+    GameButton(onClick = {
+        onPlayClick(true)
+    }) {
         Row {
             Icon(
                 imageVector = Icons.Rounded.Person,
@@ -79,7 +82,9 @@ fun HomeScreen(
         }
     }
 
-    GameButton(onClick = onPlayPeople) {
+    GameButton(onClick = {
+        onPlayClick(false)
+    }) {
         Icon(
             imageVector = Icons.Rounded.Person,
             contentDescription = null,
@@ -99,7 +104,7 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     HashGameTheme {
         HashGameBackground {
-            HomeScreen(onPlayPeople = {})
+            HomeScreen(onPlayClick = {})
         }
     }
 }

@@ -4,6 +4,8 @@ package com.neo.hashgame.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -29,21 +31,24 @@ fun MainScreen() {
             popEnterTransition = { enterToRightTransition }
         ) {
             HomeScreen(
-                onPlayPeople = { 
-                    controller.navigate(Screen.GameScreen.route)
+                onPlayClick = { vsPhone ->
+                    controller.navigate(Screen.GameScreen.route(vsPhone))
                 }
             )
         }
 
         composable(
             route = Screen.GameScreen.route,
+            arguments = listOf(navArgument(Screen.GameScreen.isPhone) { type = NavType.BoolType }),
             enterTransition = { enterToLeftTransition },
             popExitTransition = { exitToRightTransition }
-        ) {
+        ) { backStackEntry ->
+
             GameScreen(
                 onHomeClick = {
                     controller.popBackStack()
-                }
+                },
+                isPhone = backStackEntry.arguments!!.getBoolean(Screen.GameScreen.isPhone)
             )
         }
     }

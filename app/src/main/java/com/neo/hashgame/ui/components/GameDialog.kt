@@ -1,9 +1,12 @@
 package com.neo.hashgame.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -34,27 +37,38 @@ fun GameDialog(
     Card(
         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
     ) {
-        Column(
-            modifier.padding(16.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            title?.let {
-                val textStyle = MaterialTheme.typography.subtitle1
-                ProvideTextStyle(textStyle, title)
+        Column(modifier = modifier.padding(16.dp)) {
+            Box(contentAlignment = Alignment.TopStart) {
+                title?.let {
+                    val textStyle = MaterialTheme.typography.subtitle1
+                    ProvideTextStyle(textStyle, title)
+                }
             }
+
             content()
-            buttons?.invoke()
+
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                buttons?.invoke()
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun GameDialogPreview() {
+private fun GameDialogPreview() {
     Box(modifier = Modifier.fillMaxSize()) {
         GameDialog(
             title = {
                 Text(text = "Title")
+            },
+            buttons = {
+                GameButton(onClick = { }) {
+                    Text(text = "Test")
+                }
             }
         ) {
             var text by remember {

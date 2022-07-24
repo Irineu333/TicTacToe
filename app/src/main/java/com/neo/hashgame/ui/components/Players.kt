@@ -25,7 +25,8 @@ import com.neo.hashgame.model.Player
 @Composable
 fun Players(
     players: List<Player>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    playing: Player? = null
 ) = Row(
     modifier = modifier.padding(horizontal = 8.dp),
 ) {
@@ -34,7 +35,11 @@ fun Players(
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .weight(1f)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            backgroundColor = if (playing == player)
+                Color(0xFFEEEEEE)
+            else
+                MaterialTheme.colors.surface
         ) {
             Row(
                 modifier = Modifier
@@ -80,16 +85,18 @@ fun Symbol(
 @Preview
 @Composable
 private fun PlayersPreview() {
-    Players(
-        players = listOf(
-            Player.Phone(
-                Hash.Symbol.O
-            ),
-            Player.Person(
-                "Irineu",
-                Hash.Symbol.X
-            )
+    val players = listOf(
+        Player.Phone(
+            Hash.Symbol.O
         ),
+        Player.Person(
+            "Irineu",
+            Hash.Symbol.X
+        )
+    )
+    Players(
+        players = players,
+        playing = players[0],
         modifier = Modifier.fillMaxWidth()
     )
 }

@@ -30,25 +30,28 @@ private val Density.DEFAULT_LINE_WIDTH
 
 @Composable
 fun HashTable(
+    hash: Hash,
     modifier: Modifier = Modifier,
+    canClick : (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null,
     lineHashColor: Color = MaterialTheme.colors.onBackground,
-    linePlayersColors: Color = MaterialTheme.colors.primary,
-    hash: Hash
+    linePlayersColors: Color = MaterialTheme.colors.primary
 ) = Box(modifier = modifier) {
     DrawBackground(lineHashColor)
     DrawForeground(
+        hash = hash,
+        canClick = canClick,
         onBlockClick = onBlockClick,
-        linePlayersColors = linePlayersColors,
-        hash = hash
+        lineSymbolsColors = linePlayersColors
     )
 }
 
 @Composable
 private fun DrawForeground(
-    onBlockClick: OnBlockClick? = null,
-    linePlayersColors: Color,
-    hash: Hash
+    hash: Hash,
+    lineSymbolsColors: Color,
+    canClick: (Hash.Block) -> Boolean = { true },
+    onBlockClick: OnBlockClick? = null
 ) = BoxWithConstraints {
 
     val rowsSize = remember { maxHeight / 3 }
@@ -56,14 +59,14 @@ private fun DrawForeground(
 
     for (row in Hash.KEY_RANGE) {
         for (column in Hash.KEY_RANGE) {
-
             Block(
                 block = Hash.Block(
                     row = row,
                     column = column,
                     symbol = hash.get(row, column)
                 ),
-                linePlayersColors = linePlayersColors,
+                linePlayersColors = lineSymbolsColors,
+                canClick = canClick,
                 onClick = onBlockClick,
                 modifier = Modifier
                     .size(
@@ -82,26 +85,25 @@ private fun DrawForeground(
 @Composable
 private fun Block(
     block: Hash.Block,
-    onClick: OnBlockClick? = null,
     modifier: Modifier,
-    linePlayersColors: Color
+    linePlayersColors: Color,
+    canClick: (Hash.Block) -> Boolean,
+    onClick: OnBlockClick? = null
+) = Box(
+    modifier = onClick?.let onClick@{
+        if (!canClick(block)) return@onClick modifier
+        modifier.clickable { it(block) }
+    } ?: modifier,
+    contentAlignment = Alignment.Center
 ) {
-    Box(
-        modifier = onClick?.let onClick@ {
-            if (block.symbol != null) return@onClick modifier
-            modifier.clickable { it(block) }
-        } ?: modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        if (block.symbol != null) {
-            Player(
-                symbol = block.symbol,
-                linePlayersColors = linePlayersColors,
-                modifier = Modifier.fillMaxSize(
-                    fraction = 0.5f
-                )
+    if (block.symbol != null) {
+        Player(
+            symbol = block.symbol,
+            linePlayersColors = linePlayersColors,
+            modifier = Modifier.fillMaxSize(
+                fraction = 0.5f
             )
-        }
+        )
     }
 }
 

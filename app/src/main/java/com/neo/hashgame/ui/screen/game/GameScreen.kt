@@ -2,8 +2,10 @@ package com.neo.hashgame.ui.screen.game
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -35,7 +37,7 @@ import kotlin.random.Random
 fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
-    smartphone: Boolean = false,
+    isPhone: Boolean = false,
     viewModel: GameViewModel = viewModel()
 ) = Column(
     modifier = modifier.fillMaxSize(),
@@ -48,47 +50,56 @@ fun GameScreen(
     Players(
         players = state.players,
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        playing = state.playing
     )
+
+    Spacer(modifier = Modifier.height(16.dp))
 
     SquareBox(
         modifier = Modifier.padding(16.dp)
     ) {
         HashTable(
+            hash = state.hash,
             onBlockClick = {
                 viewModel.select(it.row, it.column)
             },
-            hash = state.hash
+            canClick = {
+                viewModel.canClick(it.row, it.column)
+            }
         )
     }
+
+    Spacer(modifier = Modifier.height(16.dp))
 
     GameButton(onClick = onHomeClick) {
         Text(text = "Home".uppercase())
     }
 
     if (state.players.isEmpty()) {
-        InsertPlayers(
+        InsertPlayersDialog(
             viewModel = viewModel,
-            smartphone = smartphone
+            smartphone = isPhone,
+            onDismissRequest = onHomeClick
         )
     }
 }
 
 @Composable
-fun InsertPlayers(
+fun InsertPlayersDialog(
     viewModel: GameViewModel,
-    smartphone: Boolean = false
+    smartphone: Boolean = false,
+    onDismissRequest: () -> Unit
 ) {
 
     var person1 by remember { mutableStateOf("") }
     var person2 by remember { mutableStateOf(if (smartphone) "Smartphone" else "") }
 
-    val isNotEmpty = person1.isNotBlank() && person2.isNotBlank()
-    val isError = person1 == person2 && isNotEmpty
-
+    val isNotBlank = person1.isNotBlank() && person2.isNotBlank()
+    val isError = person1 == person2 && isNotBlank
 
     GameDialog(
-        onDismissRequest = {},
+        onDismissRequest = onDismissRequest,
         title = {
             Text(
                 text = "Players".uppercase(),
@@ -127,9 +138,9 @@ fun InsertPlayers(
                         }
                     )
                 },
-                enabled = isNotEmpty && !isError
+                enabled = isNotBlank && !isError
             ) {
-                Text(text = "CONFIRMAR".uppercase())
+                Text(text = "Confirmar".uppercase())
             }
         }
     ) {
@@ -165,7 +176,14 @@ fun InsertPlayers(
 private fun GameScreenPreview() {
     HashGameTheme {
         HashGameBackground {
-            GameScreen()
+            GameScreen(
+                viewModel = GameViewModel().apply {
+                    start(
+                        Player.Person("Test1", Hash.Symbol.X),
+                        Player.Person("Test2", Hash.Symbol.O)
+                    )
+                }
+            )
         }
     }
 }
