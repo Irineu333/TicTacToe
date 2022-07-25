@@ -6,7 +6,6 @@ import com.neo.hashgame.model.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlin.random.Random
 
 class GameViewModel : ViewModel() {
 
@@ -14,21 +13,42 @@ class GameViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     fun select(row: Int, column: Int) {
+
         _uiState.update { state ->
 
-            val player = state.playing ?: return
+            val playerTurn = state.playerTurn ?: return
+
+            val newHash = state.hash.copy().apply {
+                set(playerTurn.symbol, row, column)
+            }
+
+            val newPlayerTurn = state.players.find {
+                it != playerTurn
+            }
 
             state.copy(
-                hash = state.hash.copy().apply {
-                    set(player.symbol, row, column)
-                },
-                playing = state.players.find {
-                    it != player
-                }
+                hash = newHash,
+                playerTurn = newPlayerTurn
             )
         }
 
         verifyWin()
+    }
+
+    fun start(player1: Player.Person, player2: Player) {
+
+        val players = listOf(
+            player1,
+            player2
+        )
+
+        _uiState.update {
+            it.copy(
+                players = players,
+                playerTurn = players.random(),
+                isPlaying = true
+            )
+        }
     }
 
     private fun verifyWin() {
@@ -118,37 +138,53 @@ class GameViewModel : ViewModel() {
         if (winner != null) {
             _uiState.update {
                 it.copy(
-                    winner = winner.first.apply {
+                    playerWinner = winner.first.apply {
                         windsCount++
                     },
                     hash = it.hash.copy(
                         winner = winner.second
-                    )
+                    ),
+                    isPlaying = false,
+                    playerTurn = null
                 )
             }
+            return
         }
-    }
 
-    fun start(player1: Player.Person, player2: Player) {
-        _uiState.update {
-            it.copy(
-                players = listOf(
-                    player1,
-                    player2
-                ),
-                playing = if (Random.nextBoolean())
-                    player1
-                else
-                    player2
-            )
+        val aTie = Hash.KEY_RANGE.all { row ->
+            Hash.KEY_RANGE.all { column ->
+                hash.get(row, column) != null
+            }
+        }
+
+        if (aTie) {
+            _uiState.update {
+                it.copy(
+                    tied = it.tied + 1,
+                    isPlaying = false,
+                    playerTurn = null
+                )
+            }
+            return
         }
     }
 
     fun canClick(row: Int, column: Int): Boolean {
         val state = uiState.value
         val symbol = state.hash.get(row, column)
-        val playing = state.playing
+        val playing = state.playerTurn
 
         return symbol == null && playing is Player.Person
+    }
+
+    fun clear() {
+        _uiState.update {
+            it.copy(
+                hash = Hash(),
+                playerWinner = null,
+                playerTurn = it.playerWinner ?: it.players.random(),
+                isPlaying = true
+            )
+        }
     }
 }

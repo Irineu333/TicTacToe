@@ -7,16 +7,19 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun GameButton(
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     content: @Composable RowScope.() -> Unit,
 ) = OutlinedButton(
     onClick = onClick,
+    modifier = modifier,
     enabled = enabled,
     shape = RectangleShape,
     border = BorderStroke(

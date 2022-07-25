@@ -1,14 +1,15 @@
 package com.neo.hashgame.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,8 +38,8 @@ fun HashTable(
     onBlockClick: OnBlockClick? = null,
     hashColor: Color = MaterialTheme.colors.onBackground,
     symbolsColor: Color = MaterialTheme.colors.primary,
-    winnerLineColor: Color = symbolsColor
-) = Box(modifier = modifier) {
+    winnerLineColor: Color = symbolsColor.copy(alpha = 0.4f)
+) = Surface(modifier = modifier) {
     DrawBackground(hashColor)
     DrawForeground(
         hash = hash,
@@ -56,7 +57,10 @@ private fun DrawForeground(
     winnerLineColor: Color,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null
-) = Box {
+) = Box(
+    contentAlignment = Alignment.Center,
+    modifier = Modifier.fillMaxSize()
+) {
     DrawSymbols(
         hash = hash,
         lineSymbolsColors = symbolsColor,
@@ -72,7 +76,7 @@ private fun DrawForeground(
     if (hash.winner != null) {
         DrawWinner(
             winner = hash.winner,
-            lineColor = winnerLineColor
+            lineColor = winnerLineColor,
         )
     }
 }
@@ -161,7 +165,9 @@ private fun DrawSymbols(
     modifier: Modifier = Modifier,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null
-) = BoxWithConstraints(modifier = modifier) {
+) = BoxWithConstraints(
+    modifier = modifier.fillMaxSize()
+) {
 
     val rowsSize = remember { maxHeight / 3 }
     val columnsSize = remember { maxWidth / 3 }
@@ -341,8 +347,8 @@ fun HashTablePreview() {
                 winner = Hash.Winner.Diagonal.Normal
             ).apply {
                 set(Hash.Symbol.O, 1, 1)
-                set(Hash.Symbol.O, 2, 2)
-                set(Hash.Symbol.O, 3, 3)
+                set(Hash.Symbol.X, 2, 2)
+                set(Hash.Symbol.X, 3, 3)
             }
         )
     }

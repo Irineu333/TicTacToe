@@ -31,28 +31,39 @@ fun Players(
     modifier = modifier.padding(horizontal = 8.dp),
 ) {
     for (player in players) {
-        Card(
+        PlayerCard(
+            player = player,
+            playing = playing == player,
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .weight(1f)
-                .fillMaxWidth(),
-            backgroundColor = if (playing == player)
-                Color(0xFFEEEEEE)
-            else
-                MaterialTheme.colors.surface
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .height(IntrinsicSize.Min)
-            ) {
-                Symbol(symbol = player.symbol)
-                Spacer(modifier = Modifier.padding(4.dp))
-                Text(text = player.name.uppercase(), fontSize = 16.sp)
-                Spacer(modifier = Modifier.weight(1f))
-                Text(text = "${player.windsCount}", fontSize = 16.sp)
-            }
-        }
+                .fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun PlayerCard(
+    player: Player,
+    modifier: Modifier,
+    playing: Boolean = false
+) = Card(
+    modifier = modifier,
+    backgroundColor = if (playing)
+        Color(0xFFEEEEEE)
+    else
+        MaterialTheme.colors.surface
+) {
+    Row(
+        modifier = Modifier
+            .padding(vertical = 4.dp, horizontal = 8.dp)
+            .height(IntrinsicSize.Min)
+    ) {
+        Symbol(symbol = player.symbol)
+        Spacer(modifier = Modifier.padding(4.dp))
+        Text(text = player.name.uppercase(), fontSize = 16.sp)
+        Spacer(modifier = Modifier.weight(1f))
+        Text(text = "${player.windsCount}", fontSize = 16.sp)
     }
 }
 
