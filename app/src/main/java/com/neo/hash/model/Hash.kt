@@ -42,10 +42,16 @@ data class Hash(
         }
     }
 
+    fun isEmpty() = KEY_RANGE.all { row ->
+        KEY_RANGE.all { column ->
+            get(row, column) == null
+        }
+    }
+
     data class Block(
-        val symbol: Symbol? = null,
         val row: Int,
-        val column: Int
+        val column: Int,
+        val symbol: Symbol? = null
     )
 
     sealed class Winner {

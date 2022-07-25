@@ -1,11 +1,15 @@
 package com.neo.hash.ui.screen.game
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.neo.hash.model.AI
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class GameViewModel : ViewModel() {
 
@@ -19,6 +23,7 @@ class GameViewModel : ViewModel() {
         val playerTurn = state.playerTurn ?: return
 
         val newHash = state.hash.copy().apply {
+            check(get(row, column) == null) { "invalid selection" }
             set(playerTurn.symbol, row, column)
         }
 
@@ -47,7 +52,7 @@ class GameViewModel : ViewModel() {
             return
         }
 
-        val newPlayerTurn = state.players.find {
+        val newPlayerTurn = state.players.first {
             it != playerTurn
         }
 
@@ -59,7 +64,25 @@ class GameViewModel : ViewModel() {
         }
 
         if (newPlayerTurn is Player.Phone) {
-            //IA
+            playAI()
+        }
+    }
+
+    private fun playAI() {
+
+        val state = uiState.value
+
+        if (state.playerTurn is Player.Phone) {
+            viewModelScope.launch {
+
+                val delay = launch { delay(500) }
+
+                AI.hard(state.hash, state.playerTurn.symbol)?.let {
+                    delay.join()
+
+                    select(it.row, it.column)
+                }
+            }
         }
     }
 
@@ -156,6 +179,12 @@ class GameViewModel : ViewModel() {
                 playerTurn = players.random()
             )
         }
+
+        val state = uiState.value
+
+        if (state.playerTurn is Player.Phone) {
+            playAI()
+        }
     }
 
     fun canClick(row: Int, column: Int): Boolean {
@@ -174,6 +203,12 @@ class GameViewModel : ViewModel() {
                 playerTurn = it.playerWinner ?: it.players.random(),
                 winner = null
             )
+        }
+
+        val state = uiState.value
+
+        if (state.playerTurn is Player.Phone) {
+            playAI()
         }
     }
 }
