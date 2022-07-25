@@ -3,7 +3,8 @@ package com.neo.hashgame.model
 data class Hash(
     private val symbols: Array<Array<Symbol?>> = Array(KEY_RANGE.last) {
         Array(KEY_RANGE.last) { null }
-    }
+    },
+    val winner: Winner? = null
 ) {
     fun set(
         symbol: Symbol,
@@ -41,6 +42,22 @@ data class Hash(
         val row: Int,
         val column: Int
     )
+
+    sealed class Winner {
+
+        data class Row(
+            val row: Int,
+        ) : Winner()
+
+        data class Column(
+            val column: Int,
+        ) : Winner()
+
+        sealed class Diagonal() : Winner() {
+            object Normal : Diagonal()
+            object Inverted : Diagonal()
+        }
+    }
 
     enum class Symbol {
         O,

@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -32,27 +33,135 @@ private val Density.DEFAULT_LINE_WIDTH
 fun HashTable(
     hash: Hash,
     modifier: Modifier = Modifier,
-    canClick : (Hash.Block) -> Boolean = { true },
+    canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null,
-    lineHashColor: Color = MaterialTheme.colors.onBackground,
-    linePlayersColors: Color = MaterialTheme.colors.primary
+    hashColor: Color = MaterialTheme.colors.onBackground,
+    symbolsColor: Color = MaterialTheme.colors.primary,
+    winnerLineColor: Color = symbolsColor
 ) = Box(modifier = modifier) {
-    DrawBackground(lineHashColor)
+    DrawBackground(hashColor)
     DrawForeground(
         hash = hash,
         canClick = canClick,
         onBlockClick = onBlockClick,
-        lineSymbolsColors = linePlayersColors
+        symbolsColor = symbolsColor,
+        winnerLineColor = winnerLineColor
     )
 }
 
 @Composable
 private fun DrawForeground(
     hash: Hash,
-    lineSymbolsColors: Color,
+    symbolsColor: Color,
+    winnerLineColor: Color,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null
-) = BoxWithConstraints {
+) = Box {
+    DrawSymbols(
+        hash = hash,
+        lineSymbolsColors = symbolsColor,
+        canClick = {
+            if (hash.winner == null)
+                canClick(it)
+            else
+                false
+        },
+        onBlockClick = onBlockClick
+    )
+
+    if (hash.winner != null) {
+        DrawWinner(
+            winner = hash.winner,
+            lineColor = winnerLineColor
+        )
+    }
+}
+
+@Composable
+fun DrawWinner(
+    winner: Hash.Winner,
+    lineColor: Color,
+    modifier: Modifier = Modifier
+) = Canvas(modifier = modifier.fillMaxSize()) {
+
+    val columnSize = size.width / 3
+    val columnRadius = columnSize / 2
+
+    val rowSize = size.height / 3
+    val rowRadius = rowSize / 2
+
+    fun drawRoundedLine(
+        start: Offset,
+        end: Offset
+    ) = drawRoundedLine(
+        color = lineColor,
+        start = start,
+        end = end,
+        width = 8.dp.toPx()
+    )
+
+    when (winner) {
+        is Hash.Winner.Column -> {
+
+            val rowPadding = rowRadius / 2f
+
+            val x = columnSize * winner.column.dec() + columnRadius
+            val height = size.height - rowPadding
+
+            drawRoundedLine(
+                start = Offset(x = x, y = rowPadding),
+                end = Offset(x = x, y = height)
+            )
+        }
+        is Hash.Winner.Row -> {
+
+            val columnPadding = columnRadius / 2f
+
+            val y = rowSize * winner.row.dec() + rowRadius
+            val width = size.width - columnPadding
+
+            drawRoundedLine(
+                start = Offset(x = columnPadding, y = y),
+                end = Offset(x = width, y = y)
+            )
+        }
+        Hash.Winner.Diagonal.Normal -> {
+
+            val rowPadding = rowRadius / 2f
+            val columnPadding = columnRadius / 2f
+
+            val width = size.width - rowPadding
+            val height = size.height - columnPadding
+
+            drawRoundedLine(
+                start = Offset(x = rowPadding, y = columnPadding),
+                end = Offset(x = width, y = height)
+            )
+        }
+        Hash.Winner.Diagonal.Inverted -> {
+
+            val rowPadding = rowRadius / 2f
+            val columnPadding = columnRadius / 2f
+
+            val width = size.width - rowPadding
+            val height = size.height - columnPadding
+
+            drawRoundedLine(
+                start = Offset(x = rowPadding, y = height),
+                end = Offset(x = width, y = columnPadding)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DrawSymbols(
+    hash: Hash,
+    lineSymbolsColors: Color,
+    modifier: Modifier = Modifier,
+    canClick: (Hash.Block) -> Boolean = { true },
+    onBlockClick: OnBlockClick? = null
+) = BoxWithConstraints(modifier = modifier) {
 
     val rowsSize = remember { maxHeight / 3 }
     val columnsSize = remember { maxWidth / 3 }
@@ -198,12 +307,13 @@ private fun DrawBackground(
 fun DrawScope.drawRoundedLine(
     color: Color,
     start: Offset,
-    end: Offset
+    end: Offset,
+    width : Float = DEFAULT_LINE_WIDTH
 ) = drawLine(
     color = color,
     start = start,
     end = end,
-    strokeWidth = DEFAULT_LINE_WIDTH,
+    strokeWidth = width,
     cap = StrokeCap.Round
 )
 
@@ -211,12 +321,13 @@ fun DrawScope.drawRoundedCircle(
     color: Color,
     center: Offset,
     radius: Float,
+    width : Float = DEFAULT_LINE_WIDTH
 ) = drawCircle(
     color = color,
     radius = radius,
     center = center,
     style = Stroke(
-        width = DEFAULT_LINE_WIDTH,
+        width = width,
         cap = StrokeCap.Round
     )
 )
@@ -226,9 +337,11 @@ fun DrawScope.drawRoundedCircle(
 fun HashTablePreview() {
     SquareBox {
         HashTable(
-            hash = Hash().apply {
-                set(Hash.Symbol.X, 2, 2)
+            hash = Hash(
+                winner = Hash.Winner.Diagonal.Normal
+            ).apply {
                 set(Hash.Symbol.O, 1, 1)
+                set(Hash.Symbol.O, 2, 2)
                 set(Hash.Symbol.O, 3, 3)
             }
         )

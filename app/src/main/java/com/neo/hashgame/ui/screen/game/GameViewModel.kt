@@ -39,26 +39,31 @@ class GameViewModel : ViewModel() {
 
         fun getRowWinner(row: Int): Hash.Symbol? {
             val symbol = hash.get(row, 1)
+
             return symbol.takeIf {
-                partialRange.all { hash.get(row, it) == symbol }
+                partialRange.all {
+                    hash.get(row, it) == symbol
+                }
             }
         }
 
-        fun columnWinner(column: Int): Hash.Symbol? {
+        fun getColumnWinner(column: Int): Hash.Symbol? {
             val symbol = hash.get(1, column)
+
             return symbol.takeIf {
                 partialRange.all { hash.get(it, column) == symbol }
             }
         }
 
-        fun diagonalWinner(): Hash.Symbol? {
+        fun getDiagonalWinner(): Hash.Symbol? {
             val symbol = hash.get(1, 1)
+
             return symbol.takeIf {
                 partialRange.all { hash.get(it, it) == symbol }
             }
         }
 
-        fun invertedDiagonalWinner(): Hash.Symbol? {
+        fun getInvertedDiagonalWinner(): Hash.Symbol? {
             val symbol = hash.get(1, 3)
 
             return symbol.takeIf {
@@ -68,40 +73,41 @@ class GameViewModel : ViewModel() {
             }
         }
 
-        fun getWinner(): Player? {
+        fun getWinner(): Pair<Player, Hash.Winner>? {
             for (row in Hash.KEY_RANGE) {
                 val rowWinner = getRowWinner(row)
+
                 if (rowWinner != null) {
-                    return state.players.find {
+                    return state.players.first {
                         it.symbol == rowWinner
-                    }
+                    } to Hash.Winner.Row(row)
                 }
             }
 
             for (column in Hash.KEY_RANGE) {
-                val columnWinner = columnWinner(column)
+                val columnWinner = getColumnWinner(column)
 
                 if (columnWinner != null) {
-                    return state.players.find {
+                    return state.players.first {
                         it.symbol == columnWinner
-                    }
+                    } to Hash.Winner.Column(column)
                 }
             }
 
-            val diagonalWinner = diagonalWinner()
+            val diagonalWinner = getDiagonalWinner()
 
             if (diagonalWinner != null) {
-                return state.players.find {
+                return state.players.first {
                     it.symbol == diagonalWinner
-                }
+                } to Hash.Winner.Diagonal.Normal
             }
 
-            val invertedDiagonalWinner = invertedDiagonalWinner()
+            val invertedDiagonalWinner = getInvertedDiagonalWinner()
 
             if (invertedDiagonalWinner != null) {
-                return state.players.find {
+                return state.players.first {
                     it.symbol == invertedDiagonalWinner
-                }
+                } to Hash.Winner.Diagonal.Inverted
             }
 
             return null
@@ -112,14 +118,12 @@ class GameViewModel : ViewModel() {
         if (winner != null) {
             _uiState.update {
                 it.copy(
-                    winner = when(winner) {
-                        is Player.Person -> winner.copy(
-                            windsCount = winner.windsCount + 1
-                        )
-                        is Player.Phone -> winner.copy(
-                            windsCount = winner.windsCount + 1
-                        )
-                    }
+                    winner = winner.first.apply {
+                        windsCount++
+                    },
+                    hash = it.hash.copy(
+                        winner = winner.second
+                    )
                 )
             }
         }
