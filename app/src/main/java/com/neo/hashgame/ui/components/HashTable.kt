@@ -88,11 +88,11 @@ fun DrawWinner(
     modifier: Modifier = Modifier
 ) = Canvas(modifier = modifier.fillMaxSize()) {
 
-    val columnSize = size.width / 3
-    val columnRadius = columnSize / 2
+    val columnSize = size.width / 3f
+    val columnRadius = columnSize / 2f
 
-    val rowSize = size.height / 3
-    val rowRadius = rowSize / 2
+    val rowSize = size.height / 3f
+    val rowRadius = rowSize / 2f
 
     fun drawRoundedLine(
         start: Offset,
@@ -134,11 +134,11 @@ fun DrawWinner(
             val rowPadding = rowRadius / 2f
             val columnPadding = columnRadius / 2f
 
-            val width = size.width - rowPadding
-            val height = size.height - columnPadding
+            val width = size.width - columnPadding
+            val height = size.height - rowPadding
 
             drawRoundedLine(
-                start = Offset(x = rowPadding, y = columnPadding),
+                start = Offset(x = columnPadding, y = rowPadding),
                 end = Offset(x = width, y = height)
             )
         }
@@ -147,12 +147,12 @@ fun DrawWinner(
             val rowPadding = rowRadius / 2f
             val columnPadding = columnRadius / 2f
 
-            val width = size.width - rowPadding
-            val height = size.height - columnPadding
+            val width = size.width - columnPadding
+            val height = size.height - rowPadding
 
             drawRoundedLine(
-                start = Offset(x = rowPadding, y = height),
-                end = Offset(x = width, y = columnPadding)
+                start = Offset(x = columnPadding, y = height),
+                end = Offset(x = width, y = rowPadding)
             )
         }
     }
@@ -169,8 +169,8 @@ private fun DrawSymbols(
     modifier = modifier.fillMaxSize()
 ) {
 
-    val rowsSize = remember { maxHeight / 3 }
-    val columnsSize = remember { maxWidth / 3 }
+    val rowsSize = remember { maxHeight / 3f }
+    val columnsSize = remember { maxWidth / 3f }
 
     for (row in Hash.KEY_RANGE) {
         for (column in Hash.KEY_RANGE) {
@@ -282,8 +282,8 @@ private fun DrawBackground(
     modifier = Modifier.fillMaxSize()
 ) {
 
-    val rowsSize = size.height / 3
-    val columnsSize = size.width / 3
+    val rowsSize = size.height / 3f
+    val columnsSize = size.width / 3f
 
     fun drawLine(
         start: Offset,
@@ -344,7 +344,7 @@ fun HashTablePreview() {
     SquareBox {
         HashTable(
             hash = Hash(
-                winner = Hash.Winner.Diagonal.Normal
+                winner = Hash.Winner.Diagonal.Inverted
             ).apply {
                 set(Hash.Symbol.O, 1, 1)
                 set(Hash.Symbol.X, 2, 2)
