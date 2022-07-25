@@ -14,47 +14,52 @@ class GameViewModel : ViewModel() {
 
     fun select(row: Int, column: Int) {
 
-        _uiState.update { state ->
+        val state = uiState.value
 
-            val playerTurn = state.playerTurn ?: return
+        val playerTurn = state.playerTurn ?: return
 
-            val newHash = state.hash.copy().apply {
-                set(playerTurn.symbol, row, column)
+        val newHash = state.hash.copy().apply {
+            set(playerTurn.symbol, row, column)
+        }
+
+        getWinner(newHash)?.let { winner ->
+            _uiState.update {
+                it.copy(
+                    playerWinner = winner.first.apply {
+                        windsCount++
+                    },
+                    hash = newHash,
+                    winner = winner.second,
+                    playerTurn = null
+                )
             }
+            return
+        }
 
-            val newPlayerTurn = state.players.find {
-                it != playerTurn
+        if (newHash.isTie()) {
+            _uiState.update {
+                it.copy(
+                    tied = it.tied + 1,
+                    hash = newHash,
+                    playerTurn = null
+                )
             }
+            return
+        }
 
-            state.copy(
+        val newPlayerTurn = state.players.find {
+            it != playerTurn
+        }
+
+        _uiState.update {
+            it.copy(
                 hash = newHash,
                 playerTurn = newPlayerTurn
             )
         }
-
-        verifyWin()
     }
 
-    fun start(player1: Player.Person, player2: Player) {
-
-        val players = listOf(
-            player1,
-            player2
-        )
-
-        _uiState.update {
-            it.copy(
-                players = players,
-                playerTurn = players.random(),
-                isPlaying = true
-            )
-        }
-    }
-
-    private fun verifyWin() {
-        val state = uiState.value
-        val hash = state.hash
-
+    private fun getWinner(hash: Hash): Pair<Player, Hash.Winner>? {
         val partialRange = 2..3
 
         fun getRowWinner(row: Int): Hash.Symbol? {
@@ -93,79 +98,59 @@ class GameViewModel : ViewModel() {
             }
         }
 
-        fun getWinner(): Pair<Player, Hash.Winner>? {
-            for (row in Hash.KEY_RANGE) {
-                val rowWinner = getRowWinner(row)
+        val players = uiState.value.players
 
-                if (rowWinner != null) {
-                    return state.players.first {
-                        it.symbol == rowWinner
-                    } to Hash.Winner.Row(row)
-                }
-            }
+        for (row in Hash.KEY_RANGE) {
+            val rowWinner = getRowWinner(row)
 
-            for (column in Hash.KEY_RANGE) {
-                val columnWinner = getColumnWinner(column)
-
-                if (columnWinner != null) {
-                    return state.players.first {
-                        it.symbol == columnWinner
-                    } to Hash.Winner.Column(column)
-                }
-            }
-
-            val diagonalWinner = getDiagonalWinner()
-
-            if (diagonalWinner != null) {
-                return state.players.first {
-                    it.symbol == diagonalWinner
-                } to Hash.Winner.Diagonal.Normal
-            }
-
-            val invertedDiagonalWinner = getInvertedDiagonalWinner()
-
-            if (invertedDiagonalWinner != null) {
-                return state.players.first {
-                    it.symbol == invertedDiagonalWinner
-                } to Hash.Winner.Diagonal.Inverted
-            }
-
-            return null
-        }
-
-        val winner = getWinner()
-
-        if (winner != null) {
-            _uiState.update {
-                it.copy(
-                    playerWinner = winner.first.apply {
-                        windsCount++
-                    },
-                    hash = it.hash.copy(
-                        winner = winner.second
-                    ),
-                    isPlaying = false,
-                    playerTurn = null
-                )
-            }
-            return
-        }
-
-        val aTie = Hash.KEY_RANGE.all { row ->
-            Hash.KEY_RANGE.all { column ->
-                hash.get(row, column) != null
+            if (rowWinner != null) {
+                return players.first {
+                    it.symbol == rowWinner
+                } to Hash.Winner.Row(row)
             }
         }
 
-        if (aTie) {
-            _uiState.update {
-                it.copy(
-                    tied = it.tied + 1,
-                    isPlaying = false,
-                    playerTurn = null
-                )
+        for (column in Hash.KEY_RANGE) {
+            val columnWinner = getColumnWinner(column)
+
+            if (columnWinner != null) {
+                return players.first {
+                    it.symbol == columnWinner
+                } to Hash.Winner.Column(column)
             }
-            return
+        }
+
+        val diagonalWinner = getDiagonalWinner()
+
+        if (diagonalWinner != null) {
+            return players.first {
+                it.symbol == diagonalWinner
+            } to Hash.Winner.Diagonal.Normal
+        }
+
+        val invertedDiagonalWinner = getInvertedDiagonalWinner()
+
+        if (invertedDiagonalWinner != null) {
+            return players.first {
+                it.symbol == invertedDiagonalWinner
+            } to Hash.Winner.Diagonal.Inverted
+        }
+
+        return null
+    }
+
+    fun start(player1: Player.Person, player2: Player) {
+
+        val players = listOf(
+            player1,
+            player2
+        )
+
+        _uiState.update {
+            it.copy(
+                players = players,
+                playerTurn = players.random()
+            )
         }
     }
 
@@ -183,7 +168,7 @@ class GameViewModel : ViewModel() {
                 hash = Hash(),
                 playerWinner = null,
                 playerTurn = it.playerWinner ?: it.players.random(),
-                isPlaying = true
+                winner = null
             )
         }
     }

@@ -8,6 +8,6 @@ data class GameUiState(
     val playerTurn: Player? = null,
     val playerWinner: Player? = null,
     val tied: Int = 0,
-    val isPlaying: Boolean = false,
+    val winner: Hash.Winner? = null,
     val hash: Hash = Hash()
 )

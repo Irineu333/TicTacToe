@@ -32,7 +32,6 @@ import com.neo.hashgame.ui.components.GameButton
 import com.neo.hashgame.ui.components.HashTable
 import com.neo.hashgame.ui.components.Players
 import com.neo.hashgame.ui.components.SquareBox
-import com.neo.hashgame.ui.screen.PlayersInsertDialog
 import com.neo.hashgame.ui.theme.HashGameTheme
 
 @Composable
@@ -72,12 +71,12 @@ fun GameScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-
     SquareBox(
         modifier = Modifier.padding(16.dp)
     ) {
         HashTable(
             hash = state.hash,
+            winner = state.winner,
             onBlockClick = {
                 viewModel.select(it.row, it.column)
             },
@@ -89,16 +88,20 @@ fun GameScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    GameButton(onClick = onHomeClick) {
-        Text(text = "Home".uppercase())
-    }
-
-    GameButton(
-        onClick = {
-            viewModel.clear()
+    Row {
+        GameButton(
+            onClick = {
+                viewModel.clear()
+            }
+        ) {
+            Text(text = "Limpar".uppercase())
         }
-    ) {
-        Text(text = "Limpar".uppercase())
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        GameButton(onClick = onHomeClick) {
+            Text(text = "Home".uppercase())
+        }
     }
 
     var finishing by remember { mutableStateOf(false) }

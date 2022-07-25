@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -35,15 +34,17 @@ private val Density.DEFAULT_LINE_WIDTH
 fun HashTable(
     hash: Hash,
     modifier: Modifier = Modifier,
+    winner: Hash.Winner? = null,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: OnBlockClick? = null,
     hashColor: Color = MaterialTheme.colors.onBackground,
     symbolsColor: Color = MaterialTheme.colors.primary,
     winnerLineColor: Color = symbolsColor.copy(alpha = 0.4f)
-) = Surface(modifier = modifier) {
+) = Box(modifier = modifier) {
     DrawBackground(hashColor)
     DrawForeground(
         hash = hash,
+        winner = winner,
         canClick = canClick,
         onBlockClick = onBlockClick,
         symbolsColor = symbolsColor,
@@ -54,6 +55,7 @@ fun HashTable(
 @Composable
 private fun DrawForeground(
     hash: Hash,
+    winner: Hash.Winner?,
     symbolsColor: Color,
     winnerLineColor: Color,
     canClick: (Hash.Block) -> Boolean = { true },
@@ -66,7 +68,7 @@ private fun DrawForeground(
         hash = hash,
         lineSymbolsColors = symbolsColor,
         canClick = {
-            if (hash.winner == null)
+            if (winner == null)
                 canClick(it)
             else
                 false
@@ -74,9 +76,9 @@ private fun DrawForeground(
         onBlockClick = onBlockClick
     )
 
-    if (hash.winner != null) {
+    if (winner != null) {
         DrawWinner(
-            winner = hash.winner,
+            winner = winner,
             lineColor = winnerLineColor,
         )
     }
@@ -214,8 +216,8 @@ private fun DrawSymbols(
     modifier = modifier.fillMaxSize()
 ) {
 
-    val rowsSize = remember { maxHeight / 3f }
-    val columnsSize = remember { maxWidth / 3f }
+    val rowsSize = maxHeight / 3f
+    val columnsSize = maxWidth / 3f
 
     for (row in Hash.KEY_RANGE) {
         for (column in Hash.KEY_RANGE) {
@@ -388,13 +390,12 @@ fun DrawScope.drawRoundedCircle(
 fun HashTablePreview() {
     SquareBox {
         HashTable(
-            hash = Hash(
-                winner = Hash.Winner.Diagonal.Normal
-            ).apply {
+            hash = Hash().apply {
                 set(Hash.Symbol.O, 1, 1)
                 set(Hash.Symbol.X, 2, 2)
                 set(Hash.Symbol.X, 3, 3)
-            }
+            },
+            winner = Hash.Winner.Diagonal.Normal
         )
     }
 }
