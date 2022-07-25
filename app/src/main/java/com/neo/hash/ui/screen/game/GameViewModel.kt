@@ -2,14 +2,16 @@ package com.neo.hash.ui.screen.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neo.hash.model.AI
+import com.neo.hash.model.Intelligent
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GameViewModel : ViewModel() {
 
@@ -63,25 +65,26 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        if (newPlayerTurn is Player.Phone) {
-            playAI()
-        }
+        playAI()
     }
 
     private fun playAI() {
 
         val state = uiState.value
+        val playerTurn = state.playerTurn ?: return
 
-        if (state.playerTurn is Player.Phone) {
+        if (playerTurn is Player.Phone) {
             viewModelScope.launch {
 
                 val delay = launch { delay(500) }
 
-                AI.hard(state.hash, state.playerTurn.symbol)?.let {
-                    delay.join()
-
-                    select(it.row, it.column)
+                val (row, column) = withContext(Dispatchers.Default) {
+                    Intelligent(playerTurn.symbol).easy(state.hash)
                 }
+
+                delay.join()
+
+                select(row, column)
             }
         }
     }
@@ -180,11 +183,7 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        val state = uiState.value
-
-        if (state.playerTurn is Player.Phone) {
-            playAI()
-        }
+        playAI()
     }
 
     fun canClick(row: Int, column: Int): Boolean {
@@ -205,10 +204,6 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        val state = uiState.value
-
-        if (state.playerTurn is Player.Phone) {
-            playAI()
-        }
+        playAI()
     }
 }
