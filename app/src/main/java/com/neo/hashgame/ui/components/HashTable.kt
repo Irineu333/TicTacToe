@@ -1,7 +1,7 @@
 package com.neo.hashgame.ui.components
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -86,74 +87,118 @@ fun DrawWinner(
     winner: Hash.Winner,
     lineColor: Color,
     modifier: Modifier = Modifier
-) = Canvas(modifier = modifier.fillMaxSize()) {
+) = Box {
 
-    val columnSize = size.width / 3f
-    val columnRadius = columnSize / 2f
+    val linesSize = remember { Animatable(0f) }
 
-    val rowSize = size.height / 3f
-    val rowRadius = rowSize / 2f
+    LaunchedEffect(key1 = winner) {
+        linesSize.animateTo(1f)
+    }
 
-    fun drawRoundedLine(
-        start: Offset,
-        end: Offset
-    ) = drawRoundedLine(
-        color = lineColor,
-        start = start,
-        end = end,
-        width = 8.dp.toPx()
-    )
+    Canvas(modifier = modifier.fillMaxSize()) {
 
-    when (winner) {
-        is Hash.Winner.Column -> {
+        val columnSize = size.width / 3f
+        val columnRadius = columnSize / 2f
 
-            val rowPadding = rowRadius / 2f
+        val rowSize = size.height / 3f
+        val rowRadius = rowSize / 2f
 
-            val x = columnSize * winner.column.dec() + columnRadius
-            val height = size.height - rowPadding
+        fun drawRoundedLine(
+            start: Offset,
+            end: Offset
+        ) = drawRoundedLine(
+            color = lineColor,
+            start = start,
+            end = end,
+            width = 10.dp.toPx()
+        )
 
-            drawRoundedLine(
-                start = Offset(x = x, y = rowPadding),
-                end = Offset(x = x, y = height)
-            )
-        }
-        is Hash.Winner.Row -> {
+        when (winner) {
+            is Hash.Winner.Column -> {
 
-            val columnPadding = columnRadius / 2f
+                val rowPadding = rowRadius / 2f
 
-            val y = rowSize * winner.row.dec() + rowRadius
-            val width = size.width - columnPadding
+                val x = columnSize * winner.column.dec() + columnRadius
 
-            drawRoundedLine(
-                start = Offset(x = columnPadding, y = y),
-                end = Offset(x = width, y = y)
-            )
-        }
-        Hash.Winner.Diagonal.Normal -> {
+                val height = size.height - rowPadding * 2f
 
-            val rowPadding = rowRadius / 2f
-            val columnPadding = columnRadius / 2f
+                val aHeight = height * linesSize.value
 
-            val width = size.width - columnPadding
-            val height = size.height - rowPadding
+                drawRoundedLine(
+                    start = Offset(
+                        x = x,
+                        y = rowPadding),
+                    end = Offset(
+                        x = x,
+                        y = aHeight + rowPadding
+                    )
+                )
+            }
+            is Hash.Winner.Row -> {
 
-            drawRoundedLine(
-                start = Offset(x = columnPadding, y = rowPadding),
-                end = Offset(x = width, y = height)
-            )
-        }
-        Hash.Winner.Diagonal.Inverted -> {
+                val columnPadding = columnRadius / 2f
 
-            val rowPadding = rowRadius / 2f
-            val columnPadding = columnRadius / 2f
+                val y = rowSize * winner.row.dec() + rowRadius
 
-            val width = size.width - columnPadding
-            val height = size.height - rowPadding
+                val width = size.width - columnPadding * 2f
 
-            drawRoundedLine(
-                start = Offset(x = columnPadding, y = height),
-                end = Offset(x = width, y = rowPadding)
-            )
+                val aWidth = width * linesSize.value
+
+                drawRoundedLine(
+                    start = Offset(
+                        x = columnPadding,
+                        y = y
+                    ),
+                    end = Offset(
+                        x = aWidth + columnPadding,
+                        y = y
+                    )
+                )
+            }
+            Hash.Winner.Diagonal.Normal -> {
+
+                val rowPadding = rowRadius / 2f
+                val columnPadding = columnRadius / 2f
+
+                val width = size.width - columnPadding * 2f
+                val height = size.height - rowPadding * 2f
+
+                val aWidth = width * linesSize.value
+                val aHeight = height * linesSize.value
+
+                drawRoundedLine(
+                    start = Offset(
+                        x = columnPadding,
+                        y = rowPadding
+                    ),
+                    end = Offset(
+                        x = aWidth + columnPadding,
+                        y = aHeight + rowPadding
+                    )
+                )
+            }
+            Hash.Winner.Diagonal.Inverted -> {
+
+                val rowPadding = rowRadius / 2f
+                val columnPadding = columnRadius / 2f
+
+                val width = size.width - columnPadding * 2f
+                val height = size.height - rowPadding * 2f
+
+                val aWidth = width * linesSize.value
+                val aHeight = height * linesSize.value
+
+                drawRoundedLine(
+                    start = Offset(
+                        x = columnPadding,
+                        y = height + rowPadding
+                    ),
+                    end = Offset(
+                        x = aWidth + columnPadding,
+                        y = (height - aHeight) + rowPadding
+                    )
+                )
+            }
         }
     }
 }
@@ -314,7 +359,7 @@ fun DrawScope.drawRoundedLine(
     color: Color,
     start: Offset,
     end: Offset,
-    width : Float = DEFAULT_LINE_WIDTH
+    width: Float = DEFAULT_LINE_WIDTH
 ) = drawLine(
     color = color,
     start = start,
@@ -327,7 +372,7 @@ fun DrawScope.drawRoundedCircle(
     color: Color,
     center: Offset,
     radius: Float,
-    width : Float = DEFAULT_LINE_WIDTH
+    width: Float = DEFAULT_LINE_WIDTH
 ) = drawCircle(
     color = color,
     radius = radius,
@@ -344,7 +389,7 @@ fun HashTablePreview() {
     SquareBox {
         HashTable(
             hash = Hash(
-                winner = Hash.Winner.Diagonal.Inverted
+                winner = Hash.Winner.Diagonal.Normal
             ).apply {
                 set(Hash.Symbol.O, 1, 1)
                 set(Hash.Symbol.X, 2, 2)
