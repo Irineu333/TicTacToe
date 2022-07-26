@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jogo da Velha</string>
+    <string name="text_circle">Círculo</string>
+    <string name="text_aTie">Tired</string>
+    <string name="btn_clean">Limpar</string>
+    <string name="btn_start">Início</string>
+    <string name="text_smartphone">Celular</string>
+    <string name="text_player">Jogador %d</string>
+    <string name="confirm">Confirmar</string>
+</resources>

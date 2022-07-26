@@ -16,9 +16,11 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.neo.hash.R
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 
@@ -60,9 +62,18 @@ private fun PlayerCard(
             .height(IntrinsicSize.Min)
     ) {
         Symbol(symbol = player.symbol)
+
         Spacer(modifier = Modifier.padding(4.dp))
-        Text(text = player.name.uppercase(), fontSize = 16.sp)
+
+        val name = when (player) {
+            is Player.Person -> player.name
+            is Player.Phone -> stringResource(R.string.text_smartphone)
+        }
+
+        Text(text = name.uppercase(), fontSize = 16.sp)
+
         Spacer(modifier = Modifier.weight(1f))
+
         Text(text = "${player.windsCount}", fontSize = 16.sp)
     }
 }
@@ -78,7 +89,7 @@ fun Symbol(
             Icon(
                 imageVector = Icons.Outlined.Circle,
                 tint = color,
-                contentDescription = "Circulo",
+                contentDescription = stringResource(R.string.text_circle),
                 modifier = Modifier.padding(2.dp)
             )
         }
@@ -86,7 +97,7 @@ fun Symbol(
             Icon(
                 imageVector = Icons.Outlined.Close,
                 tint = color,
-                contentDescription = "X"
+                contentDescription = "x"
             )
         }
     }

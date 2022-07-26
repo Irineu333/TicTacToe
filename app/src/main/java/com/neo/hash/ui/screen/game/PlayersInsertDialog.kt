@@ -12,14 +12,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.neo.hash.R
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
@@ -47,8 +48,10 @@ fun PlayersInsertDialog(
             )
         }
     ) {
-        var player1 by rememberSaveable { mutableStateOf("") }
-        var player2 by rememberSaveable { mutableStateOf(if (vsPhone) "Smartphone" else "") }
+        val textSmartphone = stringResource(R.string.text_smartphone)
+
+        var player1 by remember { mutableStateOf("") }
+        var player2 by remember { mutableStateOf(if (vsPhone) textSmartphone else "") }
 
         val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
         val isError = player1 == player2 && isNotBlank
@@ -64,7 +67,7 @@ fun PlayersInsertDialog(
                 imeAction = ImeAction.Next
             ),
             label = {
-                Text(text = "Player 1")
+                Text(text = stringResource(R.string.text_player, 1))
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -78,7 +81,7 @@ fun PlayersInsertDialog(
             singleLine = true,
             readOnly = vsPhone,
             label = {
-                Text(text = "Player 2")
+                Text(text = stringResource(R.string.text_player, 2))
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -118,7 +121,7 @@ fun PlayersInsertDialog(
                 },
                 enabled = isNotBlank && !isError
             ) {
-                Text(text = "Confirmar".uppercase())
+                Text(text = stringResource(R.string.confirm).uppercase())
             }
         }
     }

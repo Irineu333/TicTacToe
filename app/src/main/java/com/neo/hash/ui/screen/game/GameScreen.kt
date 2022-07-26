@@ -21,11 +21,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neo.hash.HashGameBackground
+import com.neo.hash.R
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
@@ -54,7 +56,7 @@ fun GameScreen(
                 .padding(vertical = 4.dp, horizontal = 16.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            Text(text = "Velha".uppercase(), fontSize = 16.sp)
+            Text(text = stringResource(R.string.text_aTie).uppercase(), fontSize = 16.sp)
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = "${state.tied}", fontSize = 16.sp)
         }
@@ -94,13 +96,13 @@ fun GameScreen(
                 viewModel.clear()
             }
         ) {
-            Text(text = "Limpar".uppercase())
+            Text(text = stringResource(R.string.btn_clean).uppercase())
         }
 
         Spacer(modifier = Modifier.width(16.dp))
 
         GameButton(onClick = onHomeClick) {
-            Text(text = "Início".uppercase())
+            Text(text = stringResource(R.string.btn_start).uppercase())
         }
     }
 
