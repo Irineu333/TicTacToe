@@ -40,7 +40,7 @@ fun PlayersInsertDialog(
         ),
         title = {
             Text(
-                text = "Players".uppercase(),
+                text = stringResource(R.string.players).uppercase(),
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
