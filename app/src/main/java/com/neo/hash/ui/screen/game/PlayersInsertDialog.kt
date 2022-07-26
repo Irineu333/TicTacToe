@@ -40,7 +40,7 @@ fun PlayersInsertDialog(
         ),
         title = {
             Text(
-                text = stringResource(R.string.players).uppercase(),
+                text = stringResource(R.string.text_players).uppercase(),
                 modifier = Modifier
                     .fillMaxWidth(),
                 textAlign = TextAlign.Center,
@@ -121,7 +121,7 @@ fun PlayersInsertDialog(
                 },
                 enabled = isNotBlank && !isError
             ) {
-                Text(text = stringResource(R.string.confirm).uppercase())
+                Text(text = stringResource(R.string.btn_confirm).uppercase())
             }
         }
     }

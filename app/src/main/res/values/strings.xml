@@ -6,6 +6,6 @@
     <string name="btn_start">Start</string>
     <string name="text_smartphone">Smartphone</string>
     <string name="text_player">Player %d</string>
-    <string name="confirm">Confirm</string>
-    <string name="players">Players</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="text_players">Players</string>
 </resources>
