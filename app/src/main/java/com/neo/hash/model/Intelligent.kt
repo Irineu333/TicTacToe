@@ -7,6 +7,59 @@ class Intelligent(
         return firstRandom() ?: winOrBlock() ?: xeque() ?: random()
     }
 
+    fun medium(hash: Hash): Hash.Block = with(hash) {
+        return firstRandom() ?: decisiveSecond() ?: winOrBlock() ?: xeque() ?: random()
+    }
+
+    private fun Hash.decisiveSecond(): Hash.Block? {
+
+        var count = 0;
+
+        for (row in Hash.KEY_RANGE) {
+            for (column in Hash.KEY_RANGE) {
+                if (get(row, column) != null) {
+                    count++
+                }
+            }
+        }
+
+        if (count == 1) {
+            val corners = listOf(
+                Hash.Block(1, 1),
+                Hash.Block(1, 3),
+                Hash.Block(3, 3),
+                Hash.Block(3, 1),
+            )
+
+            val sides = listOf(
+                Hash.Block(1, 2),
+                Hash.Block(2, 3),
+                Hash.Block(2, 1),
+                Hash.Block(3, 2),
+            )
+
+            val center = Hash.Block(2, 2)
+
+            val isCorners = corners.any { get(it.row, it.column) != null }
+            val isSides = sides.any { get(it.row, it.column) != null }
+            val isCenter = get(center.row, center.column) != null
+
+            if (isCorners) {
+                return center
+            }
+
+            if (isSides) {
+                return (corners + center).random()
+            }
+
+            if (isCenter) {
+                return corners.random()
+            }
+        }
+
+        return null
+    }
+
     private fun Hash.winOrBlock(): Hash.Block? {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
