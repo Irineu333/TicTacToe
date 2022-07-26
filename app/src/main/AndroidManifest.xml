@@ -4,6 +4,7 @@
     package="com.neo.hash">
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -11,16 +12,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".App"
-        android:theme="@style/Theme.HashGame"
+        android:theme="@style/Theme.Hash"
         tools:targetApi="31">
 
         <activity
-            android:screenOrientation="portrait"
-            android:configChanges="orientation"
             android:name="com.neo.hash.MainActivity"
+            android:configChanges="orientation"
             android:exported="true"
-            android:theme="@style/Theme.HashGame"
+            android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
