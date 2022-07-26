@@ -8,7 +8,7 @@ class Intelligent(
     }
 
     private fun Hash.winOrBlock(): Hash.Block? {
-        fun rows(): Hash.Block? {
+        fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
@@ -51,14 +51,12 @@ class Intelligent(
                 val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
 
                 if (critical && emptyBlocks.size == 1) {
-                    return emptyBlocks[0]
+                    add(emptyBlocks[0])
                 }
             }
-
-            return null
         }
 
-        fun columns(): Hash.Block? {
+        fun columns() = buildList {
             for (column in Hash.KEY_RANGE) {
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
@@ -101,10 +99,9 @@ class Intelligent(
                 val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
 
                 if (critical && emptyBlocks.size == 1) {
-                    return emptyBlocks[0]
+                    add(emptyBlocks[0])
                 }
             }
-            return null
         }
 
         fun diagonal(): Hash.Block? {
@@ -207,23 +204,33 @@ class Intelligent(
             return null
         }
 
-        return rows() ?: columns() ?: diagonal() ?: invertedDiagonal()
+        return buildList {
+
+            addAll(rows())
+            addAll(columns())
+
+            diagonal()?.let {
+                add(it)
+            }
+
+            invertedDiagonal()?.let {
+                add(it)
+            }
+        }.randomOrNull()
     }
 
     private fun Hash.firstRandom(): Hash.Block? {
         if (isEmpty()) {
-            val indexes = listOf(1, 2, 3)
-
             return Hash.Block(
-                row = indexes.random(),
-                column = indexes.random()
+                row = Hash.KEY_RANGE.random(),
+                column = Hash.KEY_RANGE.random()
             )
         }
         return null
     }
 
     private fun Hash.xeque(): Hash.Block? {
-        fun rows(): Hash.Block? {
+        fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
 
                 val myBlocks = mutableListOf<Hash.Block>()
@@ -265,14 +272,12 @@ class Intelligent(
                 }
 
                 if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
-                    return emptyBlocks.random()
+                    addAll(emptyBlocks)
                 }
             }
-
-            return null
         }
 
-        fun columns(): Hash.Block? {
+        fun columns() = buildList {
             for (column in Hash.KEY_RANGE) {
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
@@ -313,13 +318,12 @@ class Intelligent(
                 }
 
                 if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
-                    return emptyBlocks.random()
+                    addAll(emptyBlocks)
                 }
             }
-            return null
         }
 
-        fun diagonal(): Hash.Block? {
+        fun diagonal() = buildList {
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -359,14 +363,16 @@ class Intelligent(
                 }
             }
 
-            if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
-                return emptyBlocks.random()
+            if (
+                myBlocks.size == 1 &&
+                enemyBlocks.size == 0 &&
+                emptyBlocks.size == 2
+            ) {
+                addAll(emptyBlocks)
             }
-
-            return null
         }
 
-        fun invertedDiagonal(): Hash.Block? {
+        fun invertedDiagonal() = buildList {
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -407,14 +413,23 @@ class Intelligent(
                 }
             }
 
-            if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
-                return emptyBlocks.random()
+            if (
+                myBlocks.size == 1 &&
+                enemyBlocks.size == 0 &&
+                emptyBlocks.size == 2
+            ) {
+                addAll(emptyBlocks)
             }
-
-            return null
         }
 
-        return rows() ?: columns() ?: diagonal() ?: invertedDiagonal()
+        return buildList {
+            addAll(rows())
+            addAll(columns())
+
+            addAll(diagonal())
+            addAll(invertedDiagonal())
+
+        }.randomOrNull()
     }
 
     private fun Hash.random() = buildList {
