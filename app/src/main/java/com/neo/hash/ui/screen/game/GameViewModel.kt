@@ -16,6 +16,7 @@ class GameViewModel : ViewModel() {
     private var _uiState = MutableStateFlow(GameUiState())
     val uiState = _uiState.asStateFlow()
 
+    private var lastStatedPlayer: Player? = null
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
@@ -81,7 +82,10 @@ class GameViewModel : ViewModel() {
         val state = uiState.value
 
         if (state.playerTurn is Player.Phone) {
-            val (row, column) = Intelligent(state.playerTurn.symbol).easy(state.hash)
+            val (row, column) = Intelligent(
+                state.playerTurn.symbol
+            ).medium(state.hash)
+
             internalSelect(row, column)
         }
     }
@@ -173,10 +177,13 @@ class GameViewModel : ViewModel() {
             player2
         )
 
+
         _uiState.update {
+            lastStatedPlayer = players.random()
+
             it.copy(
                 players = players,
-                playerTurn = players.random()
+                playerTurn = lastStatedPlayer
             )
         }
 
@@ -192,11 +199,17 @@ class GameViewModel : ViewModel() {
     }
 
     fun clear() {
-        _uiState.update {
-            it.copy(
+
+        _uiState.update { state ->
+
+            lastStatedPlayer = state.players.first {
+                it != lastStatedPlayer
+            }
+
+            state.copy(
                 hash = Hash(),
                 playerWinner = null,
-                playerTurn = it.playerWinner ?: it.players.random(),
+                playerTurn = state.playerWinner ?: lastStatedPlayer,
                 winner = null
             )
         }

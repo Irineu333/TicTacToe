@@ -268,7 +268,7 @@ class Intelligent(
         }.randomOrNull()
     }
 
-    private fun Hash.firstRandom(count: Int): Hash.Block? {
+    private fun firstRandom(count: Int): Hash.Block? {
         if (count == 0) {
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
