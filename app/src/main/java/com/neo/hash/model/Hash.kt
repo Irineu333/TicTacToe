@@ -62,11 +62,30 @@ data class Hash(
         return count
     }
 
+    fun getAll() = buildList {
+        for (row in KEY_RANGE) {
+            for (column in KEY_RANGE) {
+                val symbol = get(row, column)
+                if (symbol != null) {
+                    add(
+                        Block(
+                            row,
+                            column,
+                            symbol
+                        )
+                    )
+                }
+            }
+        }
+    }
+
     data class Block(
         val row: Int,
         val column: Int,
         val symbol: Symbol? = null
-    )
+    ) {
+        fun isSide(center: Block) = center.row - row == 1 && center.column - column == 1
+    }
 
     sealed class Winner {
 

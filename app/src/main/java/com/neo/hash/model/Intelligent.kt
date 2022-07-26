@@ -12,14 +12,14 @@ class Intelligent(
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
 
-        val count = symbolsCount()
+        val all = getAll()
 
-        return firstRandom(count) ?: decisiveSecond(count) ?: winOrBlock() ?: xeque() ?: random()
+        return firstRandom(all.size) ?: decisiveSecond(all) ?: winOrBlock() ?: xeque() ?: random()
     }
 
-    private fun Hash.decisiveSecond(count: Int): Hash.Block? {
+    private fun Hash.decisiveSecond(blocks: List<Hash.Block>): Hash.Block? {
 
-        if (count == 1) {
+        if (blocks.size == 1) {
             val corners = listOf(
                 Hash.Block(1, 1),
                 Hash.Block(1, 3),
@@ -45,7 +45,8 @@ class Intelligent(
             }
 
             if (isSides) {
-                return (corners + center).random()
+                val enemyBlock: Hash.Block = blocks[0]
+                return (corners.filter { it.isSide(enemyBlock) } + center).random()
             }
 
             if (isCenter) {
