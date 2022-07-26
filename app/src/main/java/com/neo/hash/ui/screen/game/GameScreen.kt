@@ -56,7 +56,7 @@ fun GameScreen(
                 .padding(vertical = 4.dp, horizontal = 16.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            Text(text = stringResource(R.string.text_aTie).uppercase(), fontSize = 16.sp)
+            Text(text = stringResource(R.string.text_tired).uppercase(), fontSize = 16.sp)
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = "${state.tied}", fontSize = 16.sp)
         }

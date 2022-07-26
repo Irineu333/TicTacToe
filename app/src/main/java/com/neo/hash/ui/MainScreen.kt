@@ -3,6 +3,7 @@
 package com.neo.hash.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
@@ -29,6 +30,9 @@ fun MainScreen() {
     ) {
         composable(
             route = Screen.HomeScreen.route,
+            enterTransition = {
+                fadeIn()
+            },
             exitTransition = { exitToLeftTransition },
             popEnterTransition = { enterToRightTransition }
         ) { backStackEntry ->
@@ -43,14 +47,18 @@ fun MainScreen() {
 
         composable(
             route = Screen.GameScreen.route,
-            arguments = listOf(navArgument(Screen.GameScreen.isPhone) { type = NavType.BoolType }),
+            arguments = listOf(
+                navArgument(Screen.GameScreen.isPhone) {
+                    type = NavType.BoolType
+                }
+            ),
             enterTransition = { enterToLeftTransition },
             popExitTransition = { exitToRightTransition }
         ) { backStackEntry ->
 
             GameScreen(
                 onHomeClick = {
-                    if (controller isCurrent  backStackEntry) {
+                    if (controller isCurrent backStackEntry) {
                         controller.popBackStack()
                     }
                 },
