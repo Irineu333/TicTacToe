@@ -5,18 +5,22 @@ class Intelligent(
 ) {
     fun easy(hash: Hash): Hash.Block = with(hash) {
 
-        val count = symbolsCount()
+        val all = getAll()
 
-        return firstRandom(count) ?: winOrBlock() ?: xeque() ?: random()
+        return firstRandom(all) ?: winOrBlock() ?: xeque() ?: random(all)
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
 
         val all = getAll()
 
-        return firstRandom(all.size) ?: decisiveSecond(all) ?: winOrBlock() ?: xeque() ?: random()
+        return firstRandom(all) ?: decisiveSecond(all) ?: winOrBlock() ?: xeque() ?: random(all)
     }
 
+    /**
+     * action: Decisive move, blocking the opponent
+     * requirement: Be the second to play
+     */
     private fun Hash.decisiveSecond(blocks: List<Hash.Block>): Hash.Block? {
 
         if (blocks.size == 1) {
@@ -57,6 +61,10 @@ class Intelligent(
         return null
     }
 
+    /**
+     * action: Block opponent's victory or complete own victory
+     * requirement: There are one or more segments about to be closed
+     */
     private fun Hash.winOrBlock(): Hash.Block? {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
@@ -269,8 +277,12 @@ class Intelligent(
         }.randomOrNull()
     }
 
-    private fun firstRandom(count: Int): Hash.Block? {
-        if (count == 0) {
+    /**
+     * action: Run the first move
+     * requirement: Hash is empty
+     */
+    private fun firstRandom(blocks: List<Hash.Block>): Hash.Block? {
+        if (blocks.isEmpty()) {
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
                 column = Hash.KEY_RANGE.random()
@@ -279,6 +291,10 @@ class Intelligent(
         return null
     }
 
+    /**
+     * action: Threatens to close a segment
+     * requirement: A follow-up with a piece of mine
+     */
     private fun Hash.xeque(): Hash.Block? {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
@@ -482,13 +498,13 @@ class Intelligent(
         }.randomOrNull()
     }
 
-    private fun Hash.random() = buildList {
-        for (row in Hash.KEY_RANGE) {
-            for (column in Hash.KEY_RANGE) {
-                if (get(row, column) == null) {
-                    add(Hash.Block(row, column))
-                }
-            }
-        }
+    /**
+     * action: Make a random move
+     * requirement: There is an empty block
+     */
+    private fun random(
+        blocks: List<Hash.Block>
+    ) = blocks.filter {
+        it.symbol == null
     }.random()
 }

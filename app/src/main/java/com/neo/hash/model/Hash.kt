@@ -1,5 +1,7 @@
 package com.neo.hash.model
 
+import kotlin.math.abs
+
 data class Hash(
     private val symbols: Array<Array<Symbol?>> = Array(KEY_RANGE.last) {
         Array(KEY_RANGE.last) { null }
@@ -84,7 +86,9 @@ data class Hash(
         val column: Int,
         val symbol: Symbol? = null
     ) {
-        fun isSide(center: Block) = center.row - row == 1 && center.column - column == 1
+        fun isSide(center: Block) =
+            abs(center.row - row) < 2 &&
+                    abs(center.column - column) < 2
     }
 
     sealed class Winner {

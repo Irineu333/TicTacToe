@@ -3,8 +3,8 @@ package com.neo.hash.ui.screen.game
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neo.hash.model.Hash
-import com.neo.hash.model.Intelligent
 import com.neo.hash.model.Player
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +17,7 @@ class GameViewModel : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     private var lastStatedPlayer: Player? = null
+    private var aiJob: Job? = null
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
@@ -75,16 +76,19 @@ class GameViewModel : ViewModel() {
         playAI()
     }
 
-    private fun playAI() = viewModelScope.launch {
+    private fun playAI() {
+        aiJob?.cancel()
+        aiJob = viewModelScope.launch {
 
-        delay(500)
+            delay(500)
 
-        val state = uiState.value
+            val state = uiState.value
 
-        if (state.playerTurn is Player.Phone) {
-            val (row, column) = state.playerTurn.ai.medium(state.hash)
+            if (state.playerTurn is Player.Phone) {
+                val (row, column) = state.playerTurn.ai.medium(state.hash)
 
-            internalSelect(row, column)
+                internalSelect(row, column)
+            }
         }
     }
 
@@ -197,6 +201,8 @@ class GameViewModel : ViewModel() {
     }
 
     fun clear() {
+
+        aiJob?.cancel()
 
         _uiState.update { state ->
 
