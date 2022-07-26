@@ -82,9 +82,7 @@ class GameViewModel : ViewModel() {
         val state = uiState.value
 
         if (state.playerTurn is Player.Phone) {
-            val (row, column) = Intelligent(
-                state.playerTurn.symbol
-            ).medium(state.hash)
+            val (row, column) = state.playerTurn.ai.medium(state.hash)
 
             internalSelect(row, column)
         }

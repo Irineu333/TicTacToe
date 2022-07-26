@@ -130,7 +130,7 @@ private fun GameScreenPreview() {
             GameScreen(
                 viewModel = (viewModel() as GameViewModel).apply {
                     start(
-                        Player.Person("Irineu", Hash.Symbol.O),
+                        Player.Person(Hash.Symbol.O, "Irineu"),
                         Player.Phone(Hash.Symbol.X),
                     )
                 }

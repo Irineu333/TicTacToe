@@ -112,8 +112,8 @@ private fun PlayersPreview() {
             Hash.Symbol.O
         ),
         Player.Person(
-            "Irineu",
-            Hash.Symbol.X
+            Hash.Symbol.X,
+            "Irineu"
         )
     )
     Players(
