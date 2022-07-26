@@ -42,7 +42,7 @@ fun HomeScreen(
 
     SquareBox(
         modifier = Modifier
-            .fillMaxWidth(0.6f)
+            .fillMaxWidth(0.5f)
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colors.primary,
