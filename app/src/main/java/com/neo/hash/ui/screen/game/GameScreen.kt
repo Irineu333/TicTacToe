@@ -51,16 +51,16 @@ fun GameScreen(
     Card(modifier = Modifier.alpha(if (state.tied > 0) 1f else 0f)) {
         Row(
             modifier = Modifier
-                .padding(vertical = 4.dp, horizontal = 8.dp)
+                .padding(vertical = 4.dp, horizontal = 16.dp)
                 .height(IntrinsicSize.Min)
         ) {
-            Text(text = "Velha", fontSize = 16.sp)
-            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "Velha".uppercase(), fontSize = 16.sp)
+            Spacer(modifier = Modifier.width(16.dp))
             Text(text = "${state.tied}", fontSize = 16.sp)
         }
     }
 
-    Spacer(modifier = Modifier.height(8.dp))
+    Spacer(modifier = Modifier.height(16.dp))
 
     Players(
         players = state.players,
@@ -100,7 +100,7 @@ fun GameScreen(
         Spacer(modifier = Modifier.width(16.dp))
 
         GameButton(onClick = onHomeClick) {
-            Text(text = "Home".uppercase())
+            Text(text = "Início".uppercase())
         }
     }
 
@@ -124,10 +124,10 @@ private fun GameScreenPreview() {
     HashGameTheme {
         HashGameBackground {
             GameScreen(
-                viewModel = GameViewModel().apply {
+                viewModel = (viewModel() as GameViewModel).apply {
                     start(
-                        Player.Person("Test1", Hash.Symbol.X),
-                        Player.Person("Test2", Hash.Symbol.O)
+                        Player.Person("Irineu", Hash.Symbol.O),
+                        Player.Phone(Hash.Symbol.X),
                     )
                 }
             )

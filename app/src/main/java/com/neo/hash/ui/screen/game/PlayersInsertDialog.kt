@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -46,8 +47,8 @@ fun PlayersInsertDialog(
             )
         }
     ) {
-        var player1 by remember { mutableStateOf("") }
-        var player2 by remember { mutableStateOf(if (vsPhone) "Smartphone" else "") }
+        var player1 by rememberSaveable { mutableStateOf("") }
+        var player2 by rememberSaveable { mutableStateOf(if (vsPhone) "Smartphone" else "") }
 
         val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
         val isError = player1 == player2 && isNotBlank
@@ -84,7 +85,9 @@ fun PlayersInsertDialog(
 
         Row(
             horizontalArrangement = Arrangement.End,
-            modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxWidth()
         ) {
             GameButton(
                 onClick = {

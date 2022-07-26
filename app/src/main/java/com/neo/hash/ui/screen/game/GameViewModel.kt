@@ -2,10 +2,11 @@ package com.neo.hash.ui.screen.game
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.neo.hash.model.Intelligent
 import com.neo.hash.model.Hash
+import com.neo.hash.model.Intelligent
 import com.neo.hash.model.Player
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,8 +19,16 @@ class GameViewModel : ViewModel() {
     private var _uiState = MutableStateFlow(GameUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun select(row: Int, column: Int) {
 
+    fun select(row: Int, column: Int) {
+        val state = uiState.value
+
+        if (state.playerTurn is Player.Person) {
+            internalSelect(row, column)
+        }
+    }
+
+    private fun internalSelect(row: Int, column: Int) {
         val state = uiState.value
 
         val playerTurn = state.playerTurn ?: return
@@ -68,23 +77,19 @@ class GameViewModel : ViewModel() {
         playAI()
     }
 
-    private fun playAI() {
-
-        val state = uiState.value
-        val playerTurn = state.playerTurn ?: return
-
+    private fun playAI() = with(uiState.value) {
         if (playerTurn is Player.Phone) {
             viewModelScope.launch {
 
                 val delay = launch { delay(500) }
 
                 val (row, column) = withContext(Dispatchers.Default) {
-                    Intelligent(playerTurn.symbol).easy(state.hash)
+                    Intelligent(playerTurn.symbol).easy(hash)
                 }
 
                 delay.join()
 
-                select(row, column)
+                internalSelect(row, column)
             }
         }
     }
