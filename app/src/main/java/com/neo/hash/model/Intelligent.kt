@@ -337,7 +337,11 @@ class Intelligent(
                     }
                 }
 
-                if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
+                if (
+                    myBlocks.size == 1 &&
+                    enemyBlocks.size == 0 &&
+                    emptyBlocks.size == 2
+                ) {
                     addAll(emptyBlocks)
                 }
             }
@@ -383,7 +387,11 @@ class Intelligent(
                     }
                 }
 
-                if (myBlocks.size == 1 && enemyBlocks.size == 0 && emptyBlocks.size == 2) {
+                if (
+                    myBlocks.size == 1 &&
+                    enemyBlocks.size == 0 &&
+                    emptyBlocks.size == 2
+                ) {
                     addAll(emptyBlocks)
                 }
             }
