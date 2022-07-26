@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
@@ -11,9 +13,10 @@ android {
         minSdk 21
         targetSdk 32
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary true
         }
@@ -24,20 +27,30 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            minifyEnabled false
+            versionNameSuffix '-dev'
+            applicationIdSuffix ".dev"
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     buildFeatures {
         compose true
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion compose_version
     }
+
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -51,25 +64,34 @@ dependencies {
 
     //compose
     implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
     implementation "androidx.compose.material:material:$compose_version"
     implementation "androidx.compose.material:material-icons-extended:$compose_version"
-    implementation "androidx.compose.ui:ui-tooling-preview:$compose_version"
 
+    //compose navigation
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
+    //activity compose integration
     implementation 'androidx.activity:activity-compose:1.5.0'
 
-    implementation 'com.jakewharton.timber:timber:5.0.1'
-
     // TODO: temporary, remove when navigation compose has transition animations
-    implementation ('com.google.accompanist:accompanist-navigation-animation:0.23.1') {
+    implementation('com.google.accompanist:accompanist-navigation-animation:0.23.1') {
         because("navigation compose has no transition animations")
     }
 
+    //splash
     implementation 'androidx.core:core-splashscreen:1.0.0-rc01'
 
-    //extensions
+    //lifecycle
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
+
+    //log
+    implementation 'com.jakewharton.timber:timber:5.0.1'
+
+    //firebase
+    implementation platform('com.google.firebase:firebase-bom:30.3.1')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     //tests
     testImplementation 'junit:junit:4.13.2'

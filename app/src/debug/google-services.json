@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "863781521576",
+    "project_id": "neo-tictactoe-dev",
+    "storage_bucket": "neo-tictactoe-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:863781521576:android:6d73200d85f6f4a035da9d",
+        "android_client_info": {
+          "package_name": "com.neo.hash.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "863781521576-v42856njeglkntnl2rke05agt2edc1ug.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAjSrNjbJZ7LetQOobvSOAlaXsy4oD-8II"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "863781521576-v42856njeglkntnl2rke05agt2edc1ug.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

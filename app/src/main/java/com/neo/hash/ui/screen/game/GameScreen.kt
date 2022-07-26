@@ -26,7 +26,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.neo.hash.HashGameBackground
 import com.neo.hash.R
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
@@ -34,6 +33,7 @@ import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.Players
 import com.neo.hash.ui.components.SquareBox
+import com.neo.hash.ui.theme.HashGameBackground
 import com.neo.hash.ui.theme.HashGameTheme
 
 @Composable

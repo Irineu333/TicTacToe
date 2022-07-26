@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.neo.hash.ui.MainScreen
+import com.neo.hash.ui.theme.HashGameBackground
 import com.neo.hash.ui.theme.HashGameTheme
 
 class MainActivity : ComponentActivity() {
@@ -29,16 +30,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-}
-
-@Composable
-fun HashGameBackground(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colors.background,
-    content: @Composable () -> Unit,
-) = Surface(
-    modifier = modifier,
-    color = color
-) {
-    content()
 }

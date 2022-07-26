@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">TicTacToe</string>
+    <string name="app_name">Tic Tac Toe</string>
     <string name="text_circle">Circle</string>
     <string name="text_tired">Velha</string>
     <string name="btn_clean">Clear</string>

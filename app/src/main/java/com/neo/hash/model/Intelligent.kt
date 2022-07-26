@@ -14,14 +14,32 @@ class Intelligent(
 
         val all = getAll()
 
-        return firstRandom(all) ?: decisiveSecond(all) ?: winOrBlock() ?: xeque() ?: random(all)
+        return firstRandom(all) ?: blockOnSecond(all) ?: winOrBlock() ?: xeque() ?: random(all)
+    }
+
+    fun hard(hash: Hash): Hash.Block = with(hash) {
+
+        val all = getAll()
+
+        return firstRandom(all) ?: blockOnSecond(all) ?: perfectThird(all) ?: winOrBlock() ?: xeque() ?: random(all)
+    }
+
+    private fun perfectThird(all: List<Hash.Block>): Hash.Block? {
+
+        if (all.size == 2) {
+
+        }
+
+        return null
     }
 
     /**
-     * action: Decisive move, blocking the opponent
+     * action: Blocking the first movement of opponent
      * requirement: Be the second to play
      */
-    private fun Hash.decisiveSecond(blocks: List<Hash.Block>): Hash.Block? {
+    private fun Hash.blockOnSecond(
+        blocks: List<Hash.Block>
+    ): Hash.Block? {
 
         if (blocks.size == 1) {
             val corners = listOf(
@@ -281,7 +299,9 @@ class Intelligent(
      * action: Run the first move
      * requirement: Hash is empty
      */
-    private fun firstRandom(blocks: List<Hash.Block>): Hash.Block? {
+    private fun firstRandom(
+        blocks: List<Hash.Block>
+    ): Hash.Block? {
         if (blocks.isEmpty()) {
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
