@@ -48,6 +48,20 @@ data class Hash(
         }
     }
 
+    fun symbolsCount(): Int {
+        var count = 0;
+
+        for (row in KEY_RANGE) {
+            for (column in KEY_RANGE) {
+                if (get(row, column) != null) {
+                    count++
+                }
+            }
+        }
+
+        return count
+    }
+
     data class Block(
         val row: Int,
         val column: Int,

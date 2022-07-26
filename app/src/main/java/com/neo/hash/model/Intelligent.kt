@@ -4,24 +4,20 @@ class Intelligent(
     private val mySymbol: Hash.Symbol
 ) {
     fun easy(hash: Hash): Hash.Block = with(hash) {
-        return firstRandom() ?: winOrBlock() ?: xeque() ?: random()
+
+        val count = symbolsCount()
+
+        return firstRandom(count) ?: winOrBlock() ?: xeque() ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
-        return firstRandom() ?: decisiveSecond() ?: winOrBlock() ?: xeque() ?: random()
+
+        val count = symbolsCount()
+
+        return firstRandom(count) ?: decisiveSecond(count) ?: winOrBlock() ?: xeque() ?: random()
     }
 
-    private fun Hash.decisiveSecond(): Hash.Block? {
-
-        var count = 0;
-
-        for (row in Hash.KEY_RANGE) {
-            for (column in Hash.KEY_RANGE) {
-                if (get(row, column) != null) {
-                    count++
-                }
-            }
-        }
+    private fun Hash.decisiveSecond(count: Int): Hash.Block? {
 
         if (count == 1) {
             val corners = listOf(
@@ -272,8 +268,8 @@ class Intelligent(
         }.randomOrNull()
     }
 
-    private fun Hash.firstRandom(): Hash.Block? {
-        if (isEmpty()) {
+    private fun Hash.firstRandom(count: Int): Hash.Block? {
+        if (count == 0) {
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
                 column = Hash.KEY_RANGE.random()
