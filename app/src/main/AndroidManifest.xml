@@ -20,6 +20,7 @@
             android:configChanges="orientation"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.Hash.Starting"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

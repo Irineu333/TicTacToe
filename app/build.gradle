@@ -66,6 +66,8 @@ dependencies {
         because("navigation compose has no transition animations")
     }
 
+    implementation 'androidx.core:core-splashscreen:1.0.0-rc01'
+
     //extensions
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
 
