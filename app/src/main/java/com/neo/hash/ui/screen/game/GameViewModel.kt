@@ -5,14 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Intelligent
 import com.neo.hash.model.Player
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class GameViewModel : ViewModel() {
 
@@ -77,20 +74,15 @@ class GameViewModel : ViewModel() {
         playAI()
     }
 
-    private fun playAI() = with(uiState.value) {
-        if (playerTurn is Player.Phone) {
-            viewModelScope.launch {
+    private fun playAI() = viewModelScope.launch {
 
-                val delay = launch { delay(500) }
+        delay(500)
 
-                val (row, column) = withContext(Dispatchers.Default) {
-                    Intelligent(playerTurn.symbol).easy(hash)
-                }
+        val state = uiState.value
 
-                delay.join()
-
-                internalSelect(row, column)
-            }
+        if (state.playerTurn is Player.Phone) {
+            val (row, column) = Intelligent(state.playerTurn.symbol).easy(state.hash)
+            internalSelect(row, column)
         }
     }
 
