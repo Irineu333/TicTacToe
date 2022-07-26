@@ -42,7 +42,8 @@ fun PlayersInsertDialog(
             Text(
                 text = stringResource(R.string.text_players).uppercase(),
                 modifier = Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.primary
             )

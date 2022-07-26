@@ -53,11 +53,13 @@ fun GameScreen(
     Card(modifier = Modifier.alpha(if (state.tied > 0) 1f else 0f)) {
         Row(
             modifier = Modifier
-                .padding(vertical = 4.dp, horizontal = 16.dp)
-                .height(IntrinsicSize.Min)
+                .padding(
+                    vertical = 4.dp,
+                    horizontal = 16.dp
+                ).height(IntrinsicSize.Min)
         ) {
             Text(text = stringResource(R.string.text_tired).uppercase(), fontSize = 16.sp)
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text(text = "${state.tied}", fontSize = 16.sp)
         }
     }
