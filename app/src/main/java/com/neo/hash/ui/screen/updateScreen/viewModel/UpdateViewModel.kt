@@ -32,7 +32,7 @@ class UpdateViewModel : ViewModel() {
                     it.copy(
                         update = UpdateVersion(
                             lastVersion = remoteConfig.getLong("version").toInt(),
-                            lasRequiredVersion = remoteConfig.getLong("required_version").toInt(),
+                            lastRequiredVersion = remoteConfig.getLong("required_version").toInt(),
                             lastVersionName = remoteConfig.getString("version_name")
                         )
                     )

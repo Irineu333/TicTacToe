@@ -22,7 +22,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neo.hash.BuildConfig
-import com.neo.hash.model.UpdateVersion
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.screen.updateScreen.viewModel.UpdateViewModel
@@ -45,10 +44,10 @@ fun UpdateScreen(
         currentVersion < update.lastVersion &&
         showDialog
     ) {
-        val cancelable = update.lasRequiredVersion >= currentVersion
+        val cancelable = currentVersion >= update.lastRequiredVersion
 
         UpdateDialog(
-            update = update,
+            versionName = update.lastVersionName,
             onDismissRequest = {
                 if (cancelable) {
                     showDialog = false
@@ -62,7 +61,7 @@ fun UpdateScreen(
 
 @Composable
 private fun UpdateDialog(
-    update: UpdateVersion,
+    versionName: String,
     cancelable: Boolean = true,
     onDismissRequest: () -> Unit = {},
     openPlayStore: () -> Unit = {},
@@ -106,12 +105,14 @@ private fun UpdateDialog(
                         fontWeight = FontWeight.Bold
                     )
                 ) {
-                    append(update.lastVersionName)
+                    append(versionName)
                 }
 
                 append(" está disponível na PlayStore".uppercase())
             },
-            modifier = Modifier.padding(vertical = 8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .fillMaxWidth(),
             textAlign = TextAlign.Center
         )
     }
@@ -122,11 +123,7 @@ private fun UpdateDialog(
 fun UpdateDialogPreview() {
     HashTheme {
         UpdateDialog(
-            UpdateVersion(
-                lastVersion = 1,
-                lasRequiredVersion = 1,
-                lastVersionName = "1.0.0",
-            )
+            versionName = "1.0.0"
         )
     }
 }
