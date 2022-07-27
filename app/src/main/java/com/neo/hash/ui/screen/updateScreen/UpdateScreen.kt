@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -22,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neo.hash.BuildConfig
+import com.neo.hash.R
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.screen.updateScreen.viewModel.UpdateViewModel
@@ -69,7 +71,7 @@ private fun UpdateDialog(
     GameDialog(
         title = {
             Text(
-                text = "Atualização".uppercase(),
+                text = stringResource(R.string.text_update).uppercase(),
                 modifier = Modifier
                     .align(Alignment.Center),
                 color = MaterialTheme.colors.primary
@@ -81,7 +83,7 @@ private fun UpdateDialog(
                 GameButton(
                     onClick = onDismissRequest
                 ) {
-                    Text(text = "Depois".uppercase())
+                    Text(text = stringResource(R.string.btn_later).uppercase())
                 }
             }
 
@@ -90,26 +92,16 @@ private fun UpdateDialog(
             GameButton(
                 onClick = openPlayStore
             ) {
-                Text(text = "Atualizar".uppercase())
+                Text(text = stringResource(R.string.btn_update).uppercase())
             }
         },
         onDismissRequest = onDismissRequest
     ) {
         Text(
-            text = buildAnnotatedString {
-
-                append("A versão ".uppercase())
-
-                withStyle(
-                    style = SpanStyle(
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    append(versionName)
-                }
-
-                append(" está disponível na PlayStore".uppercase())
-            },
+            text = stringResource(
+                R.string.text_update_description,
+                versionName
+            ).uppercase(),
             modifier = Modifier
                 .padding(vertical = 8.dp)
                 .fillMaxWidth(),
