@@ -4,24 +4,11 @@ class Intelligent(
     private val mySymbol: Hash.Symbol
 ) {
     fun easy(hash: Hash): Hash.Block = with(hash) {
-
-        val all = getAll()
-
-        return firstRandom(all) ?: winOrBlock() ?: xeque() ?: random(all)
+        firstRandom() ?: winOrBlock() ?: xeque() ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
-
-        val all = getAll()
-
-        return firstRandom(all) ?: blockOnSecond(all) ?: winOrBlock() ?: xeque() ?: random(all)
-    }
-
-    fun hard(hash: Hash): Hash.Block = with(hash) {
-
-        val all = getAll()
-
-        return firstRandom(all) ?: blockOnSecond(all) ?: perfectThird(all) ?: winOrBlock() ?: xeque() ?: random(all)
+        firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque() ?: random()
     }
 
     private fun perfectThird(all: List<Hash.Block>): Hash.Block? {
@@ -38,10 +25,10 @@ class Intelligent(
      * requirement: Be the second to play
      */
     private fun Hash.blockOnSecond(
-        blocks: List<Hash.Block>
+        symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
 
-        if (blocks.size == 1) {
+        if (symbols.size == 1) {
             val corners = listOf(
                 Hash.Block(1, 1),
                 Hash.Block(1, 3),
@@ -67,7 +54,7 @@ class Intelligent(
             }
 
             if (isSides) {
-                val enemyBlock: Hash.Block = blocks[0]
+                val enemyBlock: Hash.Block = symbols[0]
                 return (corners.filter { it.isSide(enemyBlock) } + center).random()
             }
 
@@ -299,10 +286,8 @@ class Intelligent(
      * action: Run the first move
      * requirement: Hash is empty
      */
-    private fun firstRandom(
-        blocks: List<Hash.Block>
-    ): Hash.Block? {
-        if (blocks.isEmpty()) {
+    private fun Hash.firstRandom(): Hash.Block? {
+        if (isEmpty()) {
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
                 column = Hash.KEY_RANGE.random()
@@ -530,9 +515,7 @@ class Intelligent(
      * action: Make a random move
      * requirement: There is an empty block
      */
-    private fun random(
-        blocks: List<Hash.Block>
-    ) = blocks.filter {
+    private fun Hash.random() = getAllEmpty().filter {
         it.symbol == null
     }.random()
 }

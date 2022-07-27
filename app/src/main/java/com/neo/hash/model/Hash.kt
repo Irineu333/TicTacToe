@@ -64,7 +64,7 @@ data class Hash(
         return count
     }
 
-    fun getAll() = buildList {
+    fun getAllSymbols() = buildList {
         for (row in KEY_RANGE) {
             for (column in KEY_RANGE) {
                 val symbol = get(row, column)
@@ -74,6 +74,22 @@ data class Hash(
                             row,
                             column,
                             symbol
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    fun getAllEmpty() = buildList {
+        for (row in KEY_RANGE) {
+            for (column in KEY_RANGE) {
+                val symbol = get(row, column)
+                if (symbol == null) {
+                    add(
+                        Block(
+                            row,
+                            column
                         )
                     )
                 }
