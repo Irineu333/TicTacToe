@@ -67,7 +67,7 @@ class Intelligent(
     }
 
     /**
-     * action: Block opponent's victory or complete own victory
+     * action: Complete own victory or block opponent's victory
      * requirement: There are one or more segments about to be closed
      */
     private fun Hash.winOrBlock(): Hash.Block? {
@@ -111,10 +111,13 @@ class Intelligent(
                     }
                 }
 
-                val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
-
-                if (critical && emptyBlocks.size == 1) {
-                    add(emptyBlocks[0])
+                if (emptyBlocks.size == 1) {
+                    if (myBlocks.size == 2) {
+                        add(emptyBlocks[0] to myBlocks[0].symbol)
+                    }
+                    if (enemyBlocks.size == 2) {
+                        add(emptyBlocks[0] to enemyBlocks[0].symbol)
+                    }
                 }
             }
         }
@@ -159,15 +162,18 @@ class Intelligent(
                     }
                 }
 
-                val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
-
-                if (critical && emptyBlocks.size == 1) {
-                    add(emptyBlocks[0])
+                if (emptyBlocks.size == 1) {
+                    if (myBlocks.size == 2) {
+                        add(emptyBlocks[0] to myBlocks[0].symbol)
+                    }
+                    if (enemyBlocks.size == 2) {
+                        add(emptyBlocks[0] to enemyBlocks[0].symbol)
+                    }
                 }
             }
         }
 
-        fun diagonal(): Hash.Block? {
+        fun diagonal(): Pair<Hash.Block, Hash.Symbol?>? {
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -207,16 +213,19 @@ class Intelligent(
                 }
             }
 
-            val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
-
-            if (critical && emptyBlocks.size == 1) {
-                return emptyBlocks[0]
+            if (emptyBlocks.size == 1) {
+                if (myBlocks.size == 2) {
+                    return emptyBlocks[0] to myBlocks[0].symbol
+                }
+                if (enemyBlocks.size == 2) {
+                    return emptyBlocks[0] to enemyBlocks[0].symbol
+                }
             }
 
             return null
         }
 
-        fun invertedDiagonal(): Hash.Block? {
+        fun invertedDiagonal(): Pair<Hash.Block, Hash.Symbol?>? {
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -252,22 +261,26 @@ class Intelligent(
                     enemyBlocks.add(
                         Hash.Block(
                             row,
-                            column
+                            column,
+                            symbol
                         )
                     )
                 }
             }
 
-            val critical = emptyBlocks.size == 2 || enemyBlocks.size == 2
-
-            if (critical && emptyBlocks.size == 1) {
-                return emptyBlocks[0]
+            if (emptyBlocks.size == 1) {
+                if (myBlocks.size == 2) {
+                    return emptyBlocks[0] to myBlocks[0].symbol
+                }
+                if (enemyBlocks.size == 2) {
+                    return emptyBlocks[0] to enemyBlocks[0].symbol
+                }
             }
 
             return null
         }
 
-        return buildList {
+        val allMoves = buildList {
 
             addAll(rows())
             addAll(columns())
@@ -279,7 +292,17 @@ class Intelligent(
             invertedDiagonal()?.let {
                 add(it)
             }
-        }.randomOrNull()
+        }
+
+        val winMove = allMoves.filter {
+            it.second == mySymbol
+        }.randomOrNull()?.first
+
+        val blockMove = allMoves.filter {
+            it.second != mySymbol
+        }.randomOrNull()?.first
+
+        return winMove ?: blockMove
     }
 
     /**
