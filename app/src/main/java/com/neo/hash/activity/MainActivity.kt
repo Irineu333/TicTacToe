@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         installSplashScreen()
-        loadInterstitial()
+        //loadInterstitial()
 
         setContent {
             HashTheme {
@@ -45,7 +45,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     MainScreen(
-                        showInterstitial = this::showInterstitial
+                        showInterstitial = {
+                            it()
+                        }
                     )
 
                     Box(

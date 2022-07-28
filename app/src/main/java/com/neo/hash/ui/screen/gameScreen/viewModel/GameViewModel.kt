@@ -2,6 +2,7 @@ package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.neo.hash.BuildConfig
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,12 @@ class GameViewModel : ViewModel() {
 
     private var lastStatedPlayer: Player? = null
     private var aiJob: Job? = null
+
+    private val canRunIntelligent: Boolean
+        get() {
+            val state = uiState.value
+            return state.playerTurn is Player.Phone && state.playerTurn.isEnable
+        }
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
@@ -75,20 +82,24 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        playAI()
+        playIntelligent()
     }
 
-    private fun playAI() {
+    private fun playIntelligent() {
+        if (!canRunIntelligent) return
+
         aiJob?.cancel()
         aiJob = viewModelScope.launch {
 
-            delay(1000)
-
             val state = uiState.value
 
-            if (state.playerTurn is Player.Phone) {
+            if (state.playerTurn is Player.Phone && canRunIntelligent) {
                 val (row, column) = withContext(Dispatchers.Default) {
-                    state.playerTurn.ai.medium(state.hash)
+                    val delay = launch { delay(1000) }
+
+                    state.playerTurn.ai.medium(state.hash).also {
+                        delay.join()
+                    }
                 }
 
                 internalSelect(row, column)
@@ -193,7 +204,7 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        playAI()
+        playIntelligent()
     }
 
     fun canClick(row: Int, column: Int): Boolean {
@@ -201,7 +212,9 @@ class GameViewModel : ViewModel() {
         val symbol = state.hash.get(row, column)
         val playing = state.playerTurn
 
-        return symbol == null && playing is Player.Person
+        val disabledAi = { playing is Player.Phone && !playing.isEnable }
+
+        return symbol == null && (playing is Player.Person || disabledAi())
     }
 
     fun clear() {
@@ -222,6 +235,54 @@ class GameViewModel : ViewModel() {
             )
         }
 
-        playAI()
+        playIntelligent()
+    }
+
+    fun onDebug(player: Player) {
+
+        if (!BuildConfig.DEBUG) {
+            error("function only available in debug")
+        }
+
+        when (player) {
+            is Player.Person -> {
+                _uiState.update { state ->
+                    val newPlayerPhone = Player.Phone(
+                        symbol = player.symbol,
+                    ).apply {
+                        windsCount = player.windsCount
+                    }
+
+                    val newPlayers = listOf(
+                        state.players.first { it != player },
+                        newPlayerPhone
+                    )
+
+                    state.copy(
+                        players = newPlayers,
+                        playerTurn = state.playerTurn?.let { turn ->
+                            newPlayers.first { it.symbol == turn.symbol }
+                        },
+                        playerWinner = state.playerWinner?.let { winner ->
+                            newPlayers.first { it.symbol == winner.symbol }
+                        }
+                    )
+                }
+
+                playIntelligent()
+            }
+            is Player.Phone -> {
+
+                player.isEnable = !player.isEnable
+
+                _uiState.update {
+                    it.copy()
+                }
+
+                if (player.isEnable) {
+                    playIntelligent()
+                }
+            }
+        }
     }
 }

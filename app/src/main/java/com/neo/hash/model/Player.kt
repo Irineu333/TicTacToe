@@ -7,9 +7,10 @@ sealed class Player {
 
     data class Phone(
         override val symbol: Hash.Symbol,
-        val ai : Intelligent = Intelligent(symbol)
+        val ai : Intelligent = Intelligent(symbol),
     ) : Player() {
         override var windsCount: Int = 0
+        var isEnable : Boolean = true
     }
 
     data class Person(

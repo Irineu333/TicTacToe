@@ -31,7 +31,6 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
-import com.neo.hash.ui.components.Players
 import com.neo.hash.ui.components.SquareBox
 import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
 import com.neo.hash.ui.theme.HashBackground
@@ -82,7 +81,10 @@ fun GameScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp),
-            playing = state.playerTurn
+            playing = state.playerTurn,
+            onDebugClick = {
+                viewModel.onDebug(it)
+            }
         )
     }
 
