@@ -1,10 +1,7 @@
 package com.neo.hash
 
 import android.app.Application
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
+import com.google.android.gms.ads.MobileAds
 import timber.log.Timber
 
 class App : Application() {
@@ -14,6 +11,10 @@ class App : Application() {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+
+        MobileAds.initialize(this) {
+            Timber.i("AdMob initialized")
         }
     }
 

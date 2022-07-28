@@ -12,7 +12,11 @@ android {
         release {
             def keystoreProperties = new Properties()
 
-            keystoreProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
+            keystoreProperties.load(
+                    new FileInputStream(
+                            rootProject.file("keystore.properties")
+                    )
+            )
 
             storeFile rootProject.file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
@@ -36,16 +40,32 @@ android {
     }
 
     buildTypes {
+
+        def adsProperties = new Properties()
+
+        adsProperties.load(
+                new FileInputStream(
+                        rootProject.file("ads.properties")
+                )
+        )
+
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            //manifestPlaceholders = [ADMOB_APP_ID: adsProperties["ADMOB_APP_ID"]]
+
             signingConfig signingConfigs.release
         }
 
         debug {
             minifyEnabled false
+
             versionNameSuffix '-dev'
             applicationIdSuffix ".dev"
+
+            manifestPlaceholders = [ADMOB_APP_ID: adsProperties["DEBUG_APP_ID"]]
+            buildConfigField "String", "BANNER_ID", adsProperties["DEBUG_BANNER_ID"]
         }
     }
     compileOptions {
@@ -107,6 +127,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
+
+    //ads
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
 
     //tests
     testImplementation 'junit:junit:4.13.2'
