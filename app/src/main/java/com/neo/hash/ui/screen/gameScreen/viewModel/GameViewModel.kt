@@ -262,10 +262,9 @@ class GameViewModel : ViewModel() {
                         windsCount = player.windsCount
                     }
 
-                    val newPlayers = listOf(
-                        state.players.first { it != player },
-                        newPlayerPhone
-                    )
+                    val newPlayers = state.players.map {
+                        if (player == it) newPlayerPhone else it
+                    }
 
                     state.copy(
                         players = newPlayers,

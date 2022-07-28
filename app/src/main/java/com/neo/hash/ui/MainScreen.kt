@@ -2,6 +2,7 @@
 
 package com.neo.hash.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
@@ -46,20 +47,23 @@ fun MainScreen(
 
     val adRequest = remember { AdRequest.Builder().build() }
 
-    AndroidView(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp),
-        factory = { context ->
-            AdView(context)
-        },
-        update = { view ->
-            view.adUnitId = BuildConfig.BANNER_ID
+    AnimatedVisibility(visible = false) {
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            factory = { context ->
+                AdView(context)
+            },
+            update = { view ->
+                view.adUnitId = BuildConfig.BANNER_ID
 
-            view.setAdSize(AdSize.BANNER)
-            view.loadAd(adRequest)
-        }
-    )
+                view.setAdSize(AdSize.BANNER)
+                view.loadAd(adRequest)
+            }
+        )
+
+    }
 
     AnimatedNavHost(
         navController = controller,
