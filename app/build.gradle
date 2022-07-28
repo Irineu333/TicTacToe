@@ -65,7 +65,9 @@ android {
             applicationIdSuffix ".dev"
 
             manifestPlaceholders = [ADMOB_APP_ID: adsProperties["DEBUG_APP_ID"]]
+
             buildConfigField "String", "BANNER_ID", adsProperties["DEBUG_BANNER_ID"]
+            buildConfigField "String", "INTERSTITIAL_ID", adsProperties["DEBUG_INTERSTITIAL_ID"]
         }
     }
     compileOptions {

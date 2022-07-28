@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,7 +43,8 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
     isPhone: Boolean = false,
-    viewModel: GameViewModel = viewModel()
+    viewModel: GameViewModel = viewModel(),
+    showInterstitial: () -> Unit = {}
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.Center,
@@ -95,6 +97,7 @@ fun GameScreen(
     Row {
         GameButton(
             onClick = {
+                showInterstitial()
                 viewModel.clear()
             }
         ) {
@@ -117,10 +120,15 @@ fun GameScreen(
             onDismissRequest = {
                 finishing = true
                 onHomeClick()
-            }
+            },
         )
+    } else {
+        LaunchedEffect(key1 = "INTERSTITIAL") {
+            showInterstitial()
+        }
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable

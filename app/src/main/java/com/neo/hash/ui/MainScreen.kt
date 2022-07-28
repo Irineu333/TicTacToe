@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,30 +36,28 @@ import com.neo.hash.util.extensions.isCurrent
 
 @Composable
 fun MainScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showInterstitial : () -> Unit = {}
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.SpaceBetween
 ) {
     val controller = rememberAnimatedNavController()
 
+    val adRequest = remember { AdRequest.Builder().build() }
+
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 16.dp),
         factory = { context ->
-            AdView(context).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                )
-            }
+            AdView(context)
         },
         update = { view ->
             view.adUnitId = BuildConfig.BANNER_ID
 
             view.setAdSize(AdSize.BANNER)
-            view.loadAd(AdRequest.Builder().build())
+            view.loadAd(adRequest)
         }
     )
 
@@ -102,7 +101,8 @@ fun MainScreen(
                 },
                 isPhone = backStackEntry.arguments!!.getBoolean(
                     Screen.GameScreen.isPhone
-                )
+                ),
+                showInterstitial = showInterstitial
             )
         }
     }
