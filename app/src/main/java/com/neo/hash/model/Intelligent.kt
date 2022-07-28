@@ -13,10 +13,22 @@ class Intelligent(
         firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque() ?: random()
     }
 
-    private fun perfectThird(all: List<Hash.Block>): Hash.Block? {
+    fun hard(hash: Hash): Hash.Block = with(hash) {
+        firstRandom() ?: blockOnSecond() ?: perfectThird() ?: winOrBlock() ?: xeque() ?: random()
+    }
 
-        if (all.size == 2) {
+    private fun Hash.perfectThird(
+        symbols: List<Hash.Block> = getAllSymbols()
+    ): Hash.Block? {
+        if (symbols.size != 2) return null
 
+        val hasCorners = corners.any { get(it.row, it.column) != null }
+        val hasSides = sides.any { get(it.row, it.column) != null }
+        val hasCenter = get(center.row, center.column) != null
+
+        //only corners
+        if (hasCorners && !hasSides && !hasCenter) {
+            return corners.filter { get(it.row, it.column) == null }.randomOrNull()
         }
 
         return null
@@ -31,36 +43,21 @@ class Intelligent(
     ): Hash.Block? {
 
         if (symbols.size == 1) {
-            val corners = listOf(
-                Hash.Block(1, 1),
-                Hash.Block(1, 3),
-                Hash.Block(3, 3),
-                Hash.Block(3, 1),
-            )
 
-            val sides = listOf(
-                Hash.Block(1, 2),
-                Hash.Block(2, 3),
-                Hash.Block(2, 1),
-                Hash.Block(3, 2),
-            )
+            val hasCorners = corners.any { get(it.row, it.column) != null }
+            val hasSides = sides.any { get(it.row, it.column) != null }
+            val hasCenter = get(center.row, center.column) != null
 
-            val center = Hash.Block(2, 2)
-
-            val isCorners = corners.any { get(it.row, it.column) != null }
-            val isSides = sides.any { get(it.row, it.column) != null }
-            val isCenter = get(center.row, center.column) != null
-
-            if (isCorners) {
+            if (hasCorners) {
                 return center
             }
 
-            if (isSides) {
+            if (hasSides) {
                 val enemyBlock: Hash.Block = symbols[0]
                 return (corners.filter { it.isSide(enemyBlock) } + center).random()
             }
 
-            if (isCenter) {
+            if (hasCenter) {
                 return corners.random()
             }
         }
@@ -551,4 +548,22 @@ class Intelligent(
     private fun Hash.random() = getAllEmpty().filter {
         it.symbol == null
     }.random()
+
+    companion object {
+        val corners = listOf(
+            Hash.Block(1, 1),
+            Hash.Block(1, 3),
+            Hash.Block(3, 3),
+            Hash.Block(3, 1),
+        )
+
+        val sides = listOf(
+            Hash.Block(1, 2),
+            Hash.Block(2, 3),
+            Hash.Block(2, 1),
+            Hash.Block(3, 2),
+        )
+
+        val center = Hash.Block(2, 2)
+    }
 }
