@@ -45,7 +45,7 @@ fun MainScreen(
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(top = 16.dp),
         factory = { context ->
             AdView(context).apply {
                 layoutParams = ViewGroup.LayoutParams(

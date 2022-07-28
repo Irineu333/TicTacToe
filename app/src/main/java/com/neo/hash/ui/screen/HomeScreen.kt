@@ -2,7 +2,6 @@ package com.neo.hash.ui.screen
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -35,14 +34,13 @@ import com.neo.hash.ui.theme.HashTheme
 fun HomeScreen(
     onPlayClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
-) = Box(
-    modifier = modifier
-        .fillMaxSize()
-) {
+) = Column {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .weight(1f)
     ) {
         SquareBox(
             modifier = Modifier
@@ -108,8 +106,8 @@ fun HomeScreen(
     Text(
         text = BuildConfig.VERSION_NAME,
         modifier = Modifier
-            .align(Alignment.BottomCenter)
             .padding(bottom = 8.dp)
+            .align(Alignment.CenterHorizontally)
     )
 }
 
