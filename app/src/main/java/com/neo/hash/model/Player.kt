@@ -10,7 +10,7 @@ sealed class Player {
         val ai : Intelligent = Intelligent(symbol),
     ) : Player() {
         override var windsCount: Int = 0
-        var isEnable : Boolean = true
+        var isEnabled : Boolean = true
     }
 
     data class Person(

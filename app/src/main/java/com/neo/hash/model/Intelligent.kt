@@ -1,10 +1,12 @@
 package com.neo.hash.model
 
+import com.neo.hash.util.extensions.recurring
+
 class Intelligent(
     private val mySymbol: Hash.Symbol
 ) {
     fun easy(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: winOrBlock() ?: xeque() ?: random()
+        firstRandom() ?: winOrBlock() ?: xeque(smart = false) ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
@@ -323,7 +325,7 @@ class Intelligent(
      * action: Threatens to close a segment
      * requirement: A follow-up with a piece of mine
      */
-    private fun Hash.xeque(): Hash.Block? {
+    private fun Hash.xeque(smart: Boolean = true): Hash.Block? {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
 
@@ -339,7 +341,7 @@ class Intelligent(
                             Hash.Block(
                                 row,
                                 column,
-                                symbol = mySymbol
+                                mySymbol
                             )
                         )
                         continue
@@ -359,7 +361,8 @@ class Intelligent(
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
-                                column
+                                column,
+                                symbol
                             )
                         )
                     }
@@ -389,7 +392,7 @@ class Intelligent(
                             Hash.Block(
                                 row,
                                 column,
-                                symbol = mySymbol
+                                mySymbol
                             )
                         )
                         continue
@@ -409,7 +412,8 @@ class Intelligent(
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
-                                column
+                                column,
+                                symbol
                             )
                         )
                     }
@@ -439,14 +443,14 @@ class Intelligent(
                         Hash.Block(
                             index,
                             index,
-                            symbol = mySymbol
+                            mySymbol
                         )
                     )
                     continue
                 }
 
                 if (symbol == null) {
-                    enemyBlocks.add(
+                    emptyBlocks.add(
                         Hash.Block(
                             index,
                             index
@@ -459,7 +463,8 @@ class Intelligent(
                     enemyBlocks.add(
                         Hash.Block(
                             index,
-                            index
+                            index,
+                            symbol
                         )
                     )
                 }
@@ -489,7 +494,7 @@ class Intelligent(
                         Hash.Block(
                             row,
                             column,
-                            symbol = mySymbol
+                            mySymbol
                         )
                     )
                     continue
@@ -509,7 +514,8 @@ class Intelligent(
                     enemyBlocks.add(
                         Hash.Block(
                             row,
-                            column
+                            column,
+                            symbol
                         )
                     )
                 }
@@ -524,14 +530,18 @@ class Intelligent(
             }
         }
 
-        return buildList {
+        val moves = buildList {
             addAll(rows())
             addAll(columns())
 
             addAll(diagonal())
             addAll(invertedDiagonal())
 
-        }.randomOrNull()
+        }
+
+        return moves.let {
+            if (smart) it.recurring() else it
+        }.ifEmpty { moves }.randomOrNull()
     }
 
     /**

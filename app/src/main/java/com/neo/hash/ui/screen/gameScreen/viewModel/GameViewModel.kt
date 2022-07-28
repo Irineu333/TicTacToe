@@ -25,7 +25,7 @@ class GameViewModel : ViewModel() {
     private val canRunIntelligent: Boolean
         get() = uiState.value.let {
             it.playerTurn is Player.Phone
-                    && it.playerTurn.isEnable
+                    && it.playerTurn.isEnabled
         }
 
     fun select(row: Int, column: Int) {
@@ -38,7 +38,7 @@ class GameViewModel : ViewModel() {
                 internalSelect(row, column)
             }
             is Player.Phone -> {
-                if (BuildConfig.DEBUG && !playerTurn.isEnable) {
+                if (BuildConfig.DEBUG && !playerTurn.isEnabled) {
                     internalSelect(row, column)
                 }
             }
@@ -102,7 +102,7 @@ class GameViewModel : ViewModel() {
 
             val state = uiState.value
 
-            if (state.playerTurn is Player.Phone && canRunIntelligent) {
+            if (state.playerTurn is Player.Phone) {
                 val (row, column) = withContext(Dispatchers.Default) {
                     val delay = launch { delay(1000) }
 
@@ -111,7 +111,9 @@ class GameViewModel : ViewModel() {
                     }
                 }
 
-                internalSelect(row, column)
+                if (canRunIntelligent) {
+                    internalSelect(row, column)
+                }
             }
         }
     }
@@ -221,7 +223,7 @@ class GameViewModel : ViewModel() {
         val symbol = state.hash.get(row, column)
         val playing = state.playerTurn
 
-        val disabledAi = { playing is Player.Phone && !playing.isEnable }
+        val disabledAi = { playing is Player.Phone && !playing.isEnabled }
 
         return symbol == null && (playing is Player.Person || disabledAi())
     }
@@ -281,13 +283,13 @@ class GameViewModel : ViewModel() {
             }
             is Player.Phone -> {
 
-                player.isEnable = !player.isEnable
+                player.isEnabled = !player.isEnabled
 
                 _uiState.update {
                     it.copy()
                 }
 
-                if (player.isEnable) {
+                if (player.isEnabled) {
                     playIntelligent()
                 }
             }

@@ -18,3 +18,10 @@ fun <T> List<T>.joinToAnnotatedString(
         }
     }
 }
+
+fun <T> List<T>.recurring(
+    predicate: (T) -> T = { it }
+) = groupBy(predicate)
+    .filterValues {
+        it.size > 1
+    }.keys.toList()

@@ -74,7 +74,7 @@ private fun PlayerCard(
             )
         } else modifier,
         backgroundColor = when {
-            isPhone && !(player as Player.Phone).isEnable -> Color.Red
+            isPhone && !(player as Player.Phone).isEnabled -> Color.Red
             playing -> Color(0xFFEEEEEE)
             else -> MaterialTheme.colors.surface
         }
@@ -89,7 +89,7 @@ private fun PlayerCard(
         ) {
             Box {
                 Symbol(symbol = player.symbol)
-                if (isPhone && playing && (player as Player.Phone).isEnable) {
+                if (isPhone && playing && (player as Player.Phone).isEnabled) {
                     CircularProgressIndicator(
                         strokeWidth = 2.dp,
                         modifier = Modifier.matchParentSize()
