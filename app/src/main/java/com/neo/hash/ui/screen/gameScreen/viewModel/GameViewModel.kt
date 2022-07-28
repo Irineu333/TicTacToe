@@ -23,16 +23,25 @@ class GameViewModel : ViewModel() {
     private var aiJob: Job? = null
 
     private val canRunIntelligent: Boolean
-        get() {
-            val state = uiState.value
-            return state.playerTurn is Player.Phone && state.playerTurn.isEnable
+        get() = uiState.value.let {
+            it.playerTurn is Player.Phone
+                    && it.playerTurn.isEnable
         }
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
 
-        if (state.playerTurn is Player.Person) {
-            internalSelect(row, column)
+        val playerTurn = state.playerTurn ?: return
+
+        when (playerTurn) {
+            is Player.Person -> {
+                internalSelect(row, column)
+            }
+            is Player.Phone -> {
+                if (BuildConfig.DEBUG && !playerTurn.isEnable) {
+                    internalSelect(row, column)
+                }
+            }
         }
     }
 
