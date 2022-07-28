@@ -6,9 +6,15 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.FullScreenContentCallback
@@ -20,11 +26,12 @@ import com.neo.hash.ui.MainScreen
 import com.neo.hash.ui.screen.updateScreen.UpdateScreen
 import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme
-import timber.log.Timber
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
     private var interstitialAd: InterstitialAd? = null
+    private val snackbarHostState = SnackbarHostState()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,15 +45,44 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     MainScreen(
-                        showInterstitial = {
-                            interstitialAd?.show(this)
-                        }
+                        showInterstitial = this::showInterstitial
                     )
+
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        SnackbarHost(
+                            hostState = snackbarHostState,
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                        ) {
+
+                            Snackbar(
+                                snackbarData = it
+                            )
+                        }
+                    }
+
                     UpdateScreen(
                         openPlayStore = this::openPlayStore
                     )
                 }
             }
+        }
+    }
+
+    private fun showInterstitial(
+        onSuccess: () -> Unit
+    ) {
+        if (interstitialAd == null) {
+            loadInterstitial(
+                onSuccess = onSuccess
+            )
+        } else {
+            interstitialAd!!.show(this)
+            interstitialAd!!.fullScreenContentCallback = AdCallback(
+                onSuccess = onSuccess
+            )
         }
     }
 
@@ -68,7 +104,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun loadInterstitial() {
+    private fun loadInterstitial(
+        onSuccess: (() -> Unit)? = null
+    ) {
+
+        if (onSuccess != null) {
+            showSnackbar(
+                message = "Carregando anúncio..."
+            )
+        }
+
         InterstitialAd.load(
             this,
             BuildConfig.INTERSTITIAL_ID,
@@ -76,49 +121,55 @@ class MainActivity : ComponentActivity() {
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     this@MainActivity.interstitialAd = interstitialAd
-
-                    configCallback()
+                    onSuccess?.invoke()
                 }
-
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     interstitialAd = null
-                    Timber.e(adError.message)
+                    showSnackbar("Erro ao carregar anúncio")
                 }
             }
         )
     }
 
-    private fun configCallback() {
-        interstitialAd?.fullScreenContentCallback = object: FullScreenContentCallback() {
-            override fun onAdClicked() {
-                // Called when a click is recorded for an ad.
+    private fun showSnackbar(
+        message: String
+    ) = lifecycleScope.launch {
+        snackbarHostState.showSnackbar(message)
+    }
 
-            }
+    inner class AdCallback(
+        private val onSuccess: () -> Unit
+    ) : FullScreenContentCallback() {
+        override fun onAdClicked() {
+            // Called when a click is recorded for an ad.
 
-            override fun onAdDismissedFullScreenContent() {
-                // Called when ad is dismissed.
+        }
 
-                interstitialAd = null
-                loadInterstitial()
-            }
+        override fun onAdDismissedFullScreenContent() {
+            // Called when ad is dismissed.
 
-            override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-                // Called when ad fails to show.
+            interstitialAd = null
+            loadInterstitial()
+        }
 
-                interstitialAd = null
-                loadInterstitial()
-            }
+        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
+            // Called when ad fails to show.
 
-            override fun onAdImpression() {
-                // Called when an impression is recorded for an ad.
+            interstitialAd = null
+            loadInterstitial()
 
-            }
+            showSnackbar("Erro ao exibir anúncio")
+        }
 
-            override fun onAdShowedFullScreenContent() {
-                // Called when ad is shown.
+        override fun onAdImpression() {
+            // Called when an impression is recorded for an ad.
 
-            }
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            // Called when ad is shown.
+            onSuccess()
         }
     }
 }

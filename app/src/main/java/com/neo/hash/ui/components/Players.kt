@@ -1,12 +1,15 @@
 package com.neo.hash.ui.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -52,16 +55,25 @@ private fun PlayerCard(
 ) = Card(
     modifier = modifier,
     backgroundColor = if (playing)
-        Color(0xFFEEEEEE)
-    else
+        Color(0xFFEEEEEE) else
         MaterialTheme.colors.surface
 ) {
     Row(
         modifier = Modifier
-            .padding(vertical = 4.dp, horizontal = 8.dp)
-            .height(IntrinsicSize.Min)
+            .padding(
+                vertical = 4.dp,
+                horizontal = 8.dp
+            ).height(IntrinsicSize.Min)
     ) {
-        Symbol(symbol = player.symbol)
+        Box {
+            Symbol(symbol = player.symbol)
+            if (player is Player.Phone && playing) {
+                CircularProgressIndicator(
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.padding(4.dp))
 

@@ -2,7 +2,6 @@
 
 package com.neo.hash.ui
 
-import android.view.ViewGroup
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
@@ -33,11 +32,12 @@ import com.neo.hash.util.extensions.enterToRightTransition
 import com.neo.hash.util.extensions.exitToLeftTransition
 import com.neo.hash.util.extensions.exitToRightTransition
 import com.neo.hash.util.extensions.isCurrent
+import kotlin.reflect.KFunction1
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    showInterstitial : () -> Unit = {}
+    showInterstitial: (() -> Unit) -> Unit = { }
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.SpaceBetween

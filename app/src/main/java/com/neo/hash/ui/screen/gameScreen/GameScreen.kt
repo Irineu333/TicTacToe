@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +43,7 @@ fun GameScreen(
     onHomeClick: () -> Unit = {},
     isPhone: Boolean = false,
     viewModel: GameViewModel = viewModel(),
-    showInterstitial: () -> Unit = {}
+    showInterstitial: (() -> Unit) -> Unit = {  }
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.Center,
@@ -60,24 +59,32 @@ fun GameScreen(
                     .padding(
                         vertical = 4.dp,
                         horizontal = 16.dp
-                    )
-                    .height(IntrinsicSize.Min)
+                    ).height(IntrinsicSize.Min)
             ) {
-                Text(text = stringResource(R.string.text_tired).uppercase(), fontSize = 16.sp)
+                Text(
+                    text = stringResource(
+                        R.string.text_tired
+                    ).uppercase(),
+                    fontSize = 16.sp
+                )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "${state.tied}", fontSize = 16.sp)
+                Text(
+                    text = "${state.tied}",
+                    fontSize = 16.sp
+                )
             }
         }
     }
 
-    Players(
-        players = state.players,
-        modifier = Modifier
-            .fillMaxWidth(),
-        playing = state.playerTurn
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
+    AnimatedVisibility(visible = state.players.isNotEmpty()) {
+        Players(
+            players = state.players,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            playing = state.playerTurn
+        )
+    }
 
     SquareBox(modifier = Modifier.padding(16.dp)) {
         HashTable(
@@ -97,8 +104,9 @@ fun GameScreen(
     Row {
         GameButton(
             onClick = {
-                showInterstitial()
-                viewModel.clear()
+                showInterstitial {
+                    viewModel.clear()
+                }
             }
         ) {
             Text(text = stringResource(R.string.btn_clean).uppercase())
@@ -117,15 +125,12 @@ fun GameScreen(
         PlayersInsertDialog(
             viewModel = viewModel,
             vsPhone = isPhone,
+            showInterstitial = showInterstitial,
             onDismissRequest = {
                 finishing = true
                 onHomeClick()
             },
         )
-    } else {
-        LaunchedEffect(key1 = "INTERSTITIAL") {
-            showInterstitial()
-        }
     }
 }
 

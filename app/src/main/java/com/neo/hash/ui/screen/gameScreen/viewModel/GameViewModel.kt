@@ -4,12 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GameViewModel : ViewModel() {
 
@@ -80,12 +82,14 @@ class GameViewModel : ViewModel() {
         aiJob?.cancel()
         aiJob = viewModelScope.launch {
 
-            delay(500)
+            delay(1000)
 
             val state = uiState.value
 
             if (state.playerTurn is Player.Phone) {
-                val (row, column) = state.playerTurn.ai.medium(state.hash)
+                val (row, column) = withContext(Dispatchers.Default) {
+                    state.playerTurn.ai.medium(state.hash)
+                }
 
                 internalSelect(row, column)
             }

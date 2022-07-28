@@ -32,7 +32,8 @@ import kotlin.random.Random
 fun PlayersInsertDialog(
     viewModel: GameViewModel,
     vsPhone: Boolean = false,
-    onDismissRequest: () -> Unit
+    showInterstitial: (() -> Unit) -> Unit = { },
+    onDismissRequest: () -> Unit = {}
 ) {
     GameDialog(
         onDismissRequest = onDismissRequest,
@@ -95,30 +96,33 @@ fun PlayersInsertDialog(
         ) {
             GameButton(
                 onClick = {
-                    val symbol1 = if (Random.nextBoolean())
-                        Hash.Symbol.O else Hash.Symbol.X
+                    showInterstitial {
 
-                    val symbol2 = when (symbol1) {
-                        Hash.Symbol.O -> Hash.Symbol.X
-                        Hash.Symbol.X -> Hash.Symbol.O
-                    }
+                        val symbol1 = if (Random.nextBoolean())
+                            Hash.Symbol.O else Hash.Symbol.X
 
-                    viewModel.start(
-                        Player.Person(
-                            name = player1.trim(),
-                            symbol = symbol1
-                        ),
-                        if (vsPhone) {
-                            Player.Phone(
-                                symbol = symbol2
-                            )
-                        } else {
-                            Player.Person(
-                                name = player2.trim(),
-                                symbol = symbol2
-                            )
+                        val symbol2 = when (symbol1) {
+                            Hash.Symbol.O -> Hash.Symbol.X
+                            Hash.Symbol.X -> Hash.Symbol.O
                         }
-                    )
+
+                        viewModel.start(
+                            Player.Person(
+                                name = player1.trim(),
+                                symbol = symbol1
+                            ),
+                            if (vsPhone) {
+                                Player.Phone(
+                                    symbol = symbol2
+                                )
+                            } else {
+                                Player.Person(
+                                    name = player2.trim(),
+                                    symbol = symbol2
+                                )
+                            }
+                        )
+                    }
                 },
                 enabled = isNotBlank && !isError
             ) {
