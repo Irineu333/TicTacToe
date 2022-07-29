@@ -5,6 +5,11 @@ import com.neo.hash.util.extensions.recurring
 class Intelligent(
     private val mySymbol: Hash.Symbol
 ) {
+
+    private val Hash.hasCorners get() = corners.any { get(it.row, it.column) != null }
+    private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
+    private val Hash.hasCenter get() = get(center.row, center.column) != null
+
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom() ?: winOrBlock() ?: xeque(smart = false) ?: random()
     }
@@ -17,14 +22,14 @@ class Intelligent(
         firstRandom() ?: blockOnSecond() ?: perfectThird() ?: winOrBlock() ?: xeque() ?: random()
     }
 
+    /**
+     * action: Best plays when I'm third to play
+     * requirement: Be the third to play
+     */
     private fun Hash.perfectThird(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
         if (symbols.size != 2) return null
-
-        val hasCorners = corners.any { get(it.row, it.column) != null }
-        val hasSides = sides.any { get(it.row, it.column) != null }
-        val hasCenter = get(center.row, center.column) != null
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
@@ -43,10 +48,6 @@ class Intelligent(
     ): Hash.Block? {
 
         if (symbols.size == 1) {
-
-            val hasCorners = corners.any { get(it.row, it.column) != null }
-            val hasSides = sides.any { get(it.row, it.column) != null }
-            val hasCenter = get(center.row, center.column) != null
 
             if (hasCorners) {
                 return center
