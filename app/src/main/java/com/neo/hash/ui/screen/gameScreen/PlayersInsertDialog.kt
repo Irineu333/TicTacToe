@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +37,14 @@ fun PlayersInsertDialog(
     showInterstitial: (() -> Unit) -> Unit = { },
     onDismissRequest: () -> Unit = {}
 ) {
+    val textSmartphone = stringResource(R.string.text_smartphone)
+
+    var player1 by remember { mutableStateOf("") }
+    var player2 by remember { mutableStateOf(if (vsPhone) textSmartphone else "") }
+
+    val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
+    val isError = player1 == player2 && isNotBlank
+
     GameDialog(
         onDismissRequest = onDismissRequest,
         properties = DialogProperties(
@@ -47,54 +56,41 @@ fun PlayersInsertDialog(
                 modifier = Modifier
                     .align(Alignment.Center),
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.primary
+                color = colors.primary
             )
-        }
-    ) {
-        val textSmartphone = stringResource(R.string.text_smartphone)
+        },
+        content = {
+            OutlinedTextField(
+                value = player1,
+                onValueChange = {
+                    player1 = it.uppercase().trim()
+                },
+                isError = isError,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next
+                ),
+                label = {
+                    Text(text = stringResource(R.string.text_player, 1))
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
 
-        var player1 by remember { mutableStateOf("") }
-        var player2 by remember { mutableStateOf(if (vsPhone) textSmartphone else "") }
-
-        val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
-        val isError = player1 == player2 && isNotBlank
-
-        OutlinedTextField(
-            value = player1,
-            onValueChange = {
-                player1 = it
-            },
-            isError = isError,
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next
-            ),
-            label = {
-                Text(text = stringResource(R.string.text_player, 1))
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = player2,
-            onValueChange = {
-                player2 = it
-            },
-            isError = isError,
-            singleLine = true,
-            readOnly = vsPhone,
-            label = {
-                Text(text = stringResource(R.string.text_player, 2))
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.End,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxWidth()
-        ) {
+            OutlinedTextField(
+                value = player2,
+                onValueChange = {
+                    player2 = it.uppercase().trim()
+                },
+                isError = isError,
+                singleLine = true,
+                readOnly = vsPhone,
+                label = {
+                    Text(text = stringResource(R.string.text_player, 2))
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        buttons = {
             GameButton(
                 onClick = {
                     showInterstitial {
@@ -109,7 +105,7 @@ fun PlayersInsertDialog(
 
                         viewModel.start(
                             Player.Person(
-                                name = player1.trim(),
+                                name = player1,
                                 symbol = symbol1
                             ),
                             if (vsPhone) {
@@ -118,7 +114,7 @@ fun PlayersInsertDialog(
                                 )
                             } else {
                                 Player.Person(
-                                    name = player2.trim(),
+                                    name = player2,
                                     symbol = symbol2
                                 )
                             }
@@ -130,7 +126,7 @@ fun PlayersInsertDialog(
                 Text(text = stringResource(R.string.btn_confirm).uppercase())
             }
         }
-    }
+    )
 }
 
 @Preview
