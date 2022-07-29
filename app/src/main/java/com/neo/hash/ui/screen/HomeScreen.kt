@@ -34,61 +34,48 @@ import com.neo.hash.ui.theme.HashTheme
 fun HomeScreen(
     onPlayClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
-) = Column {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .weight(1f)
-    ) {
-        SquareBox(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .border(
-                    width = 2.dp,
-                    color = MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(8.dp)
-                )
-        ) {
-            HashTable(
-                hash = Hash().apply {
-                    set(Hash.Symbol.X, 1, 3)
-                    set(Hash.Symbol.X, 2, 2)
-                    set(Hash.Symbol.X, 3, 1)
-
-                    set(Hash.Symbol.O, 1, 2)
-                    set(Hash.Symbol.O, 2, 1)
-                    set(Hash.Symbol.O, 3, 3)
-                },
-                winner = Hash.Winner.Diagonal.Inverted,
-                modifier = Modifier.padding(16.dp)
+) = Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center,
+    modifier = modifier
+        .fillMaxSize()
+) {
+    SquareBox(
+        modifier = Modifier
+            .fillMaxWidth(0.5f)
+            .border(
+                width = 2.dp,
+                color = MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(8.dp)
             )
-        }
+    ) {
+        HashTable(
+            hash = Hash().apply {
+                set(Hash.Symbol.X, 1, 3)
+                set(Hash.Symbol.X, 2, 2)
+                set(Hash.Symbol.X, 3, 1)
 
-        Spacer(modifier = Modifier.height(16.dp))
+                set(Hash.Symbol.O, 1, 2)
+                set(Hash.Symbol.O, 2, 1)
+                set(Hash.Symbol.O, 3, 3)
+            },
+            winner = Hash.Winner.Diagonal.Inverted,
+            modifier = Modifier.padding(16.dp)
+        )
+    }
 
-        GameButton(onClick = {
-            onPlayClick(true)
-        }) {
-            Row {
-                Icon(
-                    imageVector = Icons.Rounded.Person,
-                    contentDescription = null,
-                )
+    Text(
+        text = BuildConfig.VERSION_NAME,
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+    )
 
-                Text(text = "vs", fontSize = 16.sp)
+    Spacer(modifier = Modifier.height(16.dp))
 
-                Icon(
-                    imageVector = Icons.Rounded.PhoneAndroid,
-                    contentDescription = null
-                )
-            }
-        }
-
-        GameButton(onClick = {
-            onPlayClick(false)
-        }) {
+    GameButton(onClick = {
+        onPlayClick(true)
+    }) {
+        Row {
             Icon(
                 imageVector = Icons.Rounded.Person,
                 contentDescription = null,
@@ -97,18 +84,27 @@ fun HomeScreen(
             Text(text = "vs", fontSize = 16.sp)
 
             Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
+                imageVector = Icons.Rounded.PhoneAndroid,
+                contentDescription = null
             )
         }
     }
 
-    Text(
-        text = BuildConfig.VERSION_NAME,
-        modifier = Modifier
-            .padding(bottom = 8.dp)
-            .align(Alignment.CenterHorizontally)
-    )
+    GameButton(onClick = {
+        onPlayClick(false)
+    }) {
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
+
+        Text(text = "vs", fontSize = 16.sp)
+
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
+    }
 }
 
 @Preview(showBackground = true)

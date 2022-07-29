@@ -22,7 +22,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.neo.hash.BuildConfig
-import com.neo.hash.ui.MainScreen
+import com.neo.hash.ui.screen.mainScreen.MainScreen
 import com.neo.hash.ui.screen.updateScreen.UpdateScreen
 import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme

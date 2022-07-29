@@ -1,8 +1,7 @@
 @file:OptIn(ExperimentalAnimationApi::class)
 
-package com.neo.hash.ui
+package com.neo.hash.ui.screen.mainScreen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
@@ -11,7 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -33,7 +35,6 @@ import com.neo.hash.util.extensions.enterToRightTransition
 import com.neo.hash.util.extensions.exitToLeftTransition
 import com.neo.hash.util.extensions.exitToRightTransition
 import com.neo.hash.util.extensions.isCurrent
-import kotlin.reflect.KFunction1
 
 @Composable
 fun MainScreen(
@@ -43,31 +44,27 @@ fun MainScreen(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.SpaceBetween
 ) {
+
+    var test : String? by remember { mutableStateOf(null) }
+
+    CoclewIdentifier(
+        modifier = modifier.fillMaxWidth(),
+        referenceCode = test,
+        onAddReferenceCode = {
+            test = it
+        },
+        onRemoveReferenceCode = {
+            test = null
+        }
+    )
+
     val controller = rememberAnimatedNavController()
-
-    val adRequest = remember { AdRequest.Builder().build() }
-
-    AnimatedVisibility(visible = false) {
-        AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-            factory = { context ->
-                AdView(context)
-            },
-            update = { view ->
-                view.adUnitId = BuildConfig.BANNER_ID
-
-                view.setAdSize(AdSize.BANNER)
-                view.loadAd(adRequest)
-            }
-        )
-
-    }
 
     AnimatedNavHost(
         navController = controller,
-        startDestination = Screen.HomeScreen.route
+        startDestination = Screen.HomeScreen.route,
+        modifier = Modifier.weight(1f)
+            .fillMaxSize()
     ) {
         composable(
             route = Screen.HomeScreen.route,
@@ -110,6 +107,21 @@ fun MainScreen(
             )
         }
     }
+
+    val adRequest = remember { AdRequest.Builder().build() }
+
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        factory = { context ->
+            AdView(context).apply {
+                adUnitId = BuildConfig.BANNER_ID
+                setAdSize(AdSize.BANNER)
+                loadAd(adRequest)
+            }
+        }
+    )
 }
 
 @Preview
