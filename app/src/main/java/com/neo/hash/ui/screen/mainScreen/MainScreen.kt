@@ -28,6 +28,7 @@ import com.neo.hash.BuildConfig
 import com.neo.hash.model.Screen
 import com.neo.hash.ui.screen.HomeScreen
 import com.neo.hash.ui.screen.gameScreen.GameScreen
+import com.neo.hash.ui.screen.mainScreen.viewModel.MainViewModel
 import com.neo.hash.util.extensions.enterToLeftTransition
 import com.neo.hash.util.extensions.enterToRightTransition
 import com.neo.hash.util.extensions.exitToLeftTransition

@@ -1,4 +1,4 @@
-package com.neo.hash.ui.screen.mainScreen
+package com.neo.hash.ui.screen.mainScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

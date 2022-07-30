@@ -1,4 +1,4 @@
-package com.neo.hash.id
+package com.neo.hash.di
 
 import com.neo.hash.data.DataStoreRepository
 import com.neo.hash.data.DataStoreRepositoryImpl
