@@ -41,8 +41,7 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
     isPhone: Boolean = false,
-    viewModel: GameViewModel = viewModel(),
-    showInterstitial: (() -> Unit) -> Unit = {  }
+    viewModel: GameViewModel = viewModel()
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.Center,
@@ -106,9 +105,7 @@ fun GameScreen(
     Row {
         GameButton(
             onClick = {
-                showInterstitial {
-                    viewModel.clear()
-                }
+                viewModel.clear()
             }
         ) {
             Text(text = stringResource(R.string.btn_clean).uppercase())
@@ -127,7 +124,6 @@ fun GameScreen(
         PlayersInsertDialog(
             viewModel = viewModel,
             vsPhone = isPhone,
-            showInterstitial = showInterstitial,
             onDismissRequest = {
                 finishing = true
                 onHomeClick()

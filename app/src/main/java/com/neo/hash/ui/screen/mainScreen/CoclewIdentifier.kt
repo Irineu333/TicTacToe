@@ -37,7 +37,7 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun CoclewIdentifier(
     modifier: Modifier = Modifier,
-    referenceCode: String? = null,
+    referenceCode: String = "",
     onAddReferenceCode: (String) -> Unit = {},
     onRemoveReferenceCode: () -> Unit = {},
 ) = Box(
@@ -53,7 +53,7 @@ fun CoclewIdentifier(
 
     Button(
         onClick = {
-            if (referenceCode == null) {
+            if (referenceCode.isEmpty()) {
                 showInsertReferenceCode = true
             } else {
                 onRemoveReferenceCode()
@@ -65,7 +65,7 @@ fun CoclewIdentifier(
         modifier = Modifier
             .align(Alignment.CenterEnd)
     ) {
-        AnimatedVisibility(visible = referenceCode == null) {
+        AnimatedVisibility(visible = referenceCode.isEmpty()) {
             Icon(
                 imageVector = Icons.Rounded.Add,
                 contentDescription = null,
@@ -74,12 +74,12 @@ fun CoclewIdentifier(
         }
 
         Text(
-            text = referenceCode ?: "Código de referência".uppercase(),
+            text = referenceCode.ifEmpty { "Código de referência".uppercase() },
             letterSpacing = 0.sp,
             lineHeight = 0.sp
         )
 
-        AnimatedVisibility(visible = referenceCode != null) {
+        AnimatedVisibility(visible = referenceCode.isNotEmpty()) {
             Icon(
                 imageVector = Icons.TwoTone.Cancel,
                 contentDescription = null,
@@ -91,9 +91,7 @@ fun CoclewIdentifier(
 
     if (showInsertReferenceCode) {
         InsertReferenceCode(
-            onDismissRequest = {
-                showInsertReferenceCode = false
-            },
+            onDismissRequest = { showInsertReferenceCode = false },
             onAddReferenceCode = onAddReferenceCode
         )
     }
@@ -135,7 +133,7 @@ fun InsertReferenceCode(
             OutlinedTextField(
                 value = referenceCode,
                 onValueChange = {
-                    referenceCode = it
+                    referenceCode = it.trim()
                 },
                 keyboardOptions = KeyboardOptions(
                    autoCorrect = false

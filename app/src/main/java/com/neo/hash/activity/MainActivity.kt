@@ -26,44 +26,24 @@ import com.neo.hash.ui.screen.mainScreen.MainScreen
 import com.neo.hash.ui.screen.updateScreen.UpdateScreen
 import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private var interstitialAd: InterstitialAd? = null
-    private val snackbarHostState = SnackbarHostState()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         installSplashScreen()
-        //loadInterstitial()
 
         setContent {
             HashTheme {
                 HashBackground(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-                    MainScreen(
-                        showInterstitial = {
-                            it()
-                        }
-                    )
 
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        SnackbarHost(
-                            hostState = snackbarHostState,
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                        ) {
-
-                            Snackbar(
-                                snackbarData = it
-                            )
-                        }
-                    }
+                    MainScreen()
 
                     UpdateScreen(
                         openPlayStore = this::openPlayStore
@@ -72,22 +52,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    private fun showInterstitial(
-        onSuccess: () -> Unit
-    ) {
-        if (interstitialAd == null) {
-            loadInterstitial(
-                onSuccess = onSuccess
-            )
-        } else {
-            interstitialAd!!.show(this)
-            interstitialAd!!.fullScreenContentCallback = AdCallback(
-                onSuccess = onSuccess
-            )
-        }
-    }
-
     private fun openPlayStore() {
         try {
             startActivity(
@@ -103,75 +67,6 @@ class MainActivity : ComponentActivity() {
                     Uri.parse("https://play.google.com/store/apps/details?id=$packageName")
                 )
             )
-        }
-    }
-
-    private fun loadInterstitial(
-        onSuccess: (() -> Unit)? = null
-    ) {
-
-        if (onSuccess != null) {
-            showSnackbar(
-                message = "Carregando anúncio..."
-            )
-        }
-
-        InterstitialAd.load(
-            this,
-            BuildConfig.INTERSTITIAL_ID,
-            AdRequest.Builder().build(),
-            object : InterstitialAdLoadCallback() {
-                override fun onAdLoaded(interstitialAd: InterstitialAd) {
-                    this@MainActivity.interstitialAd = interstitialAd
-                    onSuccess?.invoke()
-                }
-
-                override fun onAdFailedToLoad(adError: LoadAdError) {
-                    interstitialAd = null
-                    showSnackbar("Erro ao carregar anúncio")
-                }
-            }
-        )
-    }
-
-    private fun showSnackbar(
-        message: String
-    ) = lifecycleScope.launch {
-        snackbarHostState.showSnackbar(message)
-    }
-
-    inner class AdCallback(
-        private val onSuccess: () -> Unit
-    ) : FullScreenContentCallback() {
-        override fun onAdClicked() {
-            // Called when a click is recorded for an ad.
-
-        }
-
-        override fun onAdDismissedFullScreenContent() {
-            // Called when ad is dismissed.
-
-            interstitialAd = null
-            loadInterstitial()
-        }
-
-        override fun onAdFailedToShowFullScreenContent(adError: AdError) {
-            // Called when ad fails to show.
-
-            interstitialAd = null
-            loadInterstitial()
-
-            showSnackbar("Erro ao exibir anúncio")
-        }
-
-        override fun onAdImpression() {
-            // Called when an impression is recorded for an ad.
-
-        }
-
-        override fun onAdShowedFullScreenContent() {
-            // Called when ad is shown.
-            onSuccess()
         }
     }
 }

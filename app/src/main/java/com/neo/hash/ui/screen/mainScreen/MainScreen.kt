@@ -10,13 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -38,22 +37,22 @@ import com.neo.hash.util.extensions.isCurrent
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    showInterstitial: (() -> Unit) -> Unit = { }
+    viewModel: MainViewModel = viewModel()
 ) = Column(
     modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.SpaceBetween
 ) {
 
-    var test : String? by remember { mutableStateOf(null) }
+    val referenceCode = viewModel.referenceCode.collectAsState(initial = "").value
 
     CoclewIdentifier(
         modifier = modifier.fillMaxWidth(),
-        referenceCode = test,
-        onAddReferenceCode = {
-            test = it
+        referenceCode = referenceCode,
+        onAddReferenceCode = { code ->
+            viewModel.setReferenceCode(code)
         },
         onRemoveReferenceCode = {
-            test = null
+            viewModel.clearReferenceCode()
         }
     )
 
@@ -62,7 +61,8 @@ fun MainScreen(
     AnimatedNavHost(
         navController = controller,
         startDestination = Screen.HomeScreen.route,
-        modifier = Modifier.weight(1f)
+        modifier = Modifier
+            .weight(1f)
             .fillMaxSize()
     ) {
         composable(
@@ -101,8 +101,7 @@ fun MainScreen(
                 },
                 isPhone = backStackEntry.arguments!!.getBoolean(
                     Screen.GameScreen.isPhone
-                ),
-                showInterstitial = showInterstitial
+                )
             )
         }
     }
