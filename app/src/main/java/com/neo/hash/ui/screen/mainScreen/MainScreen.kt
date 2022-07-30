@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
@@ -40,14 +42,19 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel()
 ) = Column(
-    modifier = modifier.fillMaxSize(),
+    modifier = modifier
+        .verticalScroll(rememberScrollState())
+        .fillMaxSize(),
     verticalArrangement = Arrangement.SpaceBetween
 ) {
 
     val referenceCode = viewModel.referenceCode.collectAsState(initial = "").value
 
     CoclewIdentifier(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.padding(
+            horizontal = 16.dp,
+            vertical = 12.dp
+        ),
         referenceCode = referenceCode,
         onAddReferenceCode = { code ->
             viewModel.setReferenceCode(code)
@@ -62,9 +69,6 @@ fun MainScreen(
     AnimatedNavHost(
         navController = controller,
         startDestination = Screen.HomeScreen.route,
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxSize()
     ) {
         composable(
             route = Screen.HomeScreen.route,
@@ -111,8 +115,8 @@ fun MainScreen(
 
     AndroidView(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = 16.dp)
+            .fillMaxWidth(),
         factory = { context ->
             AdView(context).apply {
                 adUnitId = BuildConfig.BANNER_ID

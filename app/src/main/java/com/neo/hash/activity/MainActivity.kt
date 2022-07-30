@@ -25,9 +25,9 @@ class MainActivity : ComponentActivity() {
                 HashBackground(
                     modifier = Modifier.fillMaxSize(),
                 ) {
-
                     MainScreen()
                     UpdateScreen()
+
                 }
             }
         }

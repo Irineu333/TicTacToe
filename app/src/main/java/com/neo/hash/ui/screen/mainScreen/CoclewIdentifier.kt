@@ -41,12 +41,7 @@ fun CoclewIdentifier(
     onAddReferenceCode: (String) -> Unit = {},
     onRemoveReferenceCode: () -> Unit = {},
 ) = Box(
-    modifier = modifier
-        .fillMaxWidth()
-        .padding(
-            horizontal = 16.dp,
-            vertical = 12.dp
-        )
+    modifier = modifier.fillMaxWidth()
 ) {
 
     var showInsertReferenceCode by remember { mutableStateOf(false) }

@@ -222,10 +222,12 @@ class GameViewModel : ViewModel() {
         val state = uiState.value
         val symbol = state.hash.get(row, column)
         val playing = state.playerTurn
+        val winner = state.playerWinner
 
         val disabledAi = { playing is Player.Phone && !playing.isEnabled }
+        val playingIsPerson = { playing is Player.Person }
 
-        return symbol == null && (playing is Player.Person || disabledAi())
+        return symbol == null && winner == null && (playingIsPerson() || disabledAi())
     }
 
     fun clear() {

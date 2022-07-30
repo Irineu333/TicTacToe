@@ -2,6 +2,7 @@ package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -57,7 +58,8 @@ fun GameScreen(
                     .padding(
                         vertical = 4.dp,
                         horizontal = 16.dp
-                    ).height(IntrinsicSize.Min)
+                    )
+                    .height(IntrinsicSize.Min)
             ) {
                 Text(
                     text = stringResource(
@@ -87,17 +89,22 @@ fun GameScreen(
         )
     }
 
-    SquareBox(modifier = Modifier.padding(16.dp)) {
-        HashTable(
-            hash = state.hash,
-            winner = state.winner,
-            onBlockClick = {
-                viewModel.select(it.row, it.column)
-            },
-            canClick = {
-                viewModel.canClick(it.row, it.column)
-            }
-        )
+    BoxWithConstraints(Modifier) {
+        SquareBox {
+            HashTable(
+                hash = state.hash,
+                winner = state.winner,
+                onBlockClick = {
+                    viewModel.select(it.row, it.column)
+                },
+                canClick = {
+                    viewModel.canClick(it.row, it.column)
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .matchParentSize()
+            )
+        }
     }
 
     Spacer(modifier = Modifier.height(16.dp))

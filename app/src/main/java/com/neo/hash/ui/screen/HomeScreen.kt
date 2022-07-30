@@ -2,6 +2,8 @@ package com.neo.hash.ui.screen
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -40,28 +43,31 @@ fun HomeScreen(
     modifier = modifier
         .fillMaxSize()
 ) {
-    SquareBox(
-        modifier = Modifier
-            .fillMaxWidth(0.5f)
-            .border(
-                width = 2.dp,
-                color = MaterialTheme.colors.primary,
-                shape = RoundedCornerShape(8.dp)
-            )
-    ) {
-        HashTable(
-            hash = Hash().apply {
-                set(Hash.Symbol.X, 1, 3)
-                set(Hash.Symbol.X, 2, 2)
-                set(Hash.Symbol.X, 3, 1)
 
-                set(Hash.Symbol.O, 1, 2)
-                set(Hash.Symbol.O, 2, 1)
-                set(Hash.Symbol.O, 3, 3)
-            },
-            winner = Hash.Winner.Diagonal.Inverted,
-            modifier = Modifier.padding(16.dp)
-        )
+    BoxWithConstraints(Modifier.fillMaxWidth(0.5f)) {
+        SquareBox(
+            modifier = Modifier.border(
+                    width = 2.dp,
+                    color = MaterialTheme.colors.primary,
+                    shape = RoundedCornerShape(8.dp)
+                )
+        ) {
+            HashTable(
+                hash = Hash().apply {
+                    set(Hash.Symbol.X, 1, 3)
+                    set(Hash.Symbol.X, 2, 2)
+                    set(Hash.Symbol.X, 3, 1)
+
+                    set(Hash.Symbol.O, 1, 2)
+                    set(Hash.Symbol.O, 2, 1)
+                    set(Hash.Symbol.O, 3, 3)
+                },
+                winner = Hash.Winner.Diagonal.Inverted,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .matchParentSize()
+            )
+        }
     }
 
     Text(
@@ -72,27 +78,21 @@ fun HomeScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    GameButton(onClick = {
-        onPlayClick(true)
-    }) {
-        Row {
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
-            )
+    GameButton(onClick = { onPlayClick(true) }) {
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
 
-            Text(text = "vs", fontSize = 16.sp)
+        Text(text = "vs", fontSize = 16.sp)
 
-            Icon(
-                imageVector = Icons.Rounded.PhoneAndroid,
-                contentDescription = null
-            )
-        }
+        Icon(
+            imageVector = Icons.Rounded.PhoneAndroid,
+            contentDescription = null
+        )
     }
 
-    GameButton(onClick = {
-        onPlayClick(false)
-    }) {
+    GameButton(onClick = { onPlayClick(false) }) {
         Icon(
             imageVector = Icons.Rounded.Person,
             contentDescription = null,
