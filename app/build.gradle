@@ -53,7 +53,10 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 
-            //manifestPlaceholders = [ADMOB_APP_ID: adsProperties["ADMOB_APP_ID"]]
+            manifestPlaceholders = [ADMOB_APP_ID: adsProperties["APP_ID"]]
+
+            buildConfigField "String", "BANNER_ID", adsProperties["BANNER_ID"]
+            buildConfigField "String", "INTERSTITIAL_ID", adsProperties["INTERSTITIAL_ID"]
 
             signingConfig signingConfigs.release
         }
