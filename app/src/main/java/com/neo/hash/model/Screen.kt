@@ -11,6 +11,6 @@ sealed class Screen() {
         const val isPhone = "vsPhone"
         const val route = "game_screen/{$isPhone}"
 
-        fun route(vsPhone: Boolean) = "game_screen/${vsPhone}"
+        fun getRoute(vsPhone: Boolean) = "game_screen/${vsPhone}"
     }
 }

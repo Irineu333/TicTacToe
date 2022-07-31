@@ -3,13 +3,17 @@ package com.neo.hash.ui.screen.gameScreen.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.neo.hash.BuildConfig
+import com.neo.hash.dataStoreRepository
+import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.singleton.GlobalFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,6 +31,18 @@ class GameViewModel : ViewModel() {
             it.playerTurn is Player.Phone
                     && it.playerTurn.isEnabled
         }
+
+    private var referenceCode: String = ""
+
+    init {
+        setupListener()
+    }
+
+    private fun setupListener() = viewModelScope.launch {
+        dataStoreRepository.referenceCodeFlow.collectLatest {
+            referenceCode = it
+        }
+    }
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
@@ -49,6 +65,7 @@ class GameViewModel : ViewModel() {
         val state = uiState.value
 
         val playerTurn = state.playerTurn ?: return
+        if (state.playerWinner != null) return
 
         val newHash = state.hash.copy().apply {
             check(get(row, column) == null) { "invalid selection" }
@@ -56,15 +73,40 @@ class GameViewModel : ViewModel() {
         }
 
         getWinner(newHash)?.let { winner ->
-            _uiState.update {
-                it.copy(
-                    playerWinner = winner.first.apply {
-                        windsCount++
-                    },
+            _uiState.update { state ->
+
+                val playerWinner = when (val first = winner.first) {
+                    is Player.Person -> first.copy(
+                        windsCount = first.windsCount + 1
+                    )
+                    is Player.Phone -> first.copy(
+                        windsCount = first.windsCount + 1
+                    )
+                }
+
+                val players = state.players.map {
+                    if (it == winner.first) playerWinner else it
+                }
+
+                val hashWinner = winner.second
+
+                state.copy(
+                    players = players,
+                    playerWinner = playerWinner,
                     hash = newHash,
-                    winner = winner.second,
+                    winner = hashWinner,
                     playerTurn = null
                 )
+            }
+
+            if (
+                state.players.any { it is Player.Phone } &&
+                winner.first is Player.Person &&
+                referenceCode.isNotEmpty()
+            ) {
+                viewModelScope.launch {
+                    GlobalFlow.addPoints(Difficulty.MEDIUM)
+                }
             }
             return
         }
@@ -205,7 +247,6 @@ class GameViewModel : ViewModel() {
             player2
         )
 
-
         _uiState.update {
             lastStatedPlayer = players.random()
 
@@ -262,9 +303,8 @@ class GameViewModel : ViewModel() {
                 _uiState.update { state ->
                     val newPlayerPhone = Player.Phone(
                         symbol = player.symbol,
-                    ).apply {
                         windsCount = player.windsCount
-                    }
+                    )
 
                     val newPlayers = state.players.map {
                         if (player == it) newPlayerPhone else it
@@ -285,13 +325,28 @@ class GameViewModel : ViewModel() {
             }
             is Player.Phone -> {
 
-                player.isEnabled = !player.isEnabled
+                val newPhone = player.copy(
+                    isEnabled = !player.isEnabled
+                )
 
-                _uiState.update {
-                    it.copy()
+                _uiState.update { state ->
+
+                    val newPlayers = state.players.map {
+                        if (player == it) newPhone else it
+                    }
+
+                    state.copy(
+                        players = newPlayers,
+                        playerTurn = state.playerTurn?.let { turn ->
+                            newPlayers.first { it.symbol == turn.symbol }
+                        },
+                        playerWinner = state.playerWinner?.let { winner ->
+                            newPlayers.first { it.symbol == winner.symbol }
+                        }
+                    )
                 }
 
-                if (player.isEnabled) {
+                if (newPhone.isEnabled) {
                     playIntelligent()
                 }
             }

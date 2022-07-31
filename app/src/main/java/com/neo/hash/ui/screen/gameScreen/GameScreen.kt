@@ -34,17 +34,19 @@ import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.SquareBox
 import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
-import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
-    isPhone: Boolean = false,
-    viewModel: GameViewModel = viewModel()
+    againstIntelligent: Boolean = false,
+    viewModel: GameViewModel = viewModel(),
+    showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
 ) = Column(
-    modifier = modifier.fillMaxSize(),
+    modifier = modifier
+        .padding(top = 16.dp)
+        .fillMaxSize(),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
@@ -67,7 +69,9 @@ fun GameScreen(
                     ).uppercase(),
                     fontSize = 16.sp
                 )
+
                 Spacer(modifier = Modifier.width(8.dp))
+
                 Text(
                     text = "${state.tied}",
                     fontSize = 16.sp
@@ -76,16 +80,19 @@ fun GameScreen(
         }
     }
 
-    AnimatedVisibility(visible = state.players.isNotEmpty()) {
+    AnimatedVisibility(
+        visible = state.players.isNotEmpty(),
+        modifier = Modifier
+            .padding(bottom = 16.dp)
+    ) {
         Players(
             players = state.players,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
             playing = state.playerTurn,
             onDebugClick = {
                 viewModel.onDebug(it)
-            }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
         )
     }
 
@@ -112,7 +119,9 @@ fun GameScreen(
     Row {
         GameButton(
             onClick = {
-                viewModel.clear()
+                showInterstitial(false) {
+                    viewModel.clear()
+                }
             }
         ) {
             Text(text = stringResource(R.string.btn_clean).uppercase())
@@ -129,8 +138,16 @@ fun GameScreen(
 
     if (state.players.isEmpty() && !finishing) {
         PlayersInsertDialog(
-            viewModel = viewModel,
-            vsPhone = isPhone,
+            onConfirm = { player1, player2 ->
+                if (player2 is Player.Phone) {
+                    showInterstitial(true) {
+                        viewModel.start(player1, player2)
+                    }
+                } else {
+                    viewModel.start(player1, player2)
+                }
+            },
+            vsPhone = againstIntelligent,
             onDismissRequest = {
                 finishing = true
                 onHomeClick()
@@ -139,20 +156,17 @@ fun GameScreen(
     }
 }
 
-
 @Preview(showBackground = true)
 @Composable
 private fun GameScreenPreview() {
     HashTheme {
-        HashBackground {
-            GameScreen(
-                viewModel = (viewModel() as GameViewModel).apply {
-                    start(
-                        Player.Person(Hash.Symbol.O, "Irineu"),
-                        Player.Phone(Hash.Symbol.X),
-                    )
-                }
-            )
-        }
+        GameScreen(
+            viewModel = (viewModel() as GameViewModel).apply {
+                start(
+                    Player.Person(Hash.Symbol.O, "Irineu"),
+                    Player.Phone(Hash.Symbol.X),
+                )
+            }
+        )
     }
 }

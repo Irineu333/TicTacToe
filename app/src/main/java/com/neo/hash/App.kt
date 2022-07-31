@@ -2,10 +2,12 @@ package com.neo.hash
 
 import android.app.Application
 import com.google.android.gms.ads.MobileAds
-import dagger.hilt.android.HiltAndroidApp
+import com.neo.hash.data.DataStoreRepository
+import com.neo.hash.data.DataStoreRepositoryImpl
 import timber.log.Timber
 
-@HiltAndroidApp
+lateinit var dataStoreRepository: DataStoreRepository
+
 class App : Application() {
 
     override fun onCreate() {
@@ -18,6 +20,8 @@ class App : Application() {
         MobileAds.initialize(this) {
             Timber.i("AdMob initialized")
         }
+
+        dataStoreRepository = DataStoreRepositoryImpl(applicationContext)
     }
 
 }
