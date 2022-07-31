@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-class MainViewModel: ViewModel() {
+class MainViewModel : ViewModel() {
 
     val referenceCodeFlow = dataStoreRepository.referenceCodeFlow
 
@@ -32,12 +32,16 @@ class MainViewModel: ViewModel() {
 
     private fun setupListeners() {
         viewModelScope.launch {
-            dataStoreRepository.interstitialSkippedFlow.collectLatest {
-                interstitialSkippedCount = it
+            launch {
+                dataStoreRepository.interstitialSkippedFlow.collectLatest {
+                    interstitialSkippedCount = it
+                }
             }
 
-            dataStoreRepository.referenceCodeFlow.collectLatest {
-                referenceCode = it
+            launch {
+                dataStoreRepository.referenceCodeFlow.collectLatest {
+                    referenceCode = it
+                }
             }
         }
 

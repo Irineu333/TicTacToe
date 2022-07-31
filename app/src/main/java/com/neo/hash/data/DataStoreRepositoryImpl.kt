@@ -15,13 +15,15 @@ class DataStoreRepositoryImpl(
     private val userDataStore = context.userDataStore
     private val userDataStoreFlow = userDataStore.data
 
-    override val interstitialSkippedFlow: Flow<Long> = userDataStoreFlow.map {
-        it[INTERSTITIAL_SKIP_COUNT_KEY] ?: 0L
-    }
+    override val interstitialSkippedFlow: Flow<Long> =
+        userDataStoreFlow.map {
+            it[INTERSTITIAL_SKIP_COUNT_KEY] ?: 0L
+        }
 
-    override val referenceCodeFlow: Flow<String> = userDataStoreFlow.map {
-        it[REFERENCE_CODE_KEY] ?: ""
-    }
+    override val referenceCodeFlow: Flow<String> =
+        userDataStoreFlow.map {
+            it[REFERENCE_CODE_KEY] ?: ""
+        }
 
     override suspend fun setReferenceCode(code: String) {
         userDataStore.edit {
