@@ -61,19 +61,17 @@ fun MainScreen(
 
     val referenceCode = viewModel.referenceCodeFlow.collectAsState(initial = null).value
 
-    val coclewEnabled = Coclew.enabled.collectAsState(initial = false).value
+    val coclewEnabled = Coclew.enabled.collectAsState(initial = null).value
 
     var showMaintenance by remember { mutableStateOf(false) }
 
     val primaryColor by animateColorAsState(
-        if (!referenceCode.isNullOrEmpty() && coclewEnabled)
-            Color.Coclew
-        else
-            colors.primary
+        if (!referenceCode.isNullOrEmpty() && coclewEnabled == true)
+            Color.Coclew else colors.primary
     )
 
     MaterialTheme(colors.copy(primaryColor)) {
-        if (referenceCode != null) {
+        if (referenceCode != null && coclewEnabled != null) {
             AnimatedVisibility(
                 referenceCode.isNotEmpty() ||
                         isHomeScreenCurrent &&
@@ -113,7 +111,7 @@ fun MainScreen(
             navController = controller,
             startDestination = Screen.HomeScreen.route,
             modifier = Modifier
-                .weight(1f)
+                .weight(weight = 1f)
                 .verticalScroll(rememberScrollState())
         ) {
             composable(
@@ -156,7 +154,7 @@ fun MainScreen(
                     showInterstitial = { ignoreSkip, onSuccess ->
                         when {
                             referenceCode!!.isEmpty() -> onSuccess()
-                            !coclewEnabled -> showMaintenance = true
+                            coclewEnabled != true -> showMaintenance = true
                             ignoreSkip -> showInterstitial(onSuccess)
                             viewModel.isSkipInterstitial() -> onSuccess()
                             else -> showInterstitial(onSuccess)

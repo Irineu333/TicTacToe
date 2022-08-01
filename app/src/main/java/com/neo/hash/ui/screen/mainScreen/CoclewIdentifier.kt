@@ -49,11 +49,7 @@ fun CoclewIdentifier(
 
     val primaryColor by animateColorAsState(if (enabled) colors.primary else Color.Red)
 
-    MaterialTheme(
-        colors = colors.copy(
-            primary = primaryColor
-        )
-    ) {
+    MaterialTheme(colors.copy(primaryColor)) {
         Row(
             modifier = Modifier
                 .align(Alignment.CenterEnd)

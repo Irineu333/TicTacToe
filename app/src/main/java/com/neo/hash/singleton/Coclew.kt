@@ -8,6 +8,8 @@ import com.google.firebase.database.ktx.getValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
@@ -17,42 +19,31 @@ object Coclew {
         .getInstance()
         .getReference("coclew")
 
-    private val coroutine = CoroutineScope(Dispatchers.Main)
-
     val enabled by lazy {
-        Channel<Boolean>().apply {
+        MutableStateFlow(value = false).apply {
             coclewRef.child("enabled").addValueEventListener(
                 object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-
-                        val enabled = snapshot.getValue<Boolean>() ?: return
-
-                        coroutine.launch {
-                            send(enabled)
-                        }
+                        value = snapshot.getValue<Boolean>() ?: return
                     }
 
                     override fun onCancelled(error: DatabaseError) = Unit
                 }
             )
-        }.receiveAsFlow()
+        }.asStateFlow()
     }
 
     val interstitialSkip by lazy {
-        Channel<Long>().apply {
+        MutableStateFlow(value = 0L).apply {
             coclewRef
                 .child("interstitial_skip")
                 .addValueEventListener(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        val maxSkip = snapshot.getValue<Long>() ?: 0L
-
-                        coroutine.launch {
-                            send(maxSkip)
-                        }
+                        value = snapshot.getValue<Long>() ?: return
                     }
 
                     override fun onCancelled(error: DatabaseError) = Unit
                 })
-        }.receiveAsFlow()
+        }.asStateFlow()
     }
 }

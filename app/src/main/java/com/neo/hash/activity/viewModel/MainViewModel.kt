@@ -20,7 +20,6 @@ class MainViewModel : ViewModel() {
 
     private var interstitialSkippedCount = 0L
     private var referenceCode = ""
-    private var interstitialSkip = 0L
 
     init {
         setupListeners()
@@ -52,7 +51,7 @@ class MainViewModel : ViewModel() {
 
     fun isSkipInterstitial(): Boolean {
 
-        if (interstitialSkippedCount >= interstitialSkip) {
+        if (interstitialSkippedCount >= Coclew.interstitialSkip.value) {
             //don't skip
             return false
         }
