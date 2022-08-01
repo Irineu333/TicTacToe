@@ -22,7 +22,6 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.neo.hash.BuildConfig
-import com.neo.hash.activity.viewModel.MainUiEffect
 import com.neo.hash.activity.viewModel.MainViewModel
 import com.neo.hash.singleton.GlobalFlow
 import com.neo.hash.ui.components.ErrorDialog
@@ -88,32 +87,9 @@ class MainActivity : ComponentActivity() {
                 GlobalFlow.difficulty.collectLatest { difficulty ->
                     showInterstitial(
                         onSuccess = {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Calculando pontos",
-                                Toast.LENGTH_SHORT
-                            ).show()
-
                             viewModel.addPoints(difficulty)
                         }
                     )
-                }
-            }
-
-            launch {
-                viewModel.uiEffect.collectLatest { effect ->
-                    when (effect) {
-                        is MainUiEffect.Error -> TODO()
-                        is MainUiEffect.Points.Added -> {
-                            Toast.makeText(
-                                this@MainActivity,
-                                "Você ganhou ${effect.points}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        MainUiEffect.Points.Error -> TODO()
-                        is MainUiEffect.Toast -> TODO()
-                    }
                 }
             }
         }
@@ -143,7 +119,7 @@ class MainActivity : ComponentActivity() {
 
                 override fun onAdFailedToLoad(adError: LoadAdError) {
                     interstitial = null
-                    onError?.invoke("Não foi possivel carregar o anuncio.")
+                    onError?.invoke("Não foi possivel carregar o anúncio.")
                 }
             }
         )
@@ -181,7 +157,7 @@ class MainActivity : ComponentActivity() {
                 // Called when ad fails to show.
                 interstitial = null
                 loadInterstitial()
-                onError?.invoke("Não foi possivel exibir o anuncio.")
+                onError?.invoke("Não foi possivel exibir o anúncio.")
             }
 
             override fun onAdImpression() {

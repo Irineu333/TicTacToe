@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -43,6 +44,7 @@ fun GameDialog(
 ) {
     Card(
         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = modifier.padding(16.dp)) {
             title?.let {

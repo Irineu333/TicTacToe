@@ -130,8 +130,9 @@ fun InsertReferenceCode(
                 onValueChange = {
                     referenceCode = it.trim()
                 },
+                singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                   autoCorrect = false
+                    autoCorrect = false
                 ),
                 modifier = Modifier.fillMaxWidth()
             )

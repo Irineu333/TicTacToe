@@ -146,7 +146,7 @@ class GameViewModel : ViewModel() {
 
             if (state.playerTurn is Player.Phone) {
                 val (row, column) = withContext(Dispatchers.Default) {
-                    val delay = launch { delay(1000) }
+                    val delay = launch { delay(500) }
 
                     state.playerTurn.ai.hard(state.hash).also {
                         delay.join()

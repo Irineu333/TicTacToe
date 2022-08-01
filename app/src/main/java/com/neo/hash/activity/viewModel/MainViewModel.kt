@@ -19,9 +19,6 @@ class MainViewModel : ViewModel() {
 
     val referenceCodeFlow = dataStoreRepository.referenceCodeFlow
 
-    private val _uiEffect = Channel<MainUiEffect>()
-    val uiEffect get() = _uiEffect.receiveAsFlow()
-
     private var interstitialSkippedCount = 0L
     private var referenceCode = ""
     private var interstitialSkip = 0L
@@ -124,11 +121,7 @@ class MainViewModel : ViewModel() {
 
                                     val newPoints = oldPoints + addPoints
 
-                                    userValueRef.setValue(newPoints).addOnSuccessListener {
-                                        viewModelScope.launch {
-                                            _uiEffect.send(MainUiEffect.Points.Added(addPoints))
-                                        }
-                                    }
+                                    userValueRef.setValue(newPoints)
                                 }
 
                                 override fun onCancelled(error: DatabaseError) = Unit

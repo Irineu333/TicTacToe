@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +33,8 @@ fun PlayersInsertDialog(
 ) {
     val textSmartphone = stringResource(R.string.text_smartphone)
 
-    var player1 by remember { mutableStateOf("") }
-    var player2 by remember { mutableStateOf(if (vsPhone) textSmartphone else "") }
+    var player1 by rememberSaveable { mutableStateOf("") }
+    var player2 by rememberSaveable { mutableStateOf(if (vsPhone) textSmartphone else "") }
 
     val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
     val isError = player1 == player2 && isNotBlank
@@ -56,7 +57,7 @@ fun PlayersInsertDialog(
             OutlinedTextField(
                 value = player1,
                 onValueChange = {
-                    player1 = it.uppercase().trim()
+                    player1 = it.trim()
                 },
                 isError = isError,
                 singleLine = true,
@@ -72,7 +73,7 @@ fun PlayersInsertDialog(
             OutlinedTextField(
                 value = player2,
                 onValueChange = {
-                    player2 = it.uppercase().trim()
+                    player2 = it.trim()
                 },
                 isError = isError,
                 singleLine = true,
