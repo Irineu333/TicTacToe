@@ -39,12 +39,6 @@ class MainViewModel : ViewModel() {
                     referenceCode = it
                 }
             }
-
-            launch {
-                Coclew.interstitialSkip.collectLatest {
-                    interstitialSkip = it
-                }
-            }
         }
     }
 
