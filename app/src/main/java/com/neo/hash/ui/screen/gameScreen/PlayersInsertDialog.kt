@@ -1,4 +1,4 @@
-package com.neo.hash.ui.screen.game
+package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -25,6 +25,7 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
+import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
 import kotlin.random.Random
 
 @Composable
@@ -42,8 +43,7 @@ fun PlayersInsertDialog(
             Text(
                 text = stringResource(R.string.text_players).uppercase(),
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.primary
             )

@@ -9,4 +9,8 @@
     <string name="text_player">Jogador %d</string>
     <string name="btn_confirm">Confirmar</string>
     <string name="text_players">Jogadores</string>
+    <string name="text_update_description">A versão %s está disponível na PlayStore</string>
+    <string name="btn_update">Atualizar</string>
+    <string name="btn_later">Depois</string>
+    <string name="text_update">Atualização</string>
 </resources>

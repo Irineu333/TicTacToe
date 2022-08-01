@@ -31,7 +31,10 @@ private val LightColorPalette = lightColors(
 )
 
 @Composable
-fun HashGameTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun HashTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
 //    val colors = if (darkTheme) {
 //        DarkColorPalette
 //    } else {
@@ -49,7 +52,7 @@ fun HashGameTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composab
 }
 
 @Composable
-fun HashGameBackground(
+fun HashBackground(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.background,
     content: @Composable () -> Unit,

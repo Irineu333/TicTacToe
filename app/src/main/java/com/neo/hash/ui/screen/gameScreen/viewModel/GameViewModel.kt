@@ -1,4 +1,4 @@
-package com.neo.hash.ui.screen.game
+package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

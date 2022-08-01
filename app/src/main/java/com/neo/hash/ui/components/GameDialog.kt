@@ -3,8 +3,11 @@ package com.neo.hash.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
@@ -30,9 +34,9 @@ fun GameDialog(
     modifier: Modifier = Modifier,
     onDismissRequest: () -> Unit = {},
     properties: DialogProperties = DialogProperties(),
-    title: (@Composable () -> Unit)? = null,
-    buttons: (@Composable () -> Unit)? = null,
-    content: @Composable () -> Unit
+    title: (@Composable BoxScope.() -> Unit)? = null,
+    buttons: (@Composable RowScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit
 ) = Dialog(
     onDismissRequest = onDismissRequest,
     properties = properties
@@ -44,10 +48,20 @@ fun GameDialog(
             title?.let {
                 Box(
                     contentAlignment = Alignment.TopStart,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
                 ) {
                     val textStyle = MaterialTheme.typography.subtitle1
-                    ProvideTextStyle(textStyle, title)
+
+                    ProvideTextStyle(
+                        value = textStyle.copy(
+                            color = MaterialTheme.colors.primary,
+                            fontSize = 18.sp
+                        )
+                    ) {
+                        title()
+                    }
                 }
             }
 
@@ -56,7 +70,9 @@ fun GameDialog(
             buttons?.let {
                 Row(
                     horizontalArrangement = Arrangement.End,
-                    modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
                 ) {
                     it()
                 }

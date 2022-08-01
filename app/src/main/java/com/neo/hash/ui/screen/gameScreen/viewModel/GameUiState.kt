@@ -1,4 +1,4 @@
-package com.neo.hash.ui.screen.game
+package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player

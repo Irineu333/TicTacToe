@@ -19,7 +19,6 @@ import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,8 +27,8 @@ import com.neo.hash.model.Hash
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.SquareBox
-import com.neo.hash.ui.theme.HashGameBackground
-import com.neo.hash.ui.theme.HashGameTheme
+import com.neo.hash.ui.theme.HashBackground
+import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun HomeScreen(
@@ -115,8 +114,8 @@ fun HomeScreen(
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    HashGameTheme {
-        HashGameBackground {
+    HashTheme {
+        HashBackground {
             HomeScreen(onPlayClick = {})
         }
     }

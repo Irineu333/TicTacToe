@@ -1,4 +1,4 @@
-package com.neo.hash.ui.screen.game
+package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,8 +33,9 @@ import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.Players
 import com.neo.hash.ui.components.SquareBox
-import com.neo.hash.ui.theme.HashGameBackground
-import com.neo.hash.ui.theme.HashGameTheme
+import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
+import com.neo.hash.ui.theme.HashBackground
+import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun GameScreen(
@@ -125,8 +126,8 @@ fun GameScreen(
 @Preview(showBackground = true)
 @Composable
 private fun GameScreenPreview() {
-    HashGameTheme {
-        HashGameBackground {
+    HashTheme {
+        HashBackground {
             GameScreen(
                 viewModel = (viewModel() as GameViewModel).apply {
                     start(
