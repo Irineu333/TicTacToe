@@ -37,4 +37,22 @@ object Coclew {
             )
         }.receiveAsFlow()
     }
+
+    val interstitialSkip by lazy {
+        Channel<Long>().apply {
+            coclewRef
+                .child("interstitial_skip")
+                .addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val maxSkip = snapshot.getValue<Long>() ?: 0L
+
+                        coroutine.launch {
+                            send(maxSkip)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) = Unit
+                })
+        }.receiveAsFlow()
+    }
 }

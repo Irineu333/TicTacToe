@@ -10,9 +10,8 @@ import com.google.firebase.database.ktx.getValue
 import com.neo.hash.data.response.Points
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
-import kotlinx.coroutines.channels.Channel
+import com.neo.hash.singleton.Coclew
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -40,18 +39,13 @@ class MainViewModel : ViewModel() {
                     referenceCode = it
                 }
             }
-        }
 
-        FirebaseDatabase
-            .getInstance()
-            .getReference("coclew/interstitial_skip")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    interstitialSkip = snapshot.getValue<Long>() ?: 0L
+            launch {
+                Coclew.interstitialSkip.collectLatest {
+                    interstitialSkip = it
                 }
-
-                override fun onCancelled(error: DatabaseError) = Unit
-            })
+            }
+        }
     }
 
     fun setReferenceCode(code: String) = viewModelScope.launch {
