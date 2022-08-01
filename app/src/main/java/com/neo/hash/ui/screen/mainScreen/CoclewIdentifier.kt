@@ -4,19 +4,15 @@ package com.neo.hash.ui.screen.mainScreen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.twotone.Cancel
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,11 +21,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neo.hash.R
+import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.theme.HashTheme
@@ -38,6 +37,8 @@ import com.neo.hash.ui.theme.HashTheme
 fun CoclewIdentifier(
     modifier: Modifier = Modifier,
     referenceCode: String = "",
+    enabled: Boolean = true,
+    showWarning : () -> Unit = {},
     onAddReferenceCode: (String) -> Unit = {},
     onRemoveReferenceCode: () -> Unit = {},
 ) = Box(
@@ -46,41 +47,77 @@ fun CoclewIdentifier(
 
     var showInsertReferenceCode by remember { mutableStateOf(false) }
 
-    Button(
-        onClick = {
-            if (referenceCode.isEmpty()) {
-                showInsertReferenceCode = true
-            } else {
-                onRemoveReferenceCode()
-            }
-        },
-        contentPadding = PaddingValues(
-            horizontal = 10.dp
-        ),
-        modifier = Modifier
-            .align(Alignment.CenterEnd)
-    ) {
-        AnimatedVisibility(visible = referenceCode.isEmpty()) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-        }
+    val primaryColor by animateColorAsState(if (enabled) colors.primary else Color.Red)
 
-        Text(
-            text = referenceCode.ifEmpty { "Código de referência".uppercase() },
-            letterSpacing = 0.sp,
-            lineHeight = 0.sp
+    MaterialTheme(
+        colors = colors.copy(
+            primary = primaryColor
         )
+    ) {
+        Row(
+            modifier = Modifier
+                .align(Alignment.CenterEnd)
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-        AnimatedVisibility(visible = referenceCode.isNotEmpty()) {
-            Icon(
-                imageVector = Icons.TwoTone.Cancel,
-                contentDescription = null,
-                modifier = Modifier
-                    .padding(start = 8.dp)
-            )
+            AnimatedVisibility(!enabled) {
+
+                Card(
+                    modifier = Modifier
+                        .defaultMinSize(
+                            minHeight = ButtonDefaults.MinHeight
+                        )
+                        .padding(
+                            end = 8.dp
+                        )
+                        .clickable(onClick = showWarning),
+                    backgroundColor = Color.Red,
+                    contentColor = Color.White
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = null,
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    )
+                }
+            }
+
+            Button(
+                onClick = {
+                    if (referenceCode.isEmpty()) {
+                        showInsertReferenceCode = true
+                    } else {
+                        onRemoveReferenceCode()
+                    }
+                },
+                contentPadding = PaddingValues(
+                    horizontal = 10.dp
+                )
+            ) {
+                AnimatedVisibility(visible = referenceCode.isEmpty()) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                }
+
+                Text(
+                    text = referenceCode.ifEmpty { "Código de referência".uppercase() },
+                    letterSpacing = 0.sp,
+                    lineHeight = 0.sp
+                )
+
+                AnimatedVisibility(visible = referenceCode.isNotEmpty()) {
+                    Icon(
+                        imageVector = Icons.TwoTone.Cancel,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 8.dp)
+                    )
+                }
+            }
         }
     }
 
@@ -145,7 +182,18 @@ fun InsertReferenceCode(
 private fun CoclewIdentifierAddPreview() {
     HashTheme {
         CoclewIdentifier(
-            referenceCode = "KJSKDADJHAS"
+            referenceCode = "IRINEU_TEST"
+        )
+    }
+}
+
+@Preview("Reference Code Disable")
+@Composable
+private fun CoclewIdentifierDisablePreview() {
+    HashTheme {
+        CoclewIdentifier(
+            referenceCode = "IRINEU_TEST",
+            enabled = false
         )
     }
 }

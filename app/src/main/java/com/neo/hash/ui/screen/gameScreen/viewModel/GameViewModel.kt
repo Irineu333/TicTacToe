@@ -7,14 +7,12 @@ import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -99,12 +97,13 @@ class GameViewModel : ViewModel() {
                 )
             }
 
-            if (
-                state.players.any { it is Player.Phone } &&
-                winner.first is Player.Person &&
-                referenceCode.isNotEmpty()
-            ) {
-                viewModelScope.launch {
+            viewModelScope.launch {
+                if (
+                    state.players.any { it is Player.Phone } &&
+                    winner.first is Player.Person &&
+                    referenceCode.isNotEmpty() &&
+                    Coclew.enabled.last()
+                ) {
                     GlobalFlow.addPoints(Difficulty.MEDIUM)
                 }
             }

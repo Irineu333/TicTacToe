@@ -52,13 +52,13 @@ class MainActivity : ComponentActivity() {
             HashTheme {
                 HashBackground(Modifier.fillMaxSize()) {
 
-                    var error by remember { mutableStateOf("") }
+                    var errorMessage by remember { mutableStateOf("") }
 
-                    if (error.isNotEmpty()) {
+                    if (errorMessage.isNotEmpty()) {
                         ErrorDialog(
-                            message = error,
+                            message = errorMessage,
                             onDismiss = {
-                                error = ""
+                                errorMessage = ""
                             }
                         )
                     }
@@ -69,7 +69,7 @@ class MainActivity : ComponentActivity() {
                             showInterstitial(
                                 onSuccess = onSuccess,
                                 onError = {
-                                    error = it
+                                    errorMessage = it
                                 }
                             )
                         }
