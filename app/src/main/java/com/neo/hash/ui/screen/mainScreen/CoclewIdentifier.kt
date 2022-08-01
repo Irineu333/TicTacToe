@@ -21,14 +21,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neo.hash.R
-import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.theme.HashTheme
@@ -37,8 +36,8 @@ import com.neo.hash.ui.theme.HashTheme
 fun CoclewIdentifier(
     modifier: Modifier = Modifier,
     referenceCode: String = "",
-    enabled: Boolean = true,
-    showWarning : () -> Unit = {},
+    isMaintenance: Boolean = true,
+    showMaintenance: () -> Unit = {},
     onAddReferenceCode: (String) -> Unit = {},
     onRemoveReferenceCode: () -> Unit = {},
 ) = Box(
@@ -46,8 +45,9 @@ fun CoclewIdentifier(
 ) {
 
     var showInsertReferenceCode by remember { mutableStateOf(false) }
+    var showRemoveReferenceCode by remember { mutableStateOf(false) }
 
-    val primaryColor by animateColorAsState(if (enabled) colors.primary else Color.Red)
+    val primaryColor by animateColorAsState(if (isMaintenance) Color.Red else colors.primary)
 
     MaterialTheme(colors.copy(primaryColor)) {
         Row(
@@ -57,7 +57,7 @@ fun CoclewIdentifier(
             verticalAlignment = Alignment.CenterVertically
         ) {
 
-            AnimatedVisibility(!enabled) {
+            AnimatedVisibility(isMaintenance) {
 
                 Card(
                     modifier = Modifier
@@ -67,7 +67,7 @@ fun CoclewIdentifier(
                         .padding(
                             end = 8.dp
                         )
-                        .clickable(onClick = showWarning),
+                        .clickable(onClick = showMaintenance),
                     backgroundColor = Color.Red,
                     contentColor = Color.White
                 ) {
@@ -84,7 +84,7 @@ fun CoclewIdentifier(
                     if (referenceCode.isEmpty()) {
                         showInsertReferenceCode = true
                     } else {
-                        onRemoveReferenceCode()
+                        showRemoveReferenceCode = true
                     }
                 },
                 contentPadding = PaddingValues(
@@ -123,6 +123,59 @@ fun CoclewIdentifier(
             onAddReferenceCode = onAddReferenceCode
         )
     }
+
+    if (showRemoveReferenceCode) {
+        RemoveReferenceCode(
+            onDismissRequest = {
+                showRemoveReferenceCode = false
+            },
+            onRemoveReferenceCode = onRemoveReferenceCode
+        )
+    }
+}
+
+@Composable
+private fun RemoveReferenceCode(
+    onDismissRequest: () -> Unit = {},
+    onRemoveReferenceCode: () -> Unit = {}
+) {
+    GameDialog(
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        title = {
+            Text(
+                text = "Remover código".uppercase(),
+                modifier = Modifier.align(Alignment.Center)
+            )
+        },
+        content = {
+            Text(
+                text = "Deseja remover o código de referência?".uppercase(),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        },
+        buttons = {
+            GameButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text(text = "Não")
+            }
+
+            GameButton(
+                onClick = {
+                    onDismissRequest()
+                    onRemoveReferenceCode()
+                }
+            ) {
+                Text(text = "Sim")
+            }
+        },
+        buttonsArrangement = Arrangement.SpaceAround
+    )
 }
 
 @Composable
@@ -189,7 +242,7 @@ private fun CoclewIdentifierDisablePreview() {
     HashTheme {
         CoclewIdentifier(
             referenceCode = "IRINEU_TEST",
-            enabled = false
+            isMaintenance = false
         )
     }
 }
@@ -207,5 +260,13 @@ private fun CoclewIdentifierRemovePreview() {
 private fun InsertReferenceCodePreview() {
     HashTheme {
         InsertReferenceCode()
+    }
+}
+
+@Preview(name = "Remove Reference Code Dialog")
+@Composable
+private fun RemoveReferenceCodePreview() {
+    HashTheme {
+        RemoveReferenceCode()
     }
 }

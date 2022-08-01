@@ -37,6 +37,7 @@ fun GameDialog(
     properties: DialogProperties = DialogProperties(),
     title: (@Composable BoxScope.() -> Unit)? = null,
     buttons: (@Composable RowScope.() -> Unit)? = null,
+    buttonsArrangement : Arrangement.Horizontal = Arrangement.End,
     content: @Composable ColumnScope.() -> Unit
 ) = Dialog(
     onDismissRequest = onDismissRequest,
@@ -71,7 +72,7 @@ fun GameDialog(
 
             buttons?.let {
                 Row(
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = buttonsArrangement,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
