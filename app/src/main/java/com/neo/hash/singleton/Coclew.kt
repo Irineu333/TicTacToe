@@ -19,31 +19,27 @@ object Coclew {
         .getInstance()
         .getReference("coclew")
 
-    val enabled by lazy {
-        MutableStateFlow(value = false).apply {
-            coclewRef.child("enabled").addValueEventListener(
-                object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        value = snapshot.getValue<Boolean>() ?: return
-                    }
-
-                    override fun onCancelled(error: DatabaseError) = Unit
+    val enabled = MutableStateFlow(value = false).apply {
+        coclewRef.child("enabled").addValueEventListener(
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    value = snapshot.getValue<Boolean>() ?: return
                 }
-            )
-        }.asStateFlow()
-    }
 
-    val interstitialSkip by lazy {
-        MutableStateFlow(value = 0L).apply {
-            coclewRef
-                .child("interstitial_skip")
-                .addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        value = snapshot.getValue<Long>() ?: return
-                    }
+                override fun onCancelled(error: DatabaseError) = Unit
+            }
+        )
+    }.asStateFlow()
 
-                    override fun onCancelled(error: DatabaseError) = Unit
-                })
-        }.asStateFlow()
-    }
+    val interstitialSkip = MutableStateFlow(value = 0L).apply {
+        coclewRef
+            .child("interstitial_skip")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    value = snapshot.getValue<Long>() ?: return
+                }
+
+                override fun onCancelled(error: DatabaseError) = Unit
+            })
+    }.asStateFlow()
 }

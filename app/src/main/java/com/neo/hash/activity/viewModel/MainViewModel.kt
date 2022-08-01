@@ -51,7 +51,8 @@ class MainViewModel : ViewModel() {
 
     fun isSkipInterstitial(): Boolean {
 
-        if (interstitialSkippedCount >= Coclew.interstitialSkip.value) {
+        val value = Coclew.interstitialSkip.value
+        if (interstitialSkippedCount >= value) {
             //don't skip
             return false
         }
