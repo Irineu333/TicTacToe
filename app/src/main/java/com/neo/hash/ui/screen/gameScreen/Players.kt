@@ -3,14 +3,10 @@
 package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material.icons.outlined.Close
@@ -35,8 +31,7 @@ fun Players(
     onDebugClick: (Player) -> Unit = {}
 ) = Row(
     modifier = modifier
-        .padding(horizontal = 8.dp)
-        .height(IntrinsicSize.Min),
+        .padding(horizontal = 8.dp),
 ) {
     for (player in players) {
         PlayerCard(
@@ -73,23 +68,28 @@ private fun PlayerCard(
         backgroundColor = when {
             isPhone && !(player as Player.Phone).isEnabled -> Color.Red
             playing -> Color(0xFFEEEEEE)
-            else -> MaterialTheme.colors.surface
-        }
+            else -> colors.surface
+        },
     ) {
         Row(
             modifier = Modifier
                 .padding(
                     vertical = 4.dp,
                     horizontal = 8.dp
-                )
+                ),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Box {
-                Symbol(symbol = player.symbol)
+                Symbol(
+                    symbol = player.symbol,
+                    modifier = Modifier.height(20.dp)
+                )
 
-                if (isPhone && playing && (player as Player.Phone).isEnabled) {
+                if (true) {
                     CircularProgressIndicator(
                         strokeWidth = 2.dp,
-                        modifier = Modifier.matchParentSize()
+                        modifier = Modifier.matchParentSize(),
+                        color = colors.primary.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -113,21 +113,24 @@ private fun PlayerCard(
 @Composable
 fun Symbol(
     symbol: Hash.Symbol,
-    color: Color = MaterialTheme.colors.primary
+    modifier: Modifier = Modifier,
+    color: Color = colors.primary
 ) {
     when (symbol) {
         Hash.Symbol.O -> {
             Icon(
                 imageVector = Icons.Outlined.Circle,
                 tint = color,
-                contentDescription = null
+                contentDescription = null,
+                modifier = modifier
             )
         }
         Hash.Symbol.X -> {
             Icon(
                 imageVector = Icons.Outlined.Close,
                 tint = color,
-                contentDescription = null
+                contentDescription = null,
+                modifier = modifier
             )
         }
     }
