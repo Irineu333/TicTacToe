@@ -3,10 +3,7 @@ package com.neo.hash.activity.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
 import com.neo.hash.data.response.Points
@@ -15,6 +12,7 @@ import com.neo.hash.model.Difficulty
 import com.neo.hash.singleton.Coclew
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+
 
 class MainViewModel : ViewModel() {
 
@@ -112,31 +110,18 @@ class MainViewModel : ViewModel() {
                             Difficulty.HARD -> value.hard
                         }
 
+                        userValueRef.setValue(ServerValue.increment(addPoints))
+
                         userRef
-                            .child("value")
-                            .addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-
-                                    val oldPoints = snapshot.getValue<Int>() ?: 0
-
-                                    val newPoints = oldPoints + addPoints
-
-                                    userValueRef.setValue(newPoints)
-
-                                    userRef
-                                        .child("history")
-                                        .push()
-                                        .setValue(
-                                            mapOf(
-                                                "points" to addPoints,
-                                                "date" to System.currentTimeMillis(),
-                                                "difficulty" to difficulty.name
-                                            )
-                                        )
-                                }
-
-                                override fun onCancelled(error: DatabaseError) = Unit
-                            })
+                            .child("history")
+                            .push()
+                            .setValue(
+                                mapOf(
+                                    "points" to addPoints,
+                                    "date" to mapOf(".sv" to "timestamp"),
+                                    "difficulty" to difficulty.name
+                                )
+                            )
                     }
 
                     override fun onCancelled(error: DatabaseError) = Unit
