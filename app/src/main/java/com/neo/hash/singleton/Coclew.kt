@@ -19,7 +19,7 @@ object Coclew {
         .getInstance()
         .getReference("coclew")
 
-    val enabled = MutableStateFlow(value = true).apply {
+    val enabled = MutableStateFlow<Boolean?>(value = null).apply {
         coclewRef.child("enabled").addValueEventListener(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

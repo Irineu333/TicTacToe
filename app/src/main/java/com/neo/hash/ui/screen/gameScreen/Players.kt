@@ -85,7 +85,7 @@ private fun PlayerCard(
                     modifier = Modifier.height(20.dp)
                 )
 
-                if (true) {
+                if (isPhone && playing && (player as Player.Phone).isEnabled) {
                     CircularProgressIndicator(
                         strokeWidth = 2.dp,
                         modifier = Modifier.matchParentSize(),

@@ -2,11 +2,13 @@ package com.neo.hash.activity.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
+import com.google.firebase.ktx.Firebase
 import com.neo.hash.data.response.Points
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
@@ -73,23 +75,33 @@ class MainViewModel : ViewModel() {
 
     fun addPoints(difficulty: Difficulty) {
         if (referenceCode.isEmpty()) return
+        if (Coclew.enabled.value != true) return
 
-        viewModelScope.launch {
+        if (Firebase.auth.currentUser == null) {
 
-            val coclewRef = FirebaseDatabase
-                .getInstance()
-                .getReference("coclew")
+            Firebase.auth.signInAnonymously()
+                .addOnSuccessListener {
+                    addPoints(difficulty)
+                }
 
-            val userRef = coclewRef
-                .child("users")
-                .child(referenceCode)
+            return
+        }
 
-            val userValueRef = userRef
-                .child("value")
+        val coclewRef = FirebaseDatabase
+            .getInstance()
+            .getReference("coclew")
 
-            coclewRef
-                .child("points")
-                .addListenerForSingleValueEvent(object : ValueEventListener {
+        val userRef = coclewRef
+            .child("users")
+            .child(referenceCode)
+
+        val userValueRef = userRef
+            .child("value")
+
+        coclewRef
+            .child("points")
+            .addListenerForSingleValueEvent(
+                object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
                         val value = snapshot.getValue<Points>() ?: return
@@ -110,6 +122,17 @@ class MainViewModel : ViewModel() {
                                     val newPoints = oldPoints + addPoints
 
                                     userValueRef.setValue(newPoints)
+
+                                    userRef
+                                        .child("history")
+                                        .push()
+                                        .setValue(
+                                            mapOf(
+                                                "points" to addPoints,
+                                                "date" to System.currentTimeMillis(),
+                                                "difficulty" to difficulty.name
+                                            )
+                                        )
                                 }
 
                                 override fun onCancelled(error: DatabaseError) = Unit
@@ -117,7 +140,7 @@ class MainViewModel : ViewModel() {
                     }
 
                     override fun onCancelled(error: DatabaseError) = Unit
-                })
-        }
+                }
+            )
     }
 }

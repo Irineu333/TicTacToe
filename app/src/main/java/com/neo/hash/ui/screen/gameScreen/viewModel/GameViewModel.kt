@@ -102,7 +102,7 @@ class GameViewModel : ViewModel() {
                     state.players.any { it is Player.Phone } &&
                     winner.first is Player.Person &&
                     referenceCode.isNotEmpty() &&
-                    Coclew.enabled.value
+                    Coclew.enabled.value != false
                 ) {
                     GlobalFlow.addPoints(Difficulty.MEDIUM)
                 }
