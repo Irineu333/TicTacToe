@@ -22,6 +22,7 @@ import com.neo.hash.BuildConfig
 import com.neo.hash.R
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.ui.components.Symbol
 
 @Composable
 fun Players(
@@ -109,33 +110,6 @@ private fun PlayerCard(
         }
     }
 }
-
-@Composable
-fun Symbol(
-    symbol: Hash.Symbol,
-    modifier: Modifier = Modifier,
-    color: Color = colors.primary
-) {
-    when (symbol) {
-        Hash.Symbol.O -> {
-            Icon(
-                imageVector = Icons.Outlined.Circle,
-                tint = color,
-                contentDescription = null,
-                modifier = modifier
-            )
-        }
-        Hash.Symbol.X -> {
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                tint = color,
-                contentDescription = null,
-                modifier = modifier
-            )
-        }
-    }
-}
-
 
 @Preview
 @Composable

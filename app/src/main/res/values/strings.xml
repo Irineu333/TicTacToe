@@ -6,8 +6,8 @@
     <string name="btn_start">Start</string>
     <string name="text_smartphone">Smartphone</string>
     <string name="text_player">Player %d</string>
-    <string name="btn_confirm">Confirm</string>
-    <string name="text_players">Players</string>
+    <string name="btn_confirm">CONFIRM</string>
+    <string name="text_players">PLAYERS</string>
     <string name="text_update_description">Version %s is available on PlayStore</string>
     <string name="btn_update">Update</string>
     <string name="btn_later">Later</string>
