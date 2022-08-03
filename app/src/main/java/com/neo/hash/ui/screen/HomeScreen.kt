@@ -1,7 +1,9 @@
 package com.neo.hash.ui.screen
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -34,18 +37,16 @@ import com.neo.hash.ui.theme.HashTheme
 fun HomeScreen(
     onPlayClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier
-) = Box(
+) = Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalArrangement = Arrangement.Center,
     modifier = modifier
         .fillMaxSize()
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.align(Alignment.Center)
-    ) {
+
+    BoxWithConstraints(Modifier.fillMaxWidth(0.5f)) {
         SquareBox(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .border(
+            modifier = Modifier.border(
                     width = 2.dp,
                     color = MaterialTheme.colors.primary,
                     shape = RoundedCornerShape(8.dp)
@@ -62,43 +63,9 @@ fun HomeScreen(
                     set(Hash.Symbol.O, 3, 3)
                 },
                 winner = Hash.Winner.Diagonal.Inverted,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        GameButton(onClick = {
-            onPlayClick(true)
-        }) {
-            Row {
-                Icon(
-                    imageVector = Icons.Rounded.Person,
-                    contentDescription = null,
-                )
-
-                Text(text = "vs", fontSize = 16.sp)
-
-                Icon(
-                    imageVector = Icons.Rounded.PhoneAndroid,
-                    contentDescription = null
-                )
-            }
-        }
-
-        GameButton(onClick = {
-            onPlayClick(false)
-        }) {
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
-            )
-
-            Text(text = "vs", fontSize = 16.sp)
-
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
+                modifier = Modifier
+                    .padding(16.dp)
+                    .matchParentSize()
             )
         }
     }
@@ -106,9 +73,38 @@ fun HomeScreen(
     Text(
         text = BuildConfig.VERSION_NAME,
         modifier = Modifier
-            .align(Alignment.BottomCenter)
-            .padding(bottom = 8.dp)
+            .padding(vertical = 4.dp)
     )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    GameButton(onClick = { onPlayClick(true) }) {
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
+
+        Text(text = "vs", fontSize = 16.sp)
+
+        Icon(
+            imageVector = Icons.Rounded.PhoneAndroid,
+            contentDescription = null
+        )
+    }
+
+    GameButton(onClick = { onPlayClick(false) }) {
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
+
+        Text(text = "vs", fontSize = 16.sp)
+
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
+    }
 }
 
 @Preview(showBackground = true)

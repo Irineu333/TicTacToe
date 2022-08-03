@@ -12,7 +12,11 @@ android {
         release {
             def keystoreProperties = new Properties()
 
-            keystoreProperties.load(new FileInputStream(rootProject.file("keystore.properties")))
+            keystoreProperties.load(
+                    new FileInputStream(
+                            rootProject.file("keystore.properties")
+                    )
+            )
 
             storeFile rootProject.file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
@@ -26,7 +30,7 @@ android {
         minSdk 21
         targetSdk 32
         versionCode 1
-        versionName "1.0.0"
+        versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -36,16 +40,37 @@ android {
     }
 
     buildTypes {
+
+        def adsProperties = new Properties()
+
+        adsProperties.load(
+                new FileInputStream(
+                        rootProject.file("ads.properties")
+                )
+        )
+
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            manifestPlaceholders = [ADMOB_APP_ID: adsProperties["APP_ID"]]
+
+            buildConfigField "String", "BANNER_ID", adsProperties["BANNER_ID"]
+            buildConfigField "String", "INTERSTITIAL_ID", adsProperties["INTERSTITIAL_ID"]
+
             signingConfig signingConfigs.release
         }
 
         debug {
             minifyEnabled false
+
             versionNameSuffix '-dev'
             applicationIdSuffix ".dev"
+
+            manifestPlaceholders = [ADMOB_APP_ID: adsProperties["DEBUG_APP_ID"]]
+
+            buildConfigField "String", "BANNER_ID", adsProperties["DEBUG_BANNER_ID"]
+            buildConfigField "String", "INTERSTITIAL_ID", adsProperties["DEBUG_INTERSTITIAL_ID"]
         }
     }
     compileOptions {
@@ -86,7 +111,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_version"
 
     //activity compose integration
-    implementation 'androidx.activity:activity-compose:1.5.0'
+    implementation 'androidx.activity:activity-compose:1.5.1'
 
     // TODO: temporary, remove when navigation compose has transition animations
     implementation('com.google.accompanist:accompanist-navigation-animation:0.23.1') {
@@ -94,10 +119,10 @@ dependencies {
     }
 
     //splash
-    implementation 'androidx.core:core-splashscreen:1.0.0-rc01'
+    implementation 'androidx.core:core-splashscreen:1.0.0'
 
     //lifecycle
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     //log
     implementation 'com.jakewharton.timber:timber:5.0.1'
@@ -107,6 +132,14 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
+    implementation 'com.google.firebase:firebase-database-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+
+    //ads
+    implementation 'com.google.android.gms:play-services-ads:21.1.0'
+
+    //simple data persistence
+    implementation 'androidx.datastore:datastore-preferences:1.0.0'
 
     //tests
     testImplementation 'junit:junit:4.13.2'

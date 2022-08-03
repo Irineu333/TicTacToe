@@ -21,17 +21,18 @@ data class Hash(
     ) = symbols[row - 1][column - 1]
 
     override fun equals(other: Any?): Boolean {
-        if (other is Hash) {
-            for (row in KEY_RANGE) {
-                for (column in KEY_RANGE) {
-                    if (other.get(row, column) != get(row, column)) {
-                        return false
-                    }
+
+        if (other !is Hash) return false
+
+        for (row in KEY_RANGE) {
+            for (column in KEY_RANGE) {
+                if (other.get(row, column) != get(row, column)) {
+                    return false
                 }
             }
         }
 
-        return false
+        return true
     }
 
     override fun hashCode(): Int {
@@ -48,20 +49,6 @@ data class Hash(
         KEY_RANGE.all { column ->
             get(row, column) == null
         }
-    }
-
-    fun symbolsCount(): Int {
-        var count = 0;
-
-        for (row in KEY_RANGE) {
-            for (column in KEY_RANGE) {
-                if (get(row, column) != null) {
-                    count++
-                }
-            }
-        }
-
-        return count
     }
 
     fun getAllSymbols() = buildList {

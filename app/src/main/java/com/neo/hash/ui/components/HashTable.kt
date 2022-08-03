@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,8 +27,6 @@ import androidx.compose.ui.unit.dp
 import com.neo.hash.model.Hash
 import kotlin.math.min
 
-typealias OnBlockClick = (Hash.Block) -> Unit
-
 private val Density.DEFAULT_LINE_WIDTH
     get() = 4.dp.toPx()
 
@@ -35,8 +35,8 @@ fun HashTable(
     hash: Hash,
     modifier: Modifier = Modifier,
     winner: Hash.Winner? = null,
-    canClick: (Hash.Block) -> Boolean = { true },
-    onBlockClick: OnBlockClick? = null,
+    canClick: (Hash.Block) -> Boolean = { winner != null },
+    onBlockClick: ((Hash.Block) -> Unit)? = null,
     hashColor: Color = MaterialTheme.colors.onBackground,
     symbolsColor: Color = MaterialTheme.colors.primary,
     winnerLineColor: Color = symbolsColor.copy(alpha = 0.4f)
@@ -53,26 +53,21 @@ fun HashTable(
 }
 
 @Composable
-private fun DrawForeground(
+private fun BoxScope.DrawForeground(
     hash: Hash,
     winner: Hash.Winner?,
     symbolsColor: Color,
     winnerLineColor: Color,
     canClick: (Hash.Block) -> Boolean = { true },
-    onBlockClick: OnBlockClick? = null
+    onBlockClick: ((Hash.Block) -> Unit)? = null
 ) = Box(
     contentAlignment = Alignment.Center,
-    modifier = Modifier.fillMaxSize()
+    modifier = Modifier.matchParentSize()
 ) {
     DrawSymbols(
         hash = hash,
         lineSymbolsColors = symbolsColor,
-        canClick = {
-            if (winner == null)
-                canClick(it)
-            else
-                false
-        },
+        canClick = canClick,
         onBlockClick = onBlockClick
     )
 
@@ -85,19 +80,18 @@ private fun DrawForeground(
 }
 
 @Composable
-fun DrawWinner(
+fun BoxScope.DrawWinner(
     winner: Hash.Winner,
     lineColor: Color,
     modifier: Modifier = Modifier
-) = Box {
-
+) {
     val linesSize = remember { Animatable(0f) }
 
     LaunchedEffect(key1 = winner) {
         linesSize.animateTo(1f)
     }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    Canvas(modifier = modifier.matchParentSize()) {
 
         val columnSize = size.width / 3f
         val columnRadius = columnSize / 2f
@@ -129,7 +123,8 @@ fun DrawWinner(
                 drawRoundedLine(
                     start = Offset(
                         x = x,
-                        y = rowPadding),
+                        y = rowPadding
+                    ),
                     end = Offset(
                         x = x,
                         y = aHeight + rowPadding
@@ -206,14 +201,14 @@ fun DrawWinner(
 }
 
 @Composable
-private fun DrawSymbols(
+private fun BoxScope.DrawSymbols(
     hash: Hash,
     lineSymbolsColors: Color,
     modifier: Modifier = Modifier,
     canClick: (Hash.Block) -> Boolean = { true },
-    onBlockClick: OnBlockClick? = null
+    onBlockClick: ((Hash.Block) -> Unit)? = null
 ) = BoxWithConstraints(
-    modifier = modifier.fillMaxSize()
+    modifier = modifier.matchParentSize()
 ) {
 
     val rowsSize = maxHeight / 3f
@@ -250,11 +245,14 @@ private fun Block(
     modifier: Modifier,
     linePlayersColors: Color,
     canClick: (Hash.Block) -> Boolean,
-    onClick: OnBlockClick? = null
+    onClick: ((Hash.Block) -> Unit)? = null
 ) = Box(
-    modifier = onClick?.let onClick@{
-        if (!canClick(block)) return@onClick modifier
-        modifier.clickable { it(block) }
+    modifier = onClick?.let {
+        if (!canClick(block)) {
+            modifier
+        } else {
+            modifier.clickable { it(block) }
+        }
     } ?: modifier,
     contentAlignment = Alignment.Center
 ) {
@@ -323,10 +321,10 @@ private fun Player(
 }
 
 @Composable
-private fun DrawBackground(
+private fun BoxScope.DrawBackground(
     lineHashColor: Color
 ) = Canvas(
-    modifier = Modifier.fillMaxSize()
+    modifier = Modifier.matchParentSize()
 ) {
 
     val rowsSize = size.height / 3f
@@ -388,14 +386,17 @@ fun DrawScope.drawRoundedCircle(
 @Preview(showBackground = true)
 @Composable
 fun HashTablePreview() {
-    SquareBox {
-        HashTable(
-            hash = Hash().apply {
-                set(Hash.Symbol.O, 1, 1)
-                set(Hash.Symbol.X, 2, 2)
-                set(Hash.Symbol.X, 3, 3)
-            },
-            winner = Hash.Winner.Diagonal.Normal
-        )
+    BoxWithConstraints {
+        SquareBox {
+            HashTable(
+                hash = Hash().apply {
+                    set(Hash.Symbol.O, 1, 1)
+                    set(Hash.Symbol.X, 2, 2)
+                    set(Hash.Symbol.X, 3, 3)
+                },
+                winner = Hash.Winner.Diagonal.Normal,
+                modifier = Modifier.matchParentSize()
+            )
+        }
     }
 }

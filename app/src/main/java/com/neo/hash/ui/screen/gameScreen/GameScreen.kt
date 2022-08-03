@@ -1,6 +1,8 @@
 package com.neo.hash.ui.screen.gameScreen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -20,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,64 +32,86 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
-import com.neo.hash.ui.components.Players
 import com.neo.hash.ui.components.SquareBox
 import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
-import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
-    isPhone: Boolean = false,
-    viewModel: GameViewModel = viewModel()
+    againstIntelligent: Boolean = false,
+    viewModel: GameViewModel = viewModel(),
+    showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
 ) = Column(
-    modifier = modifier.fillMaxSize(),
+    modifier = modifier
+        .padding(top = 16.dp)
+        .fillMaxSize(),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
     val state = viewModel.uiState.collectAsState().value
 
-    Card(modifier = Modifier.alpha(if (state.tied > 0) 1f else 0f)) {
-        Row(
-            modifier = Modifier
-                .padding(
-                    vertical = 4.dp,
-                    horizontal = 16.dp
-                ).height(IntrinsicSize.Min)
-        ) {
-            Text(text = stringResource(R.string.text_tired).uppercase(), fontSize = 16.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(text = "${state.tied}", fontSize = 16.sp)
+    AnimatedVisibility(visible = state.tied > 0) {
+        Card(modifier = Modifier.padding(bottom = 16.dp)) {
+            Row(
+                modifier = Modifier
+                    .padding(
+                        vertical = 4.dp,
+                        horizontal = 16.dp
+                    )
+                    .height(IntrinsicSize.Min)
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.text_tired
+                    ).uppercase(),
+                    fontSize = 16.sp
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                Text(
+                    text = "${state.tied}",
+                    fontSize = 16.sp
+                )
+            }
         }
     }
 
-    Spacer(modifier = Modifier.height(16.dp))
-
-    Players(
-        players = state.players,
+    AnimatedVisibility(
+        visible = state.players.isNotEmpty(),
         modifier = Modifier
-            .fillMaxWidth(),
-        playing = state.playerTurn
-    )
-
-    Spacer(modifier = Modifier.height(16.dp))
-
-    SquareBox(
-        modifier = Modifier.padding(16.dp)
+            .padding(bottom = 16.dp)
     ) {
-        HashTable(
-            hash = state.hash,
-            winner = state.winner,
-            onBlockClick = {
-                viewModel.select(it.row, it.column)
+        Players(
+            players = state.players,
+            playing = state.playerTurn,
+            onDebugClick = {
+                viewModel.onDebug(it)
             },
-            canClick = {
-                viewModel.canClick(it.row, it.column)
-            }
+            modifier = Modifier
+                .fillMaxWidth()
         )
+    }
+
+    BoxWithConstraints(Modifier) {
+        SquareBox {
+            HashTable(
+                hash = state.hash,
+                winner = state.winner,
+                onBlockClick = {
+                    viewModel.select(it.row, it.column)
+                },
+                canClick = {
+                    viewModel.canClick(it.row, it.column)
+                },
+                modifier = Modifier
+                    .padding(16.dp)
+                    .matchParentSize()
+            )
+        }
     }
 
     Spacer(modifier = Modifier.height(16.dp))
@@ -96,7 +119,9 @@ fun GameScreen(
     Row {
         GameButton(
             onClick = {
-                viewModel.clear()
+                showInterstitial(false) {
+                    viewModel.clear()
+                }
             }
         ) {
             Text(text = stringResource(R.string.btn_clean).uppercase())
@@ -113,12 +138,20 @@ fun GameScreen(
 
     if (state.players.isEmpty() && !finishing) {
         PlayersInsertDialog(
-            viewModel = viewModel,
-            vsPhone = isPhone,
+            onConfirm = { player1, player2 ->
+                if (player2 is Player.Phone) {
+                    showInterstitial(true) {
+                        viewModel.start(player1, player2)
+                    }
+                } else {
+                    viewModel.start(player1, player2)
+                }
+            },
+            vsPhone = againstIntelligent,
             onDismissRequest = {
                 finishing = true
                 onHomeClick()
-            }
+            },
         )
     }
 }
@@ -127,15 +160,13 @@ fun GameScreen(
 @Composable
 private fun GameScreenPreview() {
     HashTheme {
-        HashBackground {
-            GameScreen(
-                viewModel = (viewModel() as GameViewModel).apply {
-                    start(
-                        Player.Person(Hash.Symbol.O, "Irineu"),
-                        Player.Phone(Hash.Symbol.X),
-                    )
-                }
-            )
-        }
+        GameScreen(
+            viewModel = (viewModel() as GameViewModel).apply {
+                start(
+                    Player.Person(Hash.Symbol.O, "Irineu"),
+                    Player.Phone(Hash.Symbol.X),
+                )
+            }
+        )
     }
 }

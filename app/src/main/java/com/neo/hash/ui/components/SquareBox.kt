@@ -2,25 +2,31 @@ package com.neo.hash.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.min
 
 @Composable
-fun SquareBox(
+fun BoxWithConstraintsScope.SquareBox(
     modifier: Modifier = Modifier,
-    content: @Composable BoxScope.() -> Unit
-) = Box(modifier = modifier) {
-    BoxWithConstraints {
+    content: @Composable BoxScope.() -> Unit,
+) = Box(
+    modifier = modifier
+        .wrapContentSize()
+        .align(Alignment.Center)
+) {
 
-        val size = remember { min(maxHeight, maxWidth) }
+    val size = min(
+        this@SquareBox.maxHeight,
+        this@SquareBox.maxWidth
+    )
 
-        Box(
-            modifier = Modifier.size(size),
-            content = content
-        )
-    }
+    Box(
+        modifier = Modifier.size(size),
+        content = content
+    )
 }

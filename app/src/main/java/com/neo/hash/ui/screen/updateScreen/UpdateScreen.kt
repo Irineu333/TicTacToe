@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -24,11 +25,11 @@ import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.screen.updateScreen.viewModel.UpdateViewModel
 import com.neo.hash.ui.theme.HashTheme
+import com.neo.hash.util.extensions.openPlayStore
 
 @Composable
 fun UpdateScreen(
-    viewModel: UpdateViewModel = viewModel(),
-    openPlayStore: () -> Unit = {}
+    viewModel: UpdateViewModel = viewModel()
 ) {
     val state = viewModel.uiState.collectAsState().value
     val update = state.update
@@ -43,6 +44,7 @@ fun UpdateScreen(
         showDialog
     ) {
         val cancelable = currentVersion >= update.lastRequiredVersion
+        val context = LocalContext.current
 
         UpdateDialog(
             versionName = update.lastVersionName,
@@ -52,7 +54,9 @@ fun UpdateScreen(
                 }
             },
             cancelable = cancelable,
-            openPlayStore = openPlayStore
+            openPlayStore =  {
+                context.openPlayStore()
+            }
         )
     }
 }

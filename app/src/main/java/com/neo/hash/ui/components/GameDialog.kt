@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -36,6 +37,7 @@ fun GameDialog(
     properties: DialogProperties = DialogProperties(),
     title: (@Composable BoxScope.() -> Unit)? = null,
     buttons: (@Composable RowScope.() -> Unit)? = null,
+    buttonsArrangement : Arrangement.Horizontal = Arrangement.End,
     content: @Composable ColumnScope.() -> Unit
 ) = Dialog(
     onDismissRequest = onDismissRequest,
@@ -43,6 +45,7 @@ fun GameDialog(
 ) {
     Card(
         border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column(modifier = modifier.padding(16.dp)) {
             title?.let {
@@ -69,7 +72,7 @@ fun GameDialog(
 
             buttons?.let {
                 Row(
-                    horizontalArrangement = Arrangement.End,
+                    horizontalArrangement = buttonsArrangement,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 8.dp)
