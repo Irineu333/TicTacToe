@@ -147,7 +147,13 @@ class GameViewModel : ViewModel() {
                 val (row, column) = withContext(Dispatchers.Default) {
                     val delay = launch { delay(500) }
 
-                    state.playerTurn.ai.hard(state.hash).also {
+                    with(state.playerTurn) {
+                        when(difficulty) {
+                            Difficulty.EASY -> intelligent.easy(state.hash)
+                            Difficulty.MEDIUM -> intelligent.medium(state.hash)
+                            Difficulty.HARD -> intelligent.hard(state.hash)
+                        }
+                    }.also {
                         delay.join()
                     }
                 }

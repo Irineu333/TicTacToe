@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.neo.hash.R
+import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
@@ -89,7 +90,9 @@ fun GameScreen(
             players = state.players,
             playing = state.playerTurn,
             onDebugClick = {
-                viewModel.onDebug(it)
+                if (it is Player.Phone) {
+                    viewModel.onDebug(it)
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -164,7 +167,10 @@ private fun GameScreenPreview() {
             viewModel = (viewModel() as GameViewModel).apply {
                 start(
                     Player.Person(Hash.Symbol.O, "Irineu"),
-                    Player.Phone(Hash.Symbol.X),
+                    Player.Phone(
+                        Hash.Symbol.X,
+                        difficulty = Difficulty.HARD
+                    ),
                 )
             }
         )

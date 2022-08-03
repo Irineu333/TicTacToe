@@ -5,10 +5,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.SyncAlt
-import androidx.compose.material.icons.outlined.TurnLeft
 import androidx.compose.material.icons.rounded.SyncAlt
-import androidx.compose.material.icons.twotone.SyncAlt
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.neo.hash.R
+import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.GameButton
@@ -46,6 +44,10 @@ fun PlayersInsertDialog(
     val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
     val isError = player1 == player2 && isNotBlank
 
+    var difficultySelection by rememberSaveable {
+        mutableStateOf(Difficulty.values().random())
+    }
+
     var symbols by rememberSaveable {
         val symbol1 = if (Random.nextBoolean())
             Hash.Symbol.O else Hash.Symbol.X
@@ -66,7 +68,8 @@ fun PlayersInsertDialog(
             ),
             if (vsPhone) {
                 Player.Phone(
-                    symbol = symbols[1]
+                    symbol = symbols[1],
+                    difficulty = difficultySelection
                 )
             } else {
                 Player.Person(
@@ -92,7 +95,6 @@ fun PlayersInsertDialog(
         },
         content = {
             Box {
-
                 Column {
                     OutlinedTextField(
                         value = player1,
@@ -130,6 +132,7 @@ fun PlayersInsertDialog(
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
+
                 IconButton(
                     onClick = {
                         symbols = symbols.asReversed()
@@ -145,6 +148,31 @@ fun PlayersInsertDialog(
                         tint = Color.Black
                     )
                 }
+            }
+
+            if (vsPhone) {
+
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    for (difficulty in Difficulty.values()) {
+                        OutlinedButton(
+                            onClick = {
+                                difficultySelection = difficulty
+                            },
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = colors.primary.copy(
+                                    if (difficulty == difficultySelection) 1f else 0.5f
+                                )
+                            )
+                        ) {
+                            Text(text = difficulty.name)
+                        }
+                    }
+                }
+
+                Divider(modifier = Modifier.padding(top = 8.dp))
             }
         },
         buttons = {
@@ -172,6 +200,7 @@ fun PlayersInsertDialog(
 private fun PlayersInsertDialogPreview() {
     PlayersInsertDialog(
         onConfirm = { _, _ -> },
-        onDismissRequest = {}
+        onDismissRequest = {},
+        vsPhone = true
     )
 }
