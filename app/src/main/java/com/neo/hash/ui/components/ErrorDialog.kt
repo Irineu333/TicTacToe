@@ -1,5 +1,6 @@
 package com.neo.hash.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -35,6 +36,7 @@ fun ErrorDialog(
                 modifier = Modifier.align(CenterHorizontally)
             )
         },
+        buttonsArrangement = Arrangement.Center,
         buttons = {
             TextButton(
                 onClick = onDismiss

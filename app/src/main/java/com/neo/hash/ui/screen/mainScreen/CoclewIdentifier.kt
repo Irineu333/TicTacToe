@@ -145,33 +145,33 @@ private fun RemoveReferenceCode(
         },
         title = {
             Text(
-                text = "Remover código".uppercase(),
+                text = "REMOVER CÓDIGO ",
                 modifier = Modifier.align(Alignment.Center)
             )
         },
         content = {
             Text(
-                text = "Deseja remover o código de referência?".uppercase(),
+                text = "Remover o código de referência?",
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         },
         buttons = {
-            GameButton(
+            TextButton(
                 onClick = {
                     onDismissRequest()
                 }
             ) {
-                Text(text = "Não")
+                Text(text = "NÃO")
             }
 
-            GameButton(
+            TextButton(
                 onClick = {
                     onDismissRequest()
                     onRemoveReferenceCode()
                 }
             ) {
-                Text(text = "Sim")
+                Text(text = "SIM")
             }
         },
         buttonsArrangement = Arrangement.SpaceAround
@@ -191,7 +191,7 @@ fun InsertReferenceCode(
         onDismissRequest = onDismissRequest,
         title = {
             Text(
-                text = "Código de referência".uppercase(),
+                text = "CÓDIGO DE REFERÊNCIA",
                 modifier = Modifier
                     .align(Alignment.Center)
             )

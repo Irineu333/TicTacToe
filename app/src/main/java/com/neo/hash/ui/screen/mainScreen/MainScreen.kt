@@ -16,6 +16,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -57,16 +58,17 @@ fun MainScreen(
     val controller = rememberAnimatedNavController()
 
     val currentDestination = controller.currentBackStackEntryAsState().value?.destination
+
     val isHomeScreenCurrent = currentDestination?.route == Screen.HomeScreen.route
 
     val referenceCode = viewModel.referenceCodeFlow.collectAsState(initial = null).value
 
     val coclewEnabled = Coclew.enabled.collectAsState().value
 
-    var showMaintenance by remember { mutableStateOf(false) }
+    var showMaintenance by rememberSaveable { mutableStateOf(false) }
 
     val primaryColor by animateColorAsState(
-        if (!referenceCode.isNullOrEmpty() && coclewEnabled == false)
+        if (!referenceCode.isNullOrEmpty())
             Color.Coclew else colors.primary
     )
 
@@ -102,7 +104,7 @@ fun MainScreen(
                 onDismiss = {
                     showMaintenance = false
                 },
-                title = "Aviso",
+                title = "AVISO",
                 message = "Estamos em manutenção."
             )
         }
@@ -151,6 +153,7 @@ fun MainScreen(
                     againstIntelligent = backStackEntry.arguments!!.getBoolean(
                         Screen.GameScreen.isPhone
                     ),
+                    isCoclewMode = !referenceCode.isNullOrEmpty(),
                     showInterstitial = { ignoreSkip, onSuccess ->
                         when {
                             referenceCode!!.isEmpty() || coclewEnabled == null -> onSuccess()

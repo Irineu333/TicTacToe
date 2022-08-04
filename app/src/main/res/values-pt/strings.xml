@@ -14,4 +14,7 @@
     <string name="btn_later">Depois</string>
     <string name="text_update">Atualização</string>
     <string name="text_artificial_intelligence">IA</string>
+    <string name="text_easy">FÁCIL</string>
+    <string name="text_medium">MÉDIO</string>
+    <string name="text_hard">DIFÍCIL</string>
 </resources>

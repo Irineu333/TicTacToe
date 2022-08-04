@@ -6,11 +6,8 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.SyncAlt
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -25,6 +22,7 @@ import com.neo.hash.R
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.singleton.Coclew
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.components.Symbol
@@ -34,6 +32,7 @@ import kotlin.random.Random
 fun PlayersInsertDialog(
     onConfirm: (Player.Person, Player) -> Unit,
     vsPhone: Boolean = false,
+    isCoclewMode: Boolean = false,
     onDismissRequest: () -> Unit = {}
 ) {
     val textSmartphone = stringResource(R.string.text_smartphone)
@@ -151,6 +150,7 @@ fun PlayersInsertDialog(
             }
 
             if (vsPhone) {
+                val points by Coclew.points.collectAsState()
 
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -167,7 +167,23 @@ fun PlayersInsertDialog(
                                 )
                             )
                         ) {
-                            Text(text = difficulty.name)
+                            Text(
+                                text = when (difficulty) {
+                                    Difficulty.EASY -> stringResource(R.string.text_easy)
+                                    Difficulty.MEDIUM -> stringResource(R.string.text_medium)
+                                    Difficulty.HARD -> stringResource(R.string.text_hard)
+                                }
+                            )
+
+                            if (isCoclewMode && points != null) {
+                                Text(
+                                    text = ":" + when (difficulty) {
+                                        Difficulty.EASY -> points!!.easy
+                                        Difficulty.MEDIUM -> points!!.medium
+                                        Difficulty.HARD -> points!!.hard
+                                    }
+                                )
+                            }
                         }
                     }
                 }

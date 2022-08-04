@@ -42,6 +42,7 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     onHomeClick: () -> Unit = {},
     againstIntelligent: Boolean = false,
+    isCoclewMode: Boolean = false,
     viewModel: GameViewModel = viewModel(),
     showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
 ) = Column(
@@ -151,6 +152,7 @@ fun GameScreen(
                 }
             },
             vsPhone = againstIntelligent,
+            isCoclewMode = isCoclewMode,
             onDismissRequest = {
                 finishing = true
                 onHomeClick()
