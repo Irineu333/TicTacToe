@@ -14,7 +14,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun ErrorDialog(
-    title: String = "ERRO",
+    title: String = "ERROR",
     onDismiss: () -> Unit = {},
     message: String
 ) = MaterialTheme(

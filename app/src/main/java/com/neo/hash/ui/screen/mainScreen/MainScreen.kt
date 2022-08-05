@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +33,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.neo.hash.BuildConfig
+import com.neo.hash.R
 import com.neo.hash.activity.viewModel.MainViewModel
 import com.neo.hash.model.Screen
 import com.neo.hash.singleton.Coclew
@@ -104,8 +106,8 @@ fun MainScreen(
                 onDismiss = {
                     showMaintenance = false
                 },
-                title = "AVISO",
-                message = "Estamos em manutenção."
+                title = stringResource(R.string.title_warning),
+                message = stringResource(R.string.text_maintenance)
             )
         }
 

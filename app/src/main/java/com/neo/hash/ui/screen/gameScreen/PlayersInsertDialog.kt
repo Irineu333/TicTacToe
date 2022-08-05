@@ -196,7 +196,7 @@ fun PlayersInsertDialog(
             GameButton(
                 onClick = onDismissRequest
             ) {
-                Text(text = "CANCEL")
+                Text(text = stringResource(R.string.btn_cancel))
             }
 
             Spacer(modifier = Modifier.weight(1f))

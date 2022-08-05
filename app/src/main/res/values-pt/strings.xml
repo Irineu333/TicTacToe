@@ -17,4 +17,12 @@
     <string name="text_easy">FÁCIL</string>
     <string name="text_medium">MÉDIO</string>
     <string name="text_hard">DIFÍCIL</string>
+    <string name="title_remove_code">REMOVE CODE</string>
+    <string name="text_remove_code">Remove referral code?</string>
+    <string name="btn_not">NO</string>
+    <string name="btn_yes">YES</string>
+    <string name="title_refeence_code">REFERENCE CODE</string>
+    <string name="title_warning">WARNING</string>
+    <string name="text_maintenance">We are under maintenance.</string>
+    <string name="btn_cancel">CANCELAR</string>
 </resources>
