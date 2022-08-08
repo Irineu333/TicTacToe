@@ -113,8 +113,6 @@ class GameViewModel : ViewModel() {
                 // count points
                 if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
 
-                    Firebase.crashlytics.log(referenceCode)
-
                     viewModelScope.launch {
                         GlobalFlow.addPoints(intelligent.difficulty)
                     }
