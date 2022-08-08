@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -390,7 +391,7 @@ fun HashTablePreview() {
         SquareBox {
             HashTable(
                 hash = Hash().apply {
-                    set(Hash.Symbol.O, 1, 1)
+                    set(Hash.Symbol.X, 1, 1)
                     set(Hash.Symbol.X, 2, 2)
                     set(Hash.Symbol.X, 3, 3)
                 },

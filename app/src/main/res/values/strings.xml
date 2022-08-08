@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Tic Tac Toe</string>
     <string name="text_circle">Circle</string>
     <string name="text_tired">Velha</string>
@@ -6,10 +6,22 @@
     <string name="btn_start">Start</string>
     <string name="text_smartphone">Smartphone</string>
     <string name="text_player">Player %d</string>
-    <string name="btn_confirm">Confirm</string>
-    <string name="text_players">Players</string>
+    <string name="btn_confirm">CONFIRM</string>
+    <string name="text_players">PLAYERS</string>
     <string name="text_update_description">Version %s is available on PlayStore</string>
     <string name="btn_update">Update</string>
     <string name="btn_later">Later</string>
     <string name="text_update">Update</string>
+    <string name="text_artificial_intelligence">AI</string>
+    <string name="text_easy">EASY</string>
+    <string name="text_medium">MEDIUM</string>
+    <string name="text_hard">HARD</string>
+    <string name="title_remove_code">REMOVE CODE</string>
+    <string name="text_remove_code">Remove reference code?</string>
+    <string name="btn_not">NO</string>
+    <string name="btn_yes">YES</string>
+    <string name="title_warning">WARNING</string>
+    <string name="btn_cancel" tools:ignore="ButtonCase">CANCEL</string>
+    <string name="title_refeence_code">REFERENCE CODE</string>
+    <string name="text_maintenance">We are under maintenance.</string>
 </resources>

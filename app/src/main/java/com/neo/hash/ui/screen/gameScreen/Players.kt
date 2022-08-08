@@ -7,21 +7,23 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neo.hash.BuildConfig
 import com.neo.hash.R
+import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.ui.components.Symbol
 
 @Composable
 fun Players(
@@ -96,12 +98,29 @@ private fun PlayerCard(
 
             Spacer(modifier = Modifier.padding(4.dp))
 
-            val name = when (player) {
-                is Player.Person -> player.name
-                is Player.Phone -> stringResource(R.string.text_smartphone)
+            val name = buildAnnotatedString {
+                when (player) {
+                    is Player.Person -> {
+                        append(player.name.uppercase())
+                    }
+                    is Player.Phone -> {
+
+                        append("${stringResource(id = R.string.text_artificial_intelligence)}:")
+
+                        withStyle(SpanStyle(colors.primary)) {
+                            append(
+                                when (player.difficulty) {
+                                    Difficulty.EASY -> stringResource(R.string.text_easy)
+                                    Difficulty.MEDIUM -> stringResource(R.string.text_medium)
+                                    Difficulty.HARD -> stringResource(R.string.text_hard)
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
-            Text(text = name.uppercase(), fontSize = 16.sp)
+            Text(text = name, fontSize = 16.sp)
 
             Spacer(modifier = Modifier.weight(weight = 1f))
 
@@ -110,39 +129,13 @@ private fun PlayerCard(
     }
 }
 
-@Composable
-fun Symbol(
-    symbol: Hash.Symbol,
-    modifier: Modifier = Modifier,
-    color: Color = colors.primary
-) {
-    when (symbol) {
-        Hash.Symbol.O -> {
-            Icon(
-                imageVector = Icons.Outlined.Circle,
-                tint = color,
-                contentDescription = null,
-                modifier = modifier
-            )
-        }
-        Hash.Symbol.X -> {
-            Icon(
-                imageVector = Icons.Outlined.Close,
-                tint = color,
-                contentDescription = null,
-                modifier = modifier
-            )
-        }
-    }
-}
-
-
 @Preview
 @Composable
 private fun PlayersPreview() {
     val players = listOf(
         Player.Phone(
-            Hash.Symbol.O
+            Hash.Symbol.O,
+            difficulty = Difficulty.HARD
         ),
         Player.Person(
             Hash.Symbol.X,

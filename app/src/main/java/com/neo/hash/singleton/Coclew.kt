@@ -5,6 +5,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.getValue
+import com.neo.hash.data.response.Points
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -37,6 +38,19 @@ object Coclew {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     value = snapshot.getValue<Long>() ?: return
+                }
+
+                override fun onCancelled(error: DatabaseError) = Unit
+            })
+    }.asStateFlow()
+
+
+    val points = MutableStateFlow<Points?>(value = null).apply {
+        coclewRef
+            .child("points")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    value = snapshot.getValue<Points>() ?: return
                 }
 
                 override fun onCancelled(error: DatabaseError) = Unit

@@ -2,6 +2,10 @@ package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
@@ -97,14 +101,26 @@ class GameViewModel : ViewModel() {
                 )
             }
 
-            viewModelScope.launch {
-                if (
-                    state.players.any { it is Player.Phone } &&
-                    winner.first is Player.Person &&
-                    referenceCode.isNotEmpty() &&
-                    Coclew.enabled.value != false
-                ) {
-                    GlobalFlow.addPoints(Difficulty.MEDIUM)
+            val vsIntelligent = state.players.any { it is Player.Phone }
+
+            if (vsIntelligent && winner.first is Player.Person) {
+                // intelligent lost
+
+                val intelligent = state.players.first {
+                    it is Player.Phone
+                } as Player.Phone
+
+                // count points
+                if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
+
+                    viewModelScope.launch {
+                        GlobalFlow.addPoints(intelligent.difficulty)
+                    }
+                }
+
+                // report hard mode failure
+                if (intelligent.difficulty == Difficulty.HARD) {
+
                 }
             }
             return
@@ -147,7 +163,13 @@ class GameViewModel : ViewModel() {
                 val (row, column) = withContext(Dispatchers.Default) {
                     val delay = launch { delay(500) }
 
-                    state.playerTurn.ai.hard(state.hash).also {
+                    with(state.playerTurn) {
+                        when (difficulty) {
+                            Difficulty.EASY -> intelligent.easy(state.hash)
+                            Difficulty.MEDIUM -> intelligent.medium(state.hash)
+                            Difficulty.HARD -> intelligent.hard(state.hash)
+                        }
+                    }.also {
                         delay.join()
                     }
                 }

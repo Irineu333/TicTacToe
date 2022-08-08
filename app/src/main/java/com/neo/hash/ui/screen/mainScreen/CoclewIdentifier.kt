@@ -100,7 +100,7 @@ fun CoclewIdentifier(
                 }
 
                 Text(
-                    text = referenceCode.ifEmpty { "Código de referência".uppercase() },
+                    text = referenceCode.ifEmpty { stringResource(R.string.title_refeence_code) },
                     letterSpacing = 0.sp,
                     lineHeight = 0.sp
                 )
@@ -145,33 +145,33 @@ private fun RemoveReferenceCode(
         },
         title = {
             Text(
-                text = "Remover código".uppercase(),
+                text = stringResource(R.string.title_remove_code),
                 modifier = Modifier.align(Alignment.Center)
             )
         },
         content = {
             Text(
-                text = "Deseja remover o código de referência?".uppercase(),
+                text = stringResource(R.string.text_remove_code),
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
         },
         buttons = {
-            GameButton(
+            TextButton(
                 onClick = {
                     onDismissRequest()
                 }
             ) {
-                Text(text = "Não")
+                Text(text = stringResource(R.string.btn_not))
             }
 
-            GameButton(
+            TextButton(
                 onClick = {
                     onDismissRequest()
                     onRemoveReferenceCode()
                 }
             ) {
-                Text(text = "Sim")
+                Text(text = stringResource(R.string.btn_yes))
             }
         },
         buttonsArrangement = Arrangement.SpaceAround
@@ -191,7 +191,7 @@ fun InsertReferenceCode(
         onDismissRequest = onDismissRequest,
         title = {
             Text(
-                text = "Código de referência".uppercase(),
+                text = stringResource(R.string.title_refeence_code),
                 modifier = Modifier
                     .align(Alignment.Center)
             )
