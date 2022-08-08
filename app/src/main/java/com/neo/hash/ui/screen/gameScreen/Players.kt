@@ -108,7 +108,13 @@ private fun PlayerCard(
                         append("${stringResource(id = R.string.text_artificial_intelligence)}:")
 
                         withStyle(SpanStyle(colors.primary)) {
-                            append(player.difficulty.name)
+                            append(
+                                when (player.difficulty) {
+                                    Difficulty.EASY -> stringResource(R.string.text_easy)
+                                    Difficulty.MEDIUM -> stringResource(R.string.text_medium)
+                                    Difficulty.HARD -> stringResource(R.string.text_hard)
+                                }
+                            )
                         }
                     }
                 }

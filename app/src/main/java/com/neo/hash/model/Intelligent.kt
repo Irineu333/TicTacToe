@@ -11,11 +11,11 @@ class Intelligent(
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: winOrBlock() ?: xeque(smart = false) ?: random()
+        firstRandom() ?: winOrBlock() ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque() ?: random()
+        firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque(smart = false) ?: random()
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
