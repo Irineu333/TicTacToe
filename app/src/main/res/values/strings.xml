@@ -20,8 +20,8 @@
     <string name="text_remove_code">Remove reference code?</string>
     <string name="btn_not">NO</string>
     <string name="btn_yes">YES</string>
-    <string name="title_warning">AVISO</string>
-    <string name="text_maintenance">Estamos em manutenção.</string>
+    <string name="title_warning">WARNING</string>
     <string name="btn_cancel" tools:ignore="ButtonCase">CANCEL</string>
     <string name="title_refeence_code">REFERENCE CODE</string>
+    <string name="text_maintenance">We are under maintenance.</string>
 </resources>

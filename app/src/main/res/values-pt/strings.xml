@@ -22,7 +22,7 @@
     <string name="btn_not">NÃO</string>
     <string name="btn_yes">SIM</string>
     <string name="title_refeence_code">CÓDIGO DE REFERÊNCIA</string>
-    <string name="title_warning">WARNING</string>
-    <string name="text_maintenance">We are under maintenance.</string>
+    <string name="title_warning">AVISO</string>
+    <string name="text_maintenance">Estamos em manutenção.</string>
     <string name="btn_cancel">CANCELAR</string>
 </resources>
