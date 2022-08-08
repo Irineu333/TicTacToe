@@ -16,10 +16,10 @@
     <string name="text_easy">EASY</string>
     <string name="text_medium">MEDIUM</string>
     <string name="text_hard">HARD</string>
-    <string name="title_remove_code">REMOVER CÓDIGO</string>
-    <string name="text_remove_code">Remover o código de referência?</string>
-    <string name="btn_not">NÃO</string>
-    <string name="btn_yes">SIM</string>
+    <string name="title_remove_code">REMOVE CODE</string>
+    <string name="text_remove_code">Remove reference code?</string>
+    <string name="btn_not">NO</string>
+    <string name="btn_yes">YES</string>
     <string name="title_warning">AVISO</string>
     <string name="text_maintenance">Estamos em manutenção.</string>
     <string name="btn_cancel" tools:ignore="ButtonCase">CANCEL</string>
