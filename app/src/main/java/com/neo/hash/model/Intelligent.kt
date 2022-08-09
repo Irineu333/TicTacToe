@@ -26,11 +26,11 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        perfectFirst()
+        firstRandom()
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock()
-            ?: killDoubleXeque()
+            ?: disruptiveXeque()
             ?: random()
     }
 
@@ -43,21 +43,30 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         return null
     }
 
-    private fun Hash.killDoubleXeque(): Hash.Block? {
-        val enemyDoubleXeques = xeques(
+    private fun Hash.disruptiveXeque(): Hash.Block? {
+        val enemyXeques = xeques(
             targetSymbol = enemySymbol
-        ).recurring()
+        ).tryRecurring()
 
-        val xeques = xeques(
+        val disruptiveXeques = xeques(
             targetSymbol = mySymbol,
-            enemyBlockMoves = enemyDoubleXeques
-        )
+            enemyBlockMoves = enemyXeques
+        ).tryRecurring()
 
-        val doubleXeques = xeques.recurring()
+        return disruptiveXeques.ifEmpty {
+            val xeques = xeques(mySymbol)
+            val doubleXeques = xeques.tryRecurring()
 
-        return doubleXeques.ifEmpty {
-            xeques.ifEmpty {
-                enemyDoubleXeques
+            enemyXeques.filter {
+                doubleXeques.contains(it)
+            }.ifEmpty {
+                enemyXeques.filter {
+                    xeques.contains(it)
+                }
+            }.ifEmpty {
+                doubleXeques
+            }.ifEmpty {
+                enemyXeques
             }
         }.randomOrNull()
     }
@@ -69,7 +78,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private fun Hash.perfectThird(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
-        if (symbols.size != 2) return null
+        if (symbols.size == 2) return null
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
@@ -604,7 +613,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         val moves = xeques(targetSymbol = mySymbol)
 
         return run {
-            if (double) moves.recurring().ifEmpty { moves } else moves
+            if (double) moves.tryRecurring() else moves
         }.randomOrNull()
     }
 
@@ -634,3 +643,5 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         val center = Hash.Block(2, 2)
     }
 }
+
+private fun <E> List<E>.tryRecurring() = recurring().ifEmpty { this }
