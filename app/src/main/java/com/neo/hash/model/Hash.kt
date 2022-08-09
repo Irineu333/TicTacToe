@@ -5,13 +5,15 @@ import kotlin.math.abs
 data class Hash(
     private val symbols: Array<Array<Symbol?>> = Array(KEY_RANGE.last) {
         Array(KEY_RANGE.last) { null }
-    }
+    },
+    val log: MutableList<Block> = mutableListOf()
 ) {
     fun set(
         symbol: Symbol,
         row: Int,
         column: Int
     ) {
+        log.add(Block(row, column, symbol))
         symbols[row - 1][column - 1] = symbol
     }
 

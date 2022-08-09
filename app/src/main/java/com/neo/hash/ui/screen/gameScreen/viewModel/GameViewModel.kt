@@ -8,6 +8,7 @@ import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.dataStoreRepository
+import com.neo.hash.exceptions.HardFailureException
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
@@ -19,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.Exception
 
 class GameViewModel : ViewModel() {
 
@@ -113,6 +115,8 @@ class GameViewModel : ViewModel() {
                 // count points
                 if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
 
+                    Firebase.crashlytics.log("reference code: $referenceCode")
+
                     viewModelScope.launch {
                         GlobalFlow.addPoints(intelligent.difficulty)
                     }
@@ -121,6 +125,17 @@ class GameViewModel : ViewModel() {
                 // report hard mode failure
                 if (intelligent.difficulty == Difficulty.HARD) {
 
+                    val person = winner.first as Player.Person
+
+                    val hardFailureException = HardFailureException(
+                        intelligent,
+                        person,
+                        newHash.log
+                    )
+
+                    Firebase.crashlytics.recordException(
+                        hardFailureException
+                    )
                 }
             }
             return
