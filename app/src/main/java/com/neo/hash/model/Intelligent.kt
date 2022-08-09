@@ -1,6 +1,8 @@
 package com.neo.hash.model
 
 import com.neo.hash.BuildConfig
+import com.neo.hash.util.extensions.containsAny
+import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
 
@@ -48,6 +50,10 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         return null
     }
 
+    /**
+     * action:
+     * requirement:
+     */
     private fun Hash.disruptiveXeque(): Hash.Block? {
         val enemyXeques = xeques(
             targetSymbol = enemySymbol
@@ -58,10 +64,12 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             enemyBlockMoves = enemyXeques
         ).tryRecurring()
 
-        return disruptiveXeques.ifEmpty {
-            val xeques = xeques(mySymbol)
-            val doubleXeques = xeques.tryRecurring()
+        val xeques = xeques(mySymbol)
+        val doubleXeques = xeques.tryRecurring()
 
+        return disruptiveXeques.tryFilter {
+            doubleXeques.contains(it)
+        }.ifEmpty {
             enemyXeques.filter {
                 doubleXeques.contains(it)
             }.ifEmpty {
@@ -359,13 +367,8 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             addAll(rows())
             addAll(columns())
 
-            diagonal()?.let {
-                add(it)
-            }
-
-            invertedDiagonal()?.let {
-                add(it)
-            }
+            diagonal()?.let(::add)
+            invertedDiagonal()?.let(::add)
         }
 
         val winMove = allMoves.filter {
@@ -398,6 +401,10 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         return null
     }
 
+    /**
+     * action:
+     * requirement:
+     */
     private fun Hash.xeques(
         targetSymbol: Hash.Symbol,
         enemyBlockMoves: List<Hash.Block> = listOf()
@@ -450,7 +457,6 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                     emptyBlocks.size == 2 &&
                     !enemyBlockMoves.containsAny(emptyBlocks)
                 ) {
-
                     addAll(emptyBlocks)
                 }
             }
@@ -617,15 +623,6 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
             addAll(diagonal())
             addAll(invertedDiagonal())
-        }
-    }
-
-    private fun List<Hash.Block>.containsAny(
-        emptyBlocks: MutableList<Hash.Block>
-    ) = any { block ->
-        emptyBlocks.any {
-            block.row == it.row &&
-                    block.column == it.column
         }
     }
 

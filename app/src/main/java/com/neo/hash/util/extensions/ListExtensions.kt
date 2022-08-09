@@ -19,6 +19,14 @@ fun <T> List<T>.joinToAnnotatedString(
     }
 }
 
+fun <T> List<T>.containsAny(
+    emptyBlocks: MutableList<T>
+) = any { block ->
+    emptyBlocks.any {
+        block == it
+    }
+}
+
 fun <T> List<T>.recurring(
     predicate: (T) -> T = { it }
 ) = groupBy(predicate)
@@ -28,3 +36,6 @@ fun <T> List<T>.recurring(
 
 fun <E> List<E>.tryRecurring() =
     recurring().ifEmpty { this }
+
+fun <T> List<T>.tryFilter(predicate: (T) -> Boolean) =
+    filter(predicate).ifEmpty { this }
