@@ -95,9 +95,9 @@ data class Hash(
             abs(block.row - row) < 2 &&
                     abs(block.column - column) < 2
 
-        fun isEquals(block: Block) =
-            block.row == row &&
-                block.column == column
+        override fun toString(): String {
+            return symbol?.let { "$it - ($row, $column)" } ?: "($row, $column)"
+        }
     }
 
     sealed class Winner {

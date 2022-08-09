@@ -1,9 +1,8 @@
 package com.neo.hash.model
 
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
-import com.neo.hash.util.extensions.recurring
+import com.neo.hash.BuildConfig
 import com.neo.hash.util.extensions.tryRecurring
+import timber.log.Timber
 
 class Intelligent(private val mySymbol: Hash.Symbol) {
 
@@ -29,7 +28,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        perfectFirst()
+        run { if (BuildConfig.DEBUG) firstRandom() else perfectFirst() }
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock()
@@ -39,9 +38,12 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
     private fun Hash.perfectFirst(): Hash.Block? {
         if (isEmpty()) {
+
             return run {
                 corners + center
-            }.randomOrNull()
+            }.random().also {
+                Timber.i("perfectFirst: $it")
+            }
         }
         return null
     }
@@ -71,7 +73,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             }.ifEmpty {
                 enemyXeques
             }
-        }.randomOrNull()
+        }.randomOrNull()?.also {
+            Timber.i("disruptiveXeque: $it")
+        }
     }
 
     /**
@@ -85,11 +89,17 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
-            return corners.filter { get(it.row, it.column) == null }.randomOrNull()
+            return corners.filter {
+                get(it.row, it.column) == null
+            }.randomOrNull()?.also {
+                Timber.i("perfectThird: $it")
+            }
         }
 
         //center is winner
         if (!hasCenter) {
+            Timber.i("perfectThird: center")
+
             return center
         }
 
@@ -103,21 +113,28 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private fun Hash.blockOnSecond(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
+        if (symbols.size != 1) return null
 
-        if (symbols.size == 1) {
+        if (hasCorners) {
+            Timber.i("blockOnSecond: corners")
 
-            if (hasCorners) {
-                return center
-            }
+            return center
+        }
 
-            if (hasSides) {
-                val enemyBlock: Hash.Block = symbols[0]
-                return run { corners.filter { it.isSide(enemyBlock) } + center }.random()
-            }
+        if (hasSides) {
+            Timber.i("blockOnSecond: sides")
 
-            if (hasCenter) {
-                return corners.random()
-            }
+            val enemyBlock: Hash.Block = symbols[0]
+
+            return run {
+                corners.filter { it.isSide(enemyBlock) } + center
+            }.random()
+        }
+
+        if (hasCenter) {
+            Timber.i("blockOnSecond: center")
+
+            return corners.random()
         }
 
         return null
@@ -359,7 +376,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             it.second != mySymbol
         }.randomOrNull()?.first
 
-        return winMove ?: blockMove
+        return run { winMove ?: blockMove }?.also {
+            Timber.i("winOrBlock: $it")
+        }
     }
 
     /**
@@ -368,10 +387,13 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
      */
     private fun Hash.firstRandom(): Hash.Block? {
         if (isEmpty()) {
+
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
                 column = Hash.KEY_RANGE.random()
-            )
+            ).also {
+                Timber.i("blockOnSecond: $it")
+            }
         }
         return null
     }
@@ -617,7 +639,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
         return run {
             if (double) moves.tryRecurring() else moves
-        }.randomOrNull()
+        }.randomOrNull()?.also {
+            Timber.i("xeque: $it")
+        }
     }
 
     /**
@@ -626,7 +650,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
      */
     private fun Hash.random() = getAllEmpty().filter {
         it.symbol == null
-    }.random()
+    }.random().also {
+        Timber.i("random: $it")
+    }
 
     companion object {
         val corners = listOf(
