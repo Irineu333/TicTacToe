@@ -67,6 +67,11 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             return corners.filter { get(it.row, it.column) == null }.randomOrNull()
         }
 
+        //play in center
+        if (!hasCenter && hasSides) {
+            return center
+        }
+
         return null
     }
 
@@ -86,7 +91,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
             if (hasSides) {
                 val enemyBlock: Hash.Block = symbols[0]
-                return (corners.filter { it.isSide(enemyBlock) } + center).random()
+                return run { corners.filter { it.isSide(enemyBlock) } + center }.random()
             }
 
             if (hasCenter) {

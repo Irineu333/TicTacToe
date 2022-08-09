@@ -91,9 +91,13 @@ data class Hash(
         val column: Int,
         val symbol: Symbol? = null
     ) {
-        fun isSide(center: Block) =
-            abs(center.row - row) < 2 &&
-                    abs(center.column - column) < 2
+        fun isSide(block: Block) =
+            abs(block.row - row) < 2 &&
+                    abs(block.column - column) < 2
+
+        fun isEquals(block: Block) =
+            block.row == row &&
+                block.column == column
     }
 
     sealed class Winner {
