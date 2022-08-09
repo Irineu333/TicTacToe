@@ -2,24 +2,55 @@ package com.neo.hash.model
 
 import com.neo.hash.util.extensions.recurring
 
-class Intelligent(
-    private val mySymbol: Hash.Symbol
-) {
+class Intelligent(private val mySymbol: Hash.Symbol) {
+
+    private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
 
     private val Hash.hasCorners get() = corners.any { get(it.row, it.column) != null }
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: winOrBlock() ?: random()
+        firstRandom()
+            ?: winOrBlock()
+            ?: xeque(double = false)
+            ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque(smart = false) ?: random()
+        firstRandom()
+            ?: blockOnSecond()
+            ?: winOrBlock()
+            ?: xeque(double = true)
+            ?: random()
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: blockOnSecond() ?: perfectThird() ?: winOrBlock() ?: xeque() ?: random()
+        firstRandom()
+            ?: blockOnSecond()
+            ?: perfectThird()
+            ?: winOrBlock()
+            ?: killDoubleXeque()
+            ?: random()
+    }
+
+    private fun Hash.killDoubleXeque(): Hash.Block? {
+        val enemyDoubleXeques = xeques(
+            targetSymbol = enemySymbol
+        ).recurring()
+
+        val xeques = xeques(
+            targetSymbol = mySymbol,
+            enemyBlockMoves = enemyDoubleXeques
+        )
+
+        val doubleXeques = xeques.recurring()
+
+        return doubleXeques.ifEmpty {
+            xeques.ifEmpty {
+                enemyDoubleXeques
+            }
+        }.randomOrNull()
     }
 
     /**
@@ -319,11 +350,10 @@ class Intelligent(
         return null
     }
 
-    /**
-     * action: Threatens to close a segment
-     * requirement: A follow-up with a piece of mine
-     */
-    private fun Hash.xeque(smart: Boolean = true): Hash.Block? {
+    private fun Hash.xeques(
+        targetSymbol: Hash.Symbol,
+        enemyBlockMoves: List<Hash.Block> = listOf()
+    ): List<Hash.Block> {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
 
@@ -334,12 +364,12 @@ class Intelligent(
                 for (column in Hash.KEY_RANGE) {
                     val symbol = get(row, column)
 
-                    if (symbol == mySymbol) {
+                    if (symbol == targetSymbol) {
                         myBlocks.add(
                             Hash.Block(
                                 row,
                                 column,
-                                mySymbol
+                                targetSymbol
                             )
                         )
                         continue
@@ -355,7 +385,7 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
+                    if (symbol != targetSymbol) {
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
@@ -369,8 +399,10 @@ class Intelligent(
                 if (
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
-                    emptyBlocks.size == 2
+                    emptyBlocks.size == 2 &&
+                    !enemyBlockMoves.containsAny(emptyBlocks)
                 ) {
+
                     addAll(emptyBlocks)
                 }
             }
@@ -385,12 +417,12 @@ class Intelligent(
                 for (row in Hash.KEY_RANGE) {
                     val symbol = get(row, column)
 
-                    if (symbol == mySymbol) {
+                    if (symbol == targetSymbol) {
                         myBlocks.add(
                             Hash.Block(
                                 row,
                                 column,
-                                mySymbol
+                                targetSymbol
                             )
                         )
                         continue
@@ -406,7 +438,7 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
+                    if (symbol != targetSymbol) {
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
@@ -420,7 +452,8 @@ class Intelligent(
                 if (
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
-                    emptyBlocks.size == 2
+                    emptyBlocks.size == 2 &&
+                    !enemyBlockMoves.containsAny(emptyBlocks)
                 ) {
                     addAll(emptyBlocks)
                 }
@@ -436,12 +469,12 @@ class Intelligent(
 
                 val symbol = get(index, index)
 
-                if (symbol == mySymbol) {
+                if (symbol == targetSymbol) {
                     myBlocks.add(
                         Hash.Block(
                             index,
                             index,
-                            mySymbol
+                            targetSymbol
                         )
                     )
                     continue
@@ -457,7 +490,7 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
+                if (symbol != targetSymbol) {
                     enemyBlocks.add(
                         Hash.Block(
                             index,
@@ -471,7 +504,8 @@ class Intelligent(
             if (
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
-                emptyBlocks.size == 2
+                emptyBlocks.size == 2 &&
+                !enemyBlockMoves.containsAny(emptyBlocks)
             ) {
                 addAll(emptyBlocks)
             }
@@ -487,12 +521,12 @@ class Intelligent(
 
                 val symbol = get(row, column)
 
-                if (symbol == mySymbol) {
+                if (symbol == targetSymbol) {
                     myBlocks.add(
                         Hash.Block(
                             row,
                             column,
-                            mySymbol
+                            targetSymbol
                         )
                     )
                     continue
@@ -508,7 +542,7 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
+                if (symbol != targetSymbol) {
                     enemyBlocks.add(
                         Hash.Block(
                             row,
@@ -522,24 +556,42 @@ class Intelligent(
             if (
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
-                emptyBlocks.size == 2
+                emptyBlocks.size == 2 &&
+                !enemyBlockMoves.containsAny(emptyBlocks)
             ) {
                 addAll(emptyBlocks)
             }
         }
 
-        val moves = buildList {
+        return buildList {
             addAll(rows())
             addAll(columns())
 
             addAll(diagonal())
             addAll(invertedDiagonal())
-
         }
+    }
 
-        return moves.let {
-            if (smart) it.recurring() else it
-        }.ifEmpty { moves }.randomOrNull()
+    private fun List<Hash.Block>.containsAny(
+        emptyBlocks: MutableList<Hash.Block>
+    ) = any { block ->
+        emptyBlocks.any {
+            block.row == it.row &&
+                    block.column == it.column
+        }
+    }
+
+    /**
+     * action: Threatens to close a segment
+     * requirement: A follow-up with a piece of mine
+     */
+    private fun Hash.xeque(double: Boolean): Hash.Block? {
+
+        val moves = xeques(targetSymbol = mySymbol)
+
+        return run {
+            if (double) moves.recurring().ifEmpty { moves } else moves
+        }.randomOrNull()
     }
 
     /**
