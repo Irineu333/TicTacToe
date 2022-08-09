@@ -7,5 +7,6 @@ class HardFailureException(
     phone: Player.Phone,
     person: Player.Person,
     log: List<Hash.Block>
-) : Exception("AI - ${phone.symbol}, ${person.name} - ${person.symbol} : " +
-        log.joinToString(", ") { "${it.symbol} (${it.row}, ${it.column})" })
+) : Exception("AI - ${phone.symbol}, " +
+        "${person.name} - ${person.symbol} : " +
+        log.joinToString(", ") { "$it" })
