@@ -26,12 +26,21 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        firstRandom()
+        perfectFirst()
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock()
             ?: killDoubleXeque()
             ?: random()
+    }
+
+    private fun Hash.perfectFirst(): Hash.Block? {
+        if (isEmpty()) {
+            return run {
+                corners + center
+            }.randomOrNull()
+        }
+        return null
     }
 
     private fun Hash.killDoubleXeque(): Hash.Block? {
