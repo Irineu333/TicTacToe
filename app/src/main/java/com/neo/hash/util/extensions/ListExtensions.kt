@@ -25,3 +25,6 @@ fun <T> List<T>.recurring(
     .filterValues {
         it.size > 1
     }.keys.toList()
+
+fun <E> List<E>.tryRecurring() =
+    recurring().ifEmpty { this }

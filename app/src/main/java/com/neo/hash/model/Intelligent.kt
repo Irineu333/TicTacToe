@@ -1,6 +1,9 @@
 package com.neo.hash.model
 
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.neo.hash.util.extensions.recurring
+import com.neo.hash.util.extensions.tryRecurring
 
 class Intelligent(private val mySymbol: Hash.Symbol) {
 
@@ -26,7 +29,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        firstRandom()
+        perfectFirst()
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock()
@@ -78,15 +81,15 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private fun Hash.perfectThird(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
-        if (symbols.size == 2) return null
+        if (symbols.size != 2) return null
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
             return corners.filter { get(it.row, it.column) == null }.randomOrNull()
         }
 
-        //play in center
-        if (!hasCenter && hasSides) {
+        //center is winner
+        if (!hasCenter) {
             return center
         }
 
@@ -643,5 +646,3 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         val center = Hash.Block(2, 2)
     }
 }
-
-private fun <E> List<E>.tryRecurring() = recurring().ifEmpty { this }
