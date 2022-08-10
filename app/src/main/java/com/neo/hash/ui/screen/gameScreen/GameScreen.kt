@@ -40,11 +40,11 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    onHomeClick: () -> Unit = {},
     againstIntelligent: Boolean = false,
     isCoclewMode: Boolean = false,
-    viewModel: GameViewModel = viewModel(),
+    onHomeClick: () -> Unit = {},
     showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
+    viewModel: GameViewModel = viewModel(),
 ) = Column(
     modifier = modifier
         .padding(top = 16.dp)
@@ -100,7 +100,7 @@ fun GameScreen(
         )
     }
 
-    BoxWithConstraints(Modifier) {
+    BoxWithConstraints {
         SquareBox {
             HashTable(
                 hash = state.hash,
