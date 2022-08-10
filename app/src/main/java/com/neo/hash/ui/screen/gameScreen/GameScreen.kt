@@ -121,21 +121,25 @@ fun GameScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Row {
-        GameButton(
-            onClick = {
-                showInterstitial(false) {
-                    viewModel.clear()
+    AnimatedVisibility(visible = state.players.isNotEmpty()) {
+        Row {
+            AnimatedVisibility(visible = !isCoclewMode || state.playerTurn == null) {
+                GameButton(
+                    onClick = {
+                        showInterstitial(false) {
+                            viewModel.clear()
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.btn_clean).uppercase())
                 }
             }
-        ) {
-            Text(text = stringResource(R.string.btn_clean).uppercase())
-        }
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-        GameButton(onClick = onHomeClick) {
-            Text(text = stringResource(R.string.btn_start).uppercase())
+            GameButton(onClick = onHomeClick) {
+                Text(text = stringResource(R.string.btn_start).uppercase())
+            }
         }
     }
 
