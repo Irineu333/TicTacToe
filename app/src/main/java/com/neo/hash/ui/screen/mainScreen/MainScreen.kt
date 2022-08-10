@@ -41,6 +41,7 @@ import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.screen.HomeScreen
 import com.neo.hash.ui.screen.gameScreen.GameScreen
 import com.neo.hash.ui.theme.Coclew
+import com.neo.hash.ui.theme.CoclewDark
 import com.neo.hash.util.extensions.enterToLeftTransition
 import com.neo.hash.util.extensions.enterToRightTransition
 import com.neo.hash.util.extensions.exitToLeftTransition
@@ -74,7 +75,17 @@ fun MainScreen(
             Color.Coclew else colors.primary
     )
 
-    MaterialTheme(colors.copy(primaryColor)) {
+    val primaryVariantColor by animateColorAsState(
+        if (!referenceCode.isNullOrEmpty())
+            Color.CoclewDark else colors.primaryVariant
+    )
+
+    MaterialTheme(
+        colors.copy(
+            primary = primaryColor,
+            primaryVariant = primaryVariantColor
+        )
+    ) {
         if (referenceCode != null && coclewEnabled != null) {
             AnimatedVisibility(
                 referenceCode.isNotEmpty() ||

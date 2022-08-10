@@ -2,8 +2,7 @@ package com.neo.hash.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple200 = Color(0xFFBB86FC)
-val Purple500 = Color(0xFF6200EE)
-val Purple700 = Color(0xFF3700B3)
-val Teal200 = Color(0xFF03DAC5)
+val PurpleLight = Color(0xFFB578FF)
+val PurpleDark = Color(0xFF7A1EFF)
 val Color.Companion.Coclew get() = Color(0xFF009688)
+val Color.Companion.CoclewDark get() = Color(0xFF00665C)

@@ -5,8 +5,10 @@ package com.neo.hash.ui.screen.gameScreen
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +26,7 @@ import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.ui.components.Symbol
+import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun Players(
@@ -69,7 +72,7 @@ private fun PlayerCard(
         } else modifier,
         backgroundColor = when {
             isPhone && !(player as Player.Phone).isEnabled -> Color.Red
-            playing -> Color(0xFFEEEEEE)
+            playing -> colors.primaryVariant
             else -> colors.surface
         },
     ) {
@@ -147,4 +150,26 @@ private fun PlayersPreview() {
         playing = players[0],
         modifier = Modifier.fillMaxWidth()
     )
+}
+
+@Preview
+@Composable
+private fun PlayersDarkPreview() {
+    val players = listOf(
+        Player.Phone(
+            Hash.Symbol.O,
+            difficulty = Difficulty.HARD
+        ),
+        Player.Person(
+            Hash.Symbol.X,
+            "Irineu"
+        )
+    )
+    HashTheme(darkTheme = true) {
+        Players(
+            players = players,
+            playing = players[0],
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
 }
