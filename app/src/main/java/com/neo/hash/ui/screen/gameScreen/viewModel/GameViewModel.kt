@@ -2,23 +2,20 @@ package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
-import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.dataStoreRepository
+import com.neo.hash.exceptions.HardFailureException
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.update
+import timber.log.Timber
 
 class GameViewModel : ViewModel() {
 
@@ -113,6 +110,8 @@ class GameViewModel : ViewModel() {
                 // count points
                 if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
 
+                    Timber.i("reference code: $referenceCode")
+
                     viewModelScope.launch {
                         GlobalFlow.addPoints(intelligent.difficulty)
                     }
@@ -121,6 +120,15 @@ class GameViewModel : ViewModel() {
                 // report hard mode failure
                 if (intelligent.difficulty == Difficulty.HARD) {
 
+                    val person = winner.first as Player.Person
+
+                    val hardFailureException = HardFailureException(
+                        intelligent,
+                        person,
+                        newHash.log
+                    )
+
+                    Timber.e(hardFailureException)
                 }
             }
             return

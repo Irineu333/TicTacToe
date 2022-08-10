@@ -144,7 +144,7 @@ fun PlayersInsertDialog(
                         imageVector = Icons.Rounded.SyncAlt,
                         contentDescription = null,
                         modifier = Modifier.rotate(90f),
-                        tint = Color.Black
+                        tint = contentColorFor(colors.background)
                     )
                 }
             }
@@ -162,9 +162,14 @@ fun PlayersInsertDialog(
                                 difficultySelection = difficulty
                             },
                             colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = colors.primary.copy(
-                                    if (difficulty == difficultySelection) 1f else 0.5f
-                                )
+                                contentColor = if (difficulty == difficultySelection)
+                                    contentColorFor(colors.primary)
+                                else colors.primary,
+                                backgroundColor = if (difficulty == difficultySelection)
+                                    colors.primary
+                                else
+                                    colors.background
+
                             )
                         ) {
                             Text(

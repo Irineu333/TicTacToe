@@ -1,25 +1,89 @@
 package com.neo.hash.model
 
-import com.neo.hash.util.extensions.recurring
+import com.neo.hash.BuildConfig
+import com.neo.hash.util.extensions.containsAny
+import com.neo.hash.util.extensions.tryFilter
+import com.neo.hash.util.extensions.tryRecurring
+import timber.log.Timber
 
-class Intelligent(
-    private val mySymbol: Hash.Symbol
-) {
+class Intelligent(private val mySymbol: Hash.Symbol) {
+
+    private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
 
     private val Hash.hasCorners get() = corners.any { get(it.row, it.column) != null }
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: winOrBlock() ?: random()
+        firstRandom()
+            ?: winOrBlock()
+            ?: xeque(double = false)
+            ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: blockOnSecond() ?: winOrBlock() ?: xeque(smart = false) ?: random()
+        firstRandom()
+            ?: blockOnSecond()
+            ?: winOrBlock()
+            ?: xeque(double = true)
+            ?: random()
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        firstRandom() ?: blockOnSecond() ?: perfectThird() ?: winOrBlock() ?: xeque() ?: random()
+        run { if (BuildConfig.DEBUG) firstRandom() else perfectFirst() }
+            ?: blockOnSecond()
+            ?: perfectThird()
+            ?: winOrBlock()
+            ?: disruptiveXeque()
+            ?: random()
+    }
+
+    private fun Hash.perfectFirst(): Hash.Block? {
+        if (isEmpty()) {
+
+            return run {
+                corners + center
+            }.random().also {
+                Timber.i("perfectFirst: $it")
+            }
+        }
+        return null
+    }
+
+    /**
+     * action:
+     * requirement:
+     */
+    private fun Hash.disruptiveXeque(): Hash.Block? {
+        val enemyXeques = xeques(
+            targetSymbol = enemySymbol
+        ).tryRecurring()
+
+        val disruptiveXeques = xeques(
+            targetSymbol = mySymbol,
+            enemyBlockMoves = enemyXeques
+        ).tryRecurring()
+
+        val xeques = xeques(mySymbol)
+        val doubleXeques = xeques.tryRecurring()
+
+        return disruptiveXeques.tryFilter {
+            doubleXeques.contains(it)
+        }.ifEmpty {
+            enemyXeques.filter {
+                doubleXeques.contains(it)
+            }.ifEmpty {
+                enemyXeques.filter {
+                    xeques.contains(it)
+                }
+            }.ifEmpty {
+                doubleXeques
+            }.ifEmpty {
+                enemyXeques
+            }
+        }.randomOrNull()?.also {
+            Timber.i("disruptiveXeque: $it")
+        }
     }
 
     /**
@@ -33,7 +97,18 @@ class Intelligent(
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
-            return corners.filter { get(it.row, it.column) == null }.randomOrNull()
+            return corners.filter {
+                get(it.row, it.column) == null
+            }.randomOrNull()?.also {
+                Timber.i("perfectThird: $it")
+            }
+        }
+
+        //center is winner
+        if (!hasCenter) {
+            Timber.i("perfectThird: center")
+
+            return center
         }
 
         return null
@@ -46,21 +121,28 @@ class Intelligent(
     private fun Hash.blockOnSecond(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
+        if (symbols.size != 1) return null
 
-        if (symbols.size == 1) {
+        if (hasCorners) {
+            Timber.i("blockOnSecond: corners")
 
-            if (hasCorners) {
-                return center
-            }
+            return center
+        }
 
-            if (hasSides) {
-                val enemyBlock: Hash.Block = symbols[0]
-                return (corners.filter { it.isSide(enemyBlock) } + center).random()
-            }
+        if (hasSides) {
+            Timber.i("blockOnSecond: sides")
 
-            if (hasCenter) {
-                return corners.random()
-            }
+            val enemyBlock: Hash.Block = symbols[0]
+
+            return run {
+                corners.filter { it.isSide(enemyBlock) } + center
+            }.random()
+        }
+
+        if (hasCenter) {
+            Timber.i("blockOnSecond: center")
+
+            return corners.random()
         }
 
         return null
@@ -285,13 +367,8 @@ class Intelligent(
             addAll(rows())
             addAll(columns())
 
-            diagonal()?.let {
-                add(it)
-            }
-
-            invertedDiagonal()?.let {
-                add(it)
-            }
+            diagonal()?.let(::add)
+            invertedDiagonal()?.let(::add)
         }
 
         val winMove = allMoves.filter {
@@ -302,7 +379,9 @@ class Intelligent(
             it.second != mySymbol
         }.randomOrNull()?.first
 
-        return winMove ?: blockMove
+        return run { winMove ?: blockMove }?.also {
+            Timber.i("winOrBlock: $it")
+        }
     }
 
     /**
@@ -311,19 +390,25 @@ class Intelligent(
      */
     private fun Hash.firstRandom(): Hash.Block? {
         if (isEmpty()) {
+
             return Hash.Block(
                 row = Hash.KEY_RANGE.random(),
                 column = Hash.KEY_RANGE.random()
-            )
+            ).also {
+                Timber.i("blockOnSecond: $it")
+            }
         }
         return null
     }
 
     /**
-     * action: Threatens to close a segment
-     * requirement: A follow-up with a piece of mine
+     * action:
+     * requirement:
      */
-    private fun Hash.xeque(smart: Boolean = true): Hash.Block? {
+    private fun Hash.xeques(
+        targetSymbol: Hash.Symbol,
+        enemyBlockMoves: List<Hash.Block> = listOf()
+    ): List<Hash.Block> {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
 
@@ -334,12 +419,12 @@ class Intelligent(
                 for (column in Hash.KEY_RANGE) {
                     val symbol = get(row, column)
 
-                    if (symbol == mySymbol) {
+                    if (symbol == targetSymbol) {
                         myBlocks.add(
                             Hash.Block(
                                 row,
                                 column,
-                                mySymbol
+                                targetSymbol
                             )
                         )
                         continue
@@ -355,7 +440,7 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
+                    if (symbol != targetSymbol) {
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
@@ -369,7 +454,8 @@ class Intelligent(
                 if (
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
-                    emptyBlocks.size == 2
+                    emptyBlocks.size == 2 &&
+                    !enemyBlockMoves.containsAny(emptyBlocks)
                 ) {
                     addAll(emptyBlocks)
                 }
@@ -385,12 +471,12 @@ class Intelligent(
                 for (row in Hash.KEY_RANGE) {
                     val symbol = get(row, column)
 
-                    if (symbol == mySymbol) {
+                    if (symbol == targetSymbol) {
                         myBlocks.add(
                             Hash.Block(
                                 row,
                                 column,
-                                mySymbol
+                                targetSymbol
                             )
                         )
                         continue
@@ -406,7 +492,7 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
+                    if (symbol != targetSymbol) {
                         enemyBlocks.add(
                             Hash.Block(
                                 row,
@@ -420,7 +506,8 @@ class Intelligent(
                 if (
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
-                    emptyBlocks.size == 2
+                    emptyBlocks.size == 2 &&
+                    !enemyBlockMoves.containsAny(emptyBlocks)
                 ) {
                     addAll(emptyBlocks)
                 }
@@ -436,12 +523,12 @@ class Intelligent(
 
                 val symbol = get(index, index)
 
-                if (symbol == mySymbol) {
+                if (symbol == targetSymbol) {
                     myBlocks.add(
                         Hash.Block(
                             index,
                             index,
-                            mySymbol
+                            targetSymbol
                         )
                     )
                     continue
@@ -457,7 +544,7 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
+                if (symbol != targetSymbol) {
                     enemyBlocks.add(
                         Hash.Block(
                             index,
@@ -471,7 +558,8 @@ class Intelligent(
             if (
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
-                emptyBlocks.size == 2
+                emptyBlocks.size == 2 &&
+                !enemyBlockMoves.containsAny(emptyBlocks)
             ) {
                 addAll(emptyBlocks)
             }
@@ -487,12 +575,12 @@ class Intelligent(
 
                 val symbol = get(row, column)
 
-                if (symbol == mySymbol) {
+                if (symbol == targetSymbol) {
                     myBlocks.add(
                         Hash.Block(
                             row,
                             column,
-                            mySymbol
+                            targetSymbol
                         )
                     )
                     continue
@@ -508,7 +596,7 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
+                if (symbol != targetSymbol) {
                     enemyBlocks.add(
                         Hash.Block(
                             row,
@@ -522,24 +610,35 @@ class Intelligent(
             if (
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
-                emptyBlocks.size == 2
+                emptyBlocks.size == 2 &&
+                !enemyBlockMoves.containsAny(emptyBlocks)
             ) {
                 addAll(emptyBlocks)
             }
         }
 
-        val moves = buildList {
+        return buildList {
             addAll(rows())
             addAll(columns())
 
             addAll(diagonal())
             addAll(invertedDiagonal())
-
         }
+    }
 
-        return moves.let {
-            if (smart) it.recurring() else it
-        }.ifEmpty { moves }.randomOrNull()
+    /**
+     * action: Threatens to close a segment
+     * requirement: A follow-up with a piece of mine
+     */
+    private fun Hash.xeque(double: Boolean): Hash.Block? {
+
+        val moves = xeques(targetSymbol = mySymbol)
+
+        return run {
+            if (double) moves.tryRecurring() else moves
+        }.randomOrNull()?.also {
+            Timber.i("xeque: $it")
+        }
     }
 
     /**
@@ -548,7 +647,9 @@ class Intelligent(
      */
     private fun Hash.random() = getAllEmpty().filter {
         it.symbol == null
-    }.random()
+    }.random().also {
+        Timber.i("random: $it")
+    }
 
     companion object {
         val corners = listOf(

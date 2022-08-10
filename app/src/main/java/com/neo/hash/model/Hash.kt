@@ -5,13 +5,15 @@ import kotlin.math.abs
 data class Hash(
     private val symbols: Array<Array<Symbol?>> = Array(KEY_RANGE.last) {
         Array(KEY_RANGE.last) { null }
-    }
+    },
+    val log: MutableList<Block> = mutableListOf()
 ) {
     fun set(
         symbol: Symbol,
         row: Int,
         column: Int
     ) {
+        log.add(Block(row, column, symbol))
         symbols[row - 1][column - 1] = symbol
     }
 
@@ -89,9 +91,13 @@ data class Hash(
         val column: Int,
         val symbol: Symbol? = null
     ) {
-        fun isSide(center: Block) =
-            abs(center.row - row) < 2 &&
-                    abs(center.column - column) < 2
+        fun isSide(block: Block) =
+            abs(block.row - row) < 2 &&
+                    abs(block.column - column) < 2
+
+        override fun toString(): String {
+            return symbol?.let { "$it - ($row, $column)" } ?: "($row, $column)"
+        }
     }
 
     sealed class Winner {
