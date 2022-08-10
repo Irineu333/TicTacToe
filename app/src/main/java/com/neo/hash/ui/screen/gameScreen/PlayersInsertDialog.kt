@@ -1,6 +1,8 @@
 package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
@@ -152,11 +154,11 @@ fun PlayersInsertDialog(
             if (vsPhone) {
                 val points by Coclew.points.collectAsState()
 
-                Row(
+                LazyRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    for (difficulty in Difficulty.values()) {
+                    items(Difficulty.values()) { difficulty ->
                         OutlinedButton(
                             onClick = {
                                 difficultySelection = difficulty
