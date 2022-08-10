@@ -111,6 +111,7 @@ fun GameScreen(
                 canClick = {
                     viewModel.canClick(it.row, it.column)
                 },
+                animSymbols = true,
                 modifier = Modifier
                     .padding(16.dp)
                     .matchParentSize()

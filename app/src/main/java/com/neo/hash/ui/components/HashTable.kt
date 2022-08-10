@@ -12,12 +12,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -26,7 +25,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.neo.hash.model.Hash
-import kotlin.math.min
 
 private val Density.DEFAULT_LINE_WIDTH
     get() = 4.dp.toPx()
@@ -40,16 +38,18 @@ fun HashTable(
     onBlockClick: ((Hash.Block) -> Unit)? = null,
     hashColor: Color = MaterialTheme.colors.onBackground,
     symbolsColor: Color = MaterialTheme.colors.primary,
+    animSymbols : Boolean = false,
     winnerLineColor: Color = symbolsColor.copy(alpha = 0.4f)
 ) = Box(modifier = modifier) {
     DrawBackground(hashColor)
     DrawForeground(
         hash = hash,
         winner = winner,
-        canClick = canClick,
-        onBlockClick = onBlockClick,
         symbolsColor = symbolsColor,
-        winnerLineColor = winnerLineColor
+        animSymbols = animSymbols,
+        winnerLineColor = winnerLineColor,
+        canClick = canClick,
+        onBlockClick = onBlockClick
     )
 }
 
@@ -59,6 +59,7 @@ private fun BoxScope.DrawForeground(
     winner: Hash.Winner?,
     symbolsColor: Color,
     winnerLineColor: Color,
+    animSymbols : Boolean = false,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: ((Hash.Block) -> Unit)? = null
 ) = Box(
@@ -68,6 +69,7 @@ private fun BoxScope.DrawForeground(
     DrawSymbols(
         hash = hash,
         lineSymbolsColors = symbolsColor,
+        animSymbols = animSymbols,
         canClick = canClick,
         onBlockClick = onBlockClick
     )
@@ -206,6 +208,7 @@ private fun BoxScope.DrawSymbols(
     hash: Hash,
     lineSymbolsColors: Color,
     modifier: Modifier = Modifier,
+    animSymbols : Boolean = false,
     canClick: (Hash.Block) -> Boolean = { true },
     onBlockClick: ((Hash.Block) -> Unit)? = null
 ) = BoxWithConstraints(
@@ -224,6 +227,7 @@ private fun BoxScope.DrawSymbols(
                     symbol = hash.get(row, column)
                 ),
                 linePlayersColors = lineSymbolsColors,
+                animSymbol = animSymbols,
                 canClick = canClick,
                 onClick = onBlockClick,
                 modifier = Modifier
@@ -245,6 +249,7 @@ private fun Block(
     block: Hash.Block,
     modifier: Modifier,
     linePlayersColors: Color,
+    animSymbol: Boolean = false,
     canClick: (Hash.Block) -> Boolean,
     onClick: ((Hash.Block) -> Unit)? = null
 ) = Box(
@@ -258,9 +263,19 @@ private fun Block(
     contentAlignment = Alignment.Center
 ) {
     if (block.symbol != null) {
+
+        val drawAnim = remember { Animatable(initialValue = if (animSymbol) 0f else 2f) }
+
+        LaunchedEffect(key1 = block.symbol) {
+            drawAnim.animateTo(
+                targetValue = 2f
+            )
+        }
+
         Player(
             symbol = block.symbol,
             linePlayersColors = linePlayersColors,
+            drawAnim = drawAnim.value,
             modifier = Modifier.fillMaxSize(
                 fraction = 0.5f
             )
@@ -272,20 +287,41 @@ private fun Block(
 private fun Player(
     symbol: Hash.Symbol,
     modifier: Modifier,
-    linePlayersColors: Color
+    linePlayersColors: Color,
+    drawAnim: Float
 ) = Canvas(modifier = modifier) {
     when (symbol) {
         Hash.Symbol.O -> {
 
-            val radius = min(size.height, size.width) / 2f
+            val size = Size(size.height, size.width)
 
             drawRoundedCircle(
                 color = linePlayersColors,
-                radius = radius,
-                center = center
+                size = size,
+                sweepAngle = 360f * drawAnim / 2f
             )
         }
         Hash.Symbol.X -> {
+
+            val width1 = when (drawAnim) {
+                in 0f..1f -> size.width * drawAnim
+                else -> size.width
+            }
+
+            val height1 = when (drawAnim) {
+                in 0f..1f -> size.height * drawAnim
+                else -> size.height
+            }
+
+            val width2 = when (drawAnim) {
+                in 1f..2f -> size.width * drawAnim.dec()
+                else -> 0f
+            }
+
+            val height2 = when (drawAnim) {
+                in 1f..2f -> size.height * drawAnim.dec()
+                else -> 0f
+            }
 
             fun drawLine(
                 start: Offset,
@@ -302,15 +338,15 @@ private fun Player(
                     y = 0f
                 ),
                 end = Offset(
-                    x = size.width,
-                    y = size.height
+                    x = width1,
+                    y = height1
                 )
             )
 
             drawLine(
                 start = Offset(
-                    x = size.width,
-                    y = 0f
+                    x = width2,
+                    y = size.height - height2
                 ),
                 end = Offset(
                     x = 0f,
@@ -371,13 +407,16 @@ fun DrawScope.drawRoundedLine(
 
 fun DrawScope.drawRoundedCircle(
     color: Color,
-    center: Offset,
-    radius: Float,
+    size: Size,
+    startAngle: Float = 0f,
+    sweepAngle: Float = 360f,
     width: Float = DEFAULT_LINE_WIDTH
-) = drawCircle(
+) = drawArc(
     color = color,
-    radius = radius,
-    center = center,
+    startAngle = startAngle,
+    sweepAngle = sweepAngle,
+    size = size,
+    useCenter = false,
     style = Stroke(
         width = width,
         cap = StrokeCap.Round
@@ -392,7 +431,7 @@ fun HashTablePreview() {
             HashTable(
                 hash = Hash().apply {
                     set(Hash.Symbol.X, 1, 1)
-                    set(Hash.Symbol.X, 2, 2)
+                    set(Hash.Symbol.O, 2, 2)
                     set(Hash.Symbol.X, 3, 3)
                 },
                 winner = Hash.Winner.Diagonal.Normal,
