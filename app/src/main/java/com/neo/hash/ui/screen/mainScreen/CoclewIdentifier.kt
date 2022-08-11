@@ -68,8 +68,7 @@ fun CoclewIdentifier(
                             end = 8.dp
                         )
                         .clickable(onClick = showMaintenance),
-                    backgroundColor = Color.Red,
-                    contentColor = Color.White
+                    backgroundColor = Color.Red
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Warning,

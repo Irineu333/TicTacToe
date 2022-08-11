@@ -29,6 +29,7 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
@@ -86,31 +87,32 @@ fun MainScreen(
             primaryVariant = primaryVariantColor
         )
     ) {
-        if (referenceCode != null && coclewEnabled != null) {
-            AnimatedVisibility(
-                referenceCode.isNotEmpty() ||
-                        isHomeScreenCurrent &&
-                        coclewEnabled
-            ) {
-                CoclewIdentifier(
-                    modifier = modifier.padding(
-                        horizontal = 16.dp,
-                        vertical = 12.dp
-                    ),
-                    referenceCode = referenceCode,
-                    isMaintenance = !coclewEnabled && referenceCode.isNotEmpty(),
-                    showMaintenance = {
-                        showMaintenance = true
-                    },
-                    onAddReferenceCode = { code ->
-                        viewModel.setReferenceCode(code)
-                    },
-                    onRemoveReferenceCode = {
-                        viewModel.clearReferenceCode()
-                    }
-                )
-            }
+
+        val showFeature = !referenceCode.isNullOrEmpty() ||
+                isHomeScreenCurrent &&
+                coclewEnabled == true
+
+        AnimatedVisibility(coclewEnabled != null && showFeature) {
+            CoclewIdentifier(
+                modifier = modifier.padding(
+                    horizontal = 16.dp,
+                    vertical = 12.dp
+                ),
+                referenceCode = referenceCode ?: "",
+                isMaintenance = coclewEnabled == false &&
+                        !referenceCode.isNullOrEmpty(),
+                showMaintenance = {
+                    showMaintenance = true
+                },
+                onAddReferenceCode = { code ->
+                    viewModel.setReferenceCode(code)
+                },
+                onRemoveReferenceCode = {
+                    viewModel.clearReferenceCode()
+                }
+            )
         }
+
 
         if (showMaintenance) {
             ErrorDialog(
@@ -191,6 +193,11 @@ fun MainScreen(
                     adUnitId = BuildConfig.BANNER_ID
                     setAdSize(AdSize.BANNER)
                     loadAd(adRequest)
+                    adListener = object : AdListener() {
+                        override fun onAdLoaded() {
+
+                        }
+                    }
                 }
             }
         )
