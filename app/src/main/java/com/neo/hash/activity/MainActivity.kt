@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
 
         setupListeners()
 
-
         setContent {
             HashTheme {
                 HashBackground(Modifier.fillMaxSize()) {

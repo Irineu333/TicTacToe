@@ -10,7 +10,7 @@
 
         <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
              animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_neo</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/static_neo_utils</item>
 
         <!-- Set the theme of the Activity that directly follows your splash screen. -->
         <!-- Required -->
