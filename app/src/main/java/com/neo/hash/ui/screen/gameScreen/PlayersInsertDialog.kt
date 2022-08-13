@@ -1,6 +1,7 @@
 package com.neo.hash.ui.screen.gameScreen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.colors
@@ -11,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -152,43 +152,53 @@ fun PlayersInsertDialog(
             if (vsPhone) {
                 val points by Coclew.points.collectAsState()
 
-                Row(
+                LazyRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    for (difficulty in Difficulty.values()) {
-                        OutlinedButton(
-                            onClick = {
-                                difficultySelection = difficulty
-                            },
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = if (difficulty == difficultySelection)
-                                    contentColorFor(colors.primary)
-                                else colors.primary,
-                                backgroundColor = if (difficulty == difficultySelection)
-                                    colors.primary
-                                else
-                                    colors.background
 
-                            )
-                        ) {
-                            Text(
-                                text = when (difficulty) {
-                                    Difficulty.EASY -> stringResource(R.string.text_easy)
-                                    Difficulty.MEDIUM -> stringResource(R.string.text_medium)
-                                    Difficulty.HARD -> stringResource(R.string.text_hard)
-                                }
-                            )
+                    val difficulties = Difficulty.values()
+                    val lastIndex = difficulties.size - 1
 
-                            if (isCoclewMode && points != null) {
+                    for ((index, difficulty) in difficulties.withIndex()) {
+                        item {
+                            OutlinedButton(
+                                onClick = {
+                                    difficultySelection = difficulty
+                                },
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = if (difficulty == difficultySelection)
+                                        contentColorFor(colors.primary)
+                                    else colors.primary,
+                                    backgroundColor = if (difficulty == difficultySelection)
+                                        colors.primary
+                                    else
+                                        colors.background
+
+                                )
+                            ) {
                                 Text(
-                                    text = ":" + when (difficulty) {
-                                        Difficulty.EASY -> points!!.easy
-                                        Difficulty.MEDIUM -> points!!.medium
-                                        Difficulty.HARD -> points!!.hard
+                                    text = when (difficulty) {
+                                        Difficulty.EASY -> stringResource(R.string.text_easy)
+                                        Difficulty.MEDIUM -> stringResource(R.string.text_medium)
+                                        Difficulty.HARD -> stringResource(R.string.text_hard)
                                     }
                                 )
+
+                                if (isCoclewMode && points != null) {
+                                    Text(
+                                        text = ":" + when (difficulty) {
+                                            Difficulty.EASY -> points!!.easy
+                                            Difficulty.MEDIUM -> points!!.medium
+                                            Difficulty.HARD -> points!!.hard
+                                        }
+                                    )
+                                }
                             }
+                        }
+
+                        if (index < lastIndex) {
+                            item { Spacer(modifier = Modifier.width(8.dp)) }
                         }
                     }
                 }

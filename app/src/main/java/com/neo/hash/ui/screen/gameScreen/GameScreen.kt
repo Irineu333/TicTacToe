@@ -40,11 +40,11 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    onHomeClick: () -> Unit = {},
     againstIntelligent: Boolean = false,
     isCoclewMode: Boolean = false,
-    viewModel: GameViewModel = viewModel(),
+    onHomeClick: () -> Unit = {},
     showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
+    viewModel: GameViewModel = viewModel(),
 ) = Column(
     modifier = modifier
         .padding(top = 16.dp)
@@ -100,7 +100,7 @@ fun GameScreen(
         )
     }
 
-    BoxWithConstraints(Modifier) {
+    BoxWithConstraints {
         SquareBox {
             HashTable(
                 hash = state.hash,
@@ -111,6 +111,7 @@ fun GameScreen(
                 canClick = {
                     viewModel.canClick(it.row, it.column)
                 },
+                animSymbols = true,
                 modifier = Modifier
                     .padding(16.dp)
                     .matchParentSize()
@@ -120,21 +121,25 @@ fun GameScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    Row {
-        GameButton(
-            onClick = {
-                showInterstitial(false) {
-                    viewModel.clear()
+    AnimatedVisibility(visible = state.players.isNotEmpty()) {
+        Row {
+            AnimatedVisibility(visible = !isCoclewMode || state.playerTurn == null) {
+                GameButton(
+                    onClick = {
+                        showInterstitial(false) {
+                            viewModel.clear()
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.btn_clean).uppercase())
                 }
             }
-        ) {
-            Text(text = stringResource(R.string.btn_clean).uppercase())
-        }
 
-        Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-        GameButton(onClick = onHomeClick) {
-            Text(text = stringResource(R.string.btn_start).uppercase())
+            GameButton(onClick = onHomeClick) {
+                Text(text = stringResource(R.string.btn_start).uppercase())
+            }
         }
     }
 

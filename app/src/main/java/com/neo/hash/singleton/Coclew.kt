@@ -46,11 +46,33 @@ object Coclew {
 
 
     val points = MutableStateFlow<Points?>(value = null).apply {
+
+        var showPoints = false
+        var points : Points? = null
+
+        fun update() {
+            value = if (showPoints) { points } else { null }
+        }
+
+        coclewRef
+            .child("show_points")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    showPoints = snapshot.getValue<Boolean>() ?: return
+
+                    update()
+                }
+
+                override fun onCancelled(error: DatabaseError) = Unit
+            })
+
         coclewRef
             .child("points")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    value = snapshot.getValue<Points>() ?: return
+                    points = snapshot.getValue<Points>() ?: return
+
+                    update()
                 }
 
                 override fun onCancelled(error: DatabaseError) = Unit
