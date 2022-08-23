@@ -33,6 +33,10 @@ class GameViewModel : ViewModel() {
 
     private var referenceCode: String = ""
 
+    private val isCoclewMode
+        get() = referenceCode.isNotEmpty() &&
+                Coclew.enabled.value == true
+
     init {
         setupListener()
     }
@@ -108,7 +112,7 @@ class GameViewModel : ViewModel() {
                 } as Player.Phone
 
                 // count points
-                if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
+                if (isCoclewMode) {
 
                     Timber.i("reference code: $referenceCode")
 
@@ -162,29 +166,25 @@ class GameViewModel : ViewModel() {
     private fun playIntelligent() {
         if (!canRunIntelligent) return
 
-        aiJob?.cancel()
-        aiJob = viewModelScope.launch {
+        val state = uiState.value
 
-            val state = uiState.value
+        if (state.playerTurn is Player.Phone) {
+            val (row, column) = run {
 
-            if (state.playerTurn is Player.Phone) {
-                val (row, column) = withContext(Dispatchers.Default) {
-                    val delay = launch { delay(500) }
-
-                    with(state.playerTurn) {
-                        when (difficulty) {
-                            Difficulty.EASY -> intelligent.easy(state.hash)
-                            Difficulty.MEDIUM -> intelligent.medium(state.hash)
-                            Difficulty.HARD -> intelligent.hard(state.hash)
-                        }
-                    }.also {
-                        delay.join()
+                with(state.playerTurn) {
+                    when (difficulty) {
+                        Difficulty.EASY -> intelligent.easy(state.hash)
+                        Difficulty.MEDIUM -> if (isCoclewMode)
+                            intelligent.mediumCoclew(state.hash)
+                        else
+                            intelligent.medium(state.hash)
+                        Difficulty.HARD -> intelligent.hard(state.hash)
                     }
                 }
+            }
 
-                if (canRunIntelligent) {
-                    internalSelect(row, column)
-                }
+            if (canRunIntelligent) {
+                internalSelect(row, column)
             }
         }
     }

@@ -1,11 +1,12 @@
 package com.neo.hash.model
 
-import com.neo.hash.BuildConfig
 import com.neo.hash.util.extensions.containsAny
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
+import kotlin.random.Random
 
+@Suppress("UNUSED")
 class Intelligent(private val mySymbol: Hash.Symbol) {
 
     private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
@@ -16,24 +17,41 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
-            ?: winOrBlock()
-            ?: xeque(double = false)
-            ?: random()
+            ?: winOrBlock(block = Random.nextBoolean())
+            ?: run {
+                if (Random.nextBoolean()) {
+                    xeque(double = false)
+                } else {
+                    random()
+                }
+            } ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: winOrBlock()
+            ?: winOrBlock(block = true)
             ?: xeque(double = true)
             ?: random()
     }
 
-    fun hard(hash: Hash): Hash.Block = with(hash) {
-        run { if (BuildConfig.DEBUG) firstRandom() else perfectFirst() }
+    fun mediumCoclew(hash: Hash): Hash.Block = with(hash) {
+        firstRandom()
             ?: blockOnSecond()
             ?: perfectThird()
-            ?: winOrBlock()
+            ?: winOrBlock(block = true)
+            ?: run {
+                if (Random.nextBoolean())
+                    disruptiveXeque() else
+                    xeque(double = true)
+            } ?: random()
+    }
+
+    fun hard(hash: Hash): Hash.Block = with(hash) {
+        firstRandom()
+            ?: blockOnSecond()
+            ?: perfectThird()
+            ?: winOrBlock(block = true)
             ?: disruptiveXeque()
             ?: random()
     }
@@ -152,7 +170,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
      * action: Complete own victory or block opponent's victory
      * requirement: There are one or more segments about to be closed
      */
-    private fun Hash.winOrBlock(): Hash.Block? {
+    private fun Hash.winOrBlock(block: Boolean): Hash.Block? {
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
                 val myBlocks = mutableListOf<Hash.Block>()
@@ -197,7 +215,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                     if (myBlocks.size == 2) {
                         add(emptyBlocks[0] to myBlocks[0].symbol)
                     }
-                    if (enemyBlocks.size == 2) {
+                    if (enemyBlocks.size == 2 && block) {
                         add(emptyBlocks[0] to enemyBlocks[0].symbol)
                     }
                 }
@@ -248,7 +266,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                     if (myBlocks.size == 2) {
                         add(emptyBlocks[0] to myBlocks[0].symbol)
                     }
-                    if (enemyBlocks.size == 2) {
+                    if (enemyBlocks.size == 2 && block) {
                         add(emptyBlocks[0] to enemyBlocks[0].symbol)
                     }
                 }
@@ -299,7 +317,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                 if (myBlocks.size == 2) {
                     return emptyBlocks[0] to myBlocks[0].symbol
                 }
-                if (enemyBlocks.size == 2) {
+                if (enemyBlocks.size == 2 && block) {
                     return emptyBlocks[0] to enemyBlocks[0].symbol
                 }
             }
@@ -354,7 +372,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                 if (myBlocks.size == 2) {
                     return emptyBlocks[0] to myBlocks[0].symbol
                 }
-                if (enemyBlocks.size == 2) {
+                if (enemyBlocks.size == 2 && block) {
                     return emptyBlocks[0] to enemyBlocks[0].symbol
                 }
             }

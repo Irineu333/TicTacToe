@@ -44,7 +44,6 @@ object Coclew {
             })
     }.asStateFlow()
 
-
     val points = MutableStateFlow<Points?>(value = null).apply {
 
         var showPoints = false
