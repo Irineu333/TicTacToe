@@ -106,40 +106,37 @@ class GameViewModel : ViewModel() {
                 )
             }
 
-            val vsIntelligent = state.players.any { it is Player.Phone }
+            state.players.findType<Player.Phone>()?.let { phone ->
+                if (winner.first is Player.Person) {
+                    // count points
+                    if (isCoclewMode) {
 
-            if (vsIntelligent && winner.first is Player.Person) {
-                // intelligent lost
+                        Timber.i("reference code: $referenceCode")
 
-                val intelligent = state.players.first {
-                    it is Player.Phone
-                } as Player.Phone
+                        viewModelScope.launch {
+                            GlobalFlow.addPoints(phone.difficulty)
+                        }
+                    }
 
-                // count points
-                if (isCoclewMode) {
+                    // report hard mode failure
+                    if (phone.difficulty == Difficulty.HARD) {
 
-                    Timber.i("reference code: $referenceCode")
+                        val person = winner.first as Player.Person
 
-                    viewModelScope.launch {
-                        GlobalFlow.addPoints(intelligent.difficulty)
+                        val hardFailureException = HardFailureException(
+                            phone,
+                            person,
+                            newHash.log
+                        )
+
+                        Timber.e(hardFailureException)
                     }
                 }
 
-                // report hard mode failure
-                if (intelligent.difficulty == Difficulty.HARD) {
-
-                    val person = winner.first as Player.Person
-
-                    val hardFailureException = HardFailureException(
-                        intelligent,
-                        person,
-                        newHash.log
-                    )
-
-                    Timber.e(hardFailureException)
-                }
-
-                phoneFinishEvent(phone = intelligent, winner.first is Player.Phone)
+                phoneFinishEvent(
+                    phone = phone,
+                    phoneWin = winner.first is Player.Phone
+                )
             }
             return
         }
