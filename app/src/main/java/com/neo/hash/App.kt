@@ -54,10 +54,10 @@ class CrashReportingTree : Timber.Tree() {
             return
         }
 
-        Firebase.crashlytics.log(tag?.let { "$it : $message" } ?: message)
-
         if (t != null) {
             Firebase.crashlytics.recordException(t)
+        } else {
+            Firebase.crashlytics.log(tag?.let { "$it : $message" } ?: message)
         }
     }
 }

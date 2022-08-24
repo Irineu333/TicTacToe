@@ -1,7 +1,10 @@
 package com.neo.hash.ui.screen.gameScreen.viewModel
 
+import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.exceptions.HardFailureException
@@ -10,6 +13,7 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
+import com.neo.hash.util.extensions.findType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +36,10 @@ class GameViewModel : ViewModel() {
         }
 
     private var referenceCode: String = ""
+
+    private val isCoclewMode
+        get() = referenceCode.isNotEmpty() &&
+                Coclew.enabled.value == true
 
     init {
         setupListener()
@@ -65,9 +73,9 @@ class GameViewModel : ViewModel() {
 
         val playerTurn = state.playerTurn ?: return
         if (state.playerWinner != null) return
+        if (state.hash.get(row, column) != null) return
 
         val newHash = state.hash.copy().apply {
-            check(get(row, column) == null) { "invalid selection" }
             set(playerTurn.symbol, row, column)
         }
 
@@ -108,7 +116,7 @@ class GameViewModel : ViewModel() {
                 } as Player.Phone
 
                 // count points
-                if (referenceCode.isNotEmpty() && Coclew.enabled.value == true) {
+                if (isCoclewMode) {
 
                     Timber.i("reference code: $referenceCode")
 
@@ -130,12 +138,19 @@ class GameViewModel : ViewModel() {
 
                     Timber.e(hardFailureException)
                 }
+
+                phoneFinishEvent(phone = intelligent, winner.first is Player.Phone)
             }
             return
         }
 
         if (newHash.isTie()) {
             _uiState.update {
+
+                it.players.findType<Player.Phone>()?.let { phone ->
+                    phoneFinishEvent(phone = phone, null)
+                }
+
                 it.copy(
                     tied = it.tied + 1,
                     hash = newHash,
@@ -174,7 +189,9 @@ class GameViewModel : ViewModel() {
                     with(state.playerTurn) {
                         when (difficulty) {
                             Difficulty.EASY -> intelligent.easy(state.hash)
-                            Difficulty.MEDIUM -> intelligent.medium(state.hash)
+                            Difficulty.MEDIUM -> if (isCoclewMode)
+                                intelligent.mediumCoclew(state.hash) else
+                                intelligent.medium(state.hash)
                             Difficulty.HARD -> intelligent.hard(state.hash)
                         }
                     }.also {
@@ -286,6 +303,42 @@ class GameViewModel : ViewModel() {
         }
 
         playIntelligent()
+
+        newGameEvent(players)
+    }
+
+    private fun newGameEvent(players: List<Player>) {
+        Firebase.analytics.logEvent(
+            "new_game${
+                players.findType<Player.Phone>()?.let { phone ->
+                    "_intelligent_${
+                        when (phone.difficulty) {
+                            Difficulty.EASY -> "easy"
+                            Difficulty.MEDIUM -> "medium"
+                            Difficulty.HARD -> "hard"
+                        }
+                    }${if (isCoclewMode) "_coclew" else ""}"
+                } ?: ""
+            }", Bundle.EMPTY
+        )
+    }
+
+    private fun phoneFinishEvent(phone: Player.Phone, phoneWin: Boolean?) {
+        Firebase.analytics.logEvent(
+            "${
+                when (phoneWin) {
+                    true -> "win_phone"
+                    false -> "win_person"
+                    null -> "pie"
+                }
+            }_${
+                when (phone.difficulty) {
+                    Difficulty.EASY -> "easy"
+                    Difficulty.MEDIUM -> "medium"
+                    Difficulty.HARD -> "hard"
+                }
+            }${if (isCoclewMode) "_coclew" else ""}", Bundle.EMPTY
+        )
     }
 
     fun canClick(row: Int, column: Int): Boolean {
@@ -319,6 +372,8 @@ class GameViewModel : ViewModel() {
         }
 
         playIntelligent()
+
+        newGameEvent(uiState.value.players)
     }
 
     fun onDebug(player: Player) {
