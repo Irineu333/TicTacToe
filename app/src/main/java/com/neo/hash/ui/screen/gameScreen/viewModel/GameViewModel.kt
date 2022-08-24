@@ -121,11 +121,9 @@ class GameViewModel : ViewModel() {
                     // report hard mode failure
                     if (phone.difficulty == Difficulty.HARD) {
 
-                        val person = winner.first as Player.Person
-
                         val hardFailureException = HardFailureException(
                             phone,
-                            person,
+                            winner.first as Player.Person,
                             newHash.log
                         )
 
