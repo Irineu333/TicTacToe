@@ -1,6 +1,7 @@
 package com.neo.hash.model
 
 import com.neo.hash.util.extensions.containsAny
+import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
@@ -75,12 +76,17 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private fun Hash.disruptiveXeque(): Hash.Block? {
         val enemyXeques = xeques(
             targetSymbol = enemySymbol
-        ).tryRecurring()
+        )
 
         val disruptiveXeques = xeques(
             targetSymbol = mySymbol,
             enemyBlockMoves = enemyXeques
-        ).tryRecurring()
+        ).ifEmpty {
+            xeques(
+                targetSymbol = mySymbol,
+                enemyBlockMoves = enemyXeques.recurring()
+            )
+        }.tryRecurring()
 
         val xeques = xeques(mySymbol)
         val doubleXeques = xeques.tryRecurring()
@@ -473,9 +479,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
                     emptyBlocks.size == 2 &&
-                    !enemyBlockMoves.containsAny(emptyBlocks)
+                    !enemyBlockMoves.containsAll(emptyBlocks)
                 ) {
-                    addAll(emptyBlocks)
+                    addAll(emptyBlocks.tryFilter { enemyBlockMoves.contains(it) })
                 }
             }
         }
@@ -525,9 +531,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                     myBlocks.size == 1 &&
                     enemyBlocks.size == 0 &&
                     emptyBlocks.size == 2 &&
-                    !enemyBlockMoves.containsAny(emptyBlocks)
+                    !enemyBlockMoves.containsAll(emptyBlocks)
                 ) {
-                    addAll(emptyBlocks)
+                    addAll(emptyBlocks.tryFilter { enemyBlockMoves.contains(it) })
                 }
             }
         }
@@ -577,9 +583,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
                 emptyBlocks.size == 2 &&
-                !enemyBlockMoves.containsAny(emptyBlocks)
+                !enemyBlockMoves.containsAll(emptyBlocks)
             ) {
-                addAll(emptyBlocks)
+                addAll(emptyBlocks.tryFilter { enemyBlockMoves.contains(it) })
             }
         }
 
@@ -629,9 +635,9 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
                 myBlocks.size == 1 &&
                 enemyBlocks.size == 0 &&
                 emptyBlocks.size == 2 &&
-                !enemyBlockMoves.containsAny(emptyBlocks)
+                !enemyBlockMoves.containsAll(emptyBlocks)
             ) {
-                addAll(emptyBlocks)
+                addAll(emptyBlocks.tryFilter { enemyBlockMoves.contains(it) })
             }
         }
 

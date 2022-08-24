@@ -166,25 +166,33 @@ class GameViewModel : ViewModel() {
     private fun playIntelligent() {
         if (!canRunIntelligent) return
 
-        val state = uiState.value
+        aiJob?.cancel()
+        aiJob = viewModelScope.launch {
 
-        if (state.playerTurn is Player.Phone) {
-            val (row, column) = run {
+            val state = uiState.value
 
-                with(state.playerTurn) {
-                    when (difficulty) {
-                        Difficulty.EASY -> intelligent.easy(state.hash)
-                        Difficulty.MEDIUM -> if (isCoclewMode)
-                            intelligent.mediumCoclew(state.hash)
-                        else
-                            intelligent.medium(state.hash)
-                        Difficulty.HARD -> intelligent.hard(state.hash)
+            if (state.playerTurn is Player.Phone) {
+                val (row, column) = withContext(Dispatchers.Default) {
+                    val delay = launch { delay(500) }
+
+                    with(state.playerTurn) {
+                        when (difficulty) {
+                            Difficulty.EASY -> intelligent.easy(state.hash)
+                            Difficulty.MEDIUM -> if (isCoclewMode)
+                                intelligent.mediumCoclew(state.hash) else
+                                    intelligent.medium(state.hash)
+                            Difficulty.HARD -> intelligent.hard(state.hash)
+                        }
+                    }.also {
+                        delay.join()
                     }
                 }
-            }
 
-            if (canRunIntelligent) {
-                internalSelect(row, column)
+                
+
+                if (canRunIntelligent) {
+                    internalSelect(row, column)
+                }
             }
         }
     }
