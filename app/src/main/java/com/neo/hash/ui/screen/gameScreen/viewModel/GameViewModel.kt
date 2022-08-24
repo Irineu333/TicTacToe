@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.dataStoreRepository
@@ -299,21 +298,22 @@ class GameViewModel : ViewModel() {
 
         playIntelligent()
 
-        if (player2 is Player.Phone) {
-            newPhoneGameEvent(player2.difficulty)
-        }
+        newPhoneGameEvent(players)
     }
 
-    private fun newPhoneGameEvent(players: Difficulty) {
+    private fun newPhoneGameEvent(players: List<Player>) {
         Firebase.analytics.logEvent(
-            "NEW_AI_GAME_${
-                when (players) {
-                    Difficulty.EASY -> "EASY"
-                    Difficulty.MEDIUM -> "MEDIUM"
-                    Difficulty.HARD -> "HARD"
-                }
-            }",
-            Bundle.EMPTY
+            "new_game${
+                players.findType<Player.Phone>()?.let { phone ->
+                    "_intelligent_${
+                        when (phone.difficulty) {
+                            Difficulty.EASY -> "easy"
+                            Difficulty.MEDIUM -> "medium"
+                            Difficulty.HARD -> "hard"
+                        }
+                    }${if (isCoclewMode) "_coclew" else ""}"
+                } ?: ""
+            }", Bundle.EMPTY
         )
     }
 
@@ -349,11 +349,7 @@ class GameViewModel : ViewModel() {
 
         playIntelligent()
 
-        val player2 = uiState.value.players.findIs<Player.Phone>()
-
-        if (player2 != null) {
-            newPhoneGameEvent(player2.difficulty)
-        }
+        newPhoneGameEvent(uiState.value.players)
     }
 
     fun onDebug(player: Player) {
@@ -418,4 +414,4 @@ class GameViewModel : ViewModel() {
     }
 }
 
-private inline fun <reified T> List<Any>.findIs() = find { it is T } as? T
+private inline fun <reified T> List<Any>.findType() = find { it is T } as? T
