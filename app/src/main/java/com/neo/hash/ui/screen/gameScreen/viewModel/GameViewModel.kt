@@ -137,12 +137,19 @@ class GameViewModel : ViewModel() {
 
                     Timber.e(hardFailureException)
                 }
+
+                phoneFinishEvent(phone = intelligent, winner.first is Player.Phone)
             }
             return
         }
 
         if (newHash.isTie()) {
             _uiState.update {
+
+                it.players.findType<Player.Phone>()?.let { phone ->
+                    phoneFinishEvent(phone = phone, null)
+                }
+
                 it.copy(
                     tied = it.tied + 1,
                     hash = newHash,
@@ -298,10 +305,10 @@ class GameViewModel : ViewModel() {
 
         playIntelligent()
 
-        newPhoneGameEvent(players)
+        newGameEvent(players)
     }
 
-    private fun newPhoneGameEvent(players: List<Player>) {
+    private fun newGameEvent(players: List<Player>) {
         Firebase.analytics.logEvent(
             "new_game${
                 players.findType<Player.Phone>()?.let { phone ->
@@ -314,6 +321,24 @@ class GameViewModel : ViewModel() {
                     }${if (isCoclewMode) "_coclew" else ""}"
                 } ?: ""
             }", Bundle.EMPTY
+        )
+    }
+
+    private fun phoneFinishEvent(phone: Player.Phone, phoneWin: Boolean?) {
+        Firebase.analytics.logEvent(
+            "${
+                when (phoneWin) {
+                    true -> "win_phone"
+                    false -> "win_person"
+                    null -> "pie"
+                }
+            }_${
+                when (phone.difficulty) {
+                    Difficulty.EASY -> "easy"
+                    Difficulty.MEDIUM -> "medium"
+                    Difficulty.HARD -> "hard"
+                }
+            }${if (isCoclewMode) "_coclew" else ""}", Bundle.EMPTY
         )
     }
 
@@ -349,7 +374,7 @@ class GameViewModel : ViewModel() {
 
         playIntelligent()
 
-        newPhoneGameEvent(uiState.value.players)
+        newGameEvent(uiState.value.players)
     }
 
     fun onDebug(player: Player) {
