@@ -6,12 +6,15 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.getValue
 import com.google.firebase.ktx.Firebase
+import com.neo.hash.BuildConfig
 import com.neo.hash.data.response.Points
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
 import com.neo.hash.singleton.Coclew
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class MainViewModel : ViewModel() {
@@ -112,20 +115,66 @@ class MainViewModel : ViewModel() {
 
                         userValueRef.setValue(ServerValue.increment(addPoints))
 
-                        userRef
-                            .child("history")
-                            .push()
-                            .setValue(
-                                mapOf(
-                                    "points" to addPoints,
-                                    "date" to mapOf(".sv" to "timestamp"),
-                                    "difficulty" to difficulty.name
-                                )
-                            )
+                        coclewRef
+                            .child("timestamp")
+                            .getTimesTamp { timestamp ->
+                                coclewRef.child("historic")
+                                    .child(timestamp.getDateFormatted()).apply {
+                                        child("total")
+                                            .setValue(ServerValue.increment(addPoints))
+                                    }
+                                    .child("users")
+                                    .child(referenceCode)
+                                    .apply {
+                                        child("value")
+                                            .setValue(ServerValue.increment(addPoints))
+                                    }
+                                    .child("transactions")
+                                    .push()
+                                    .setValue(
+                                        mapOf(
+                                            "points" to addPoints,
+                                            "version" to BuildConfig.VERSION_NAME,
+                                            "date" to timestamp.getDateTimeFormatted(),
+                                            "difficulty" to difficulty.name
+                                        )
+                                    )
+                            }
                     }
 
                     override fun onCancelled(error: DatabaseError) = Unit
                 }
             )
     }
+}
+
+fun Long.getDateFormatted(): String {
+    return SimpleDateFormat(
+        "dd-MM-yyyy",
+        Locale("pt", "BR")
+    ).format(Date(this))
+}
+
+fun Long.getDateTimeFormatted(): String {
+    return SimpleDateFormat(
+        "HH:mm dd-MM-yyyy",
+        Locale("pt", "BR")
+    ).format(Date(this))
+}
+
+fun DatabaseReference.getTimesTamp(function: (Long) -> Unit) {
+    setValue(ServerValue.TIMESTAMP)
+        .addOnSuccessListener {
+            addListenerForSingleValueEvent(
+                object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        function(snapshot.getValue<Long>() ?: System.currentTimeMillis())
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        function(System.currentTimeMillis())
+                    }
+                }
+            )
+        }
 }

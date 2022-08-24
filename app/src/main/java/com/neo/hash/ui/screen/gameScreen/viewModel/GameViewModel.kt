@@ -361,7 +361,7 @@ class GameViewModel : ViewModel() {
             state.copy(
                 hash = Hash(),
                 playerWinner = null,
-                playerTurn = state.playerWinner ?: lastStatedPlayer,
+                playerTurn = lastStatedPlayer,
                 winner = null
             )
         }

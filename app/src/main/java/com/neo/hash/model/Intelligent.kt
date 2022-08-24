@@ -1,6 +1,5 @@
 package com.neo.hash.model
 
-import com.neo.hash.util.extensions.containsAny
 import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
@@ -19,13 +18,8 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: winOrBlock(block = Random.nextBoolean())
-            ?: run {
-                if (Random.nextBoolean()) {
-                    xeque(double = false)
-                } else {
-                    random()
-                }
-            } ?: random()
+            ?: xeque(double = false)
+            ?: random()
     }
 
     fun medium(hash: Hash): Hash.Block = with(hash) {
@@ -57,6 +51,10 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: random()
     }
 
+    /**
+     * action: A safer first move
+     * requirement: Be the first to play
+     */
     private fun Hash.perfectFirst(): Hash.Block? {
         if (isEmpty()) {
 
@@ -70,10 +68,11 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     /**
-     * action:
-     * requirement:
+     * action: Interrupts future enemy xeques
+     * requirement: Future enemy moves leading to xeques
      */
     private fun Hash.disruptiveXeque(): Hash.Block? {
+
         val enemyXeques = xeques(
             targetSymbol = enemySymbol
         )
@@ -409,8 +408,8 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     /**
-     * action: Run the first move
-     * requirement: Hash is empty
+     * action: Run the random first move
+     * requirement: Be the first to play
      */
     private fun Hash.firstRandom(): Hash.Block? {
         if (isEmpty()) {
@@ -426,8 +425,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     /**
-     * action:
-     * requirement:
+     * action: Search for [targetSymbol] xeques that do not lead to [enemyBlockMoves] xeques
      */
     private fun Hash.xeques(
         targetSymbol: Hash.Symbol,
