@@ -199,8 +199,6 @@ class GameViewModel : ViewModel() {
                     }
                 }
 
-
-
                 if (canRunIntelligent) {
                     internalSelect(row, column)
                 }
