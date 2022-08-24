@@ -69,9 +69,9 @@ class GameViewModel : ViewModel() {
 
         val playerTurn = state.playerTurn ?: return
         if (state.playerWinner != null) return
+        if (state.hash.get(row, column) != null) return
 
         val newHash = state.hash.copy().apply {
-            check(get(row, column) == null) { "invalid selection" }
             set(playerTurn.symbol, row, column)
         }
 
@@ -180,7 +180,7 @@ class GameViewModel : ViewModel() {
                             Difficulty.EASY -> intelligent.easy(state.hash)
                             Difficulty.MEDIUM -> if (isCoclewMode)
                                 intelligent.mediumCoclew(state.hash) else
-                                    intelligent.medium(state.hash)
+                                intelligent.medium(state.hash)
                             Difficulty.HARD -> intelligent.hard(state.hash)
                         }
                     }.also {
@@ -188,7 +188,7 @@ class GameViewModel : ViewModel() {
                     }
                 }
 
-                
+
 
                 if (canRunIntelligent) {
                     internalSelect(row, column)
