@@ -13,6 +13,7 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
+import com.neo.hash.util.extensions.findType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -438,5 +439,3 @@ class GameViewModel : ViewModel() {
         }
     }
 }
-
-private inline fun <reified T> List<Any>.findType() = find { it is T } as? T

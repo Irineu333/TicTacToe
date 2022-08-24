@@ -39,3 +39,5 @@ fun <E> List<E>.tryRecurring() =
 
 fun <T> List<T>.tryFilter(predicate: (T) -> Boolean) =
     filter(predicate).ifEmpty { this }
+
+inline fun <reified T> List<Any>.findType() = find { it is T } as? T
