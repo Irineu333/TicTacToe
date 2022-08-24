@@ -44,7 +44,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: run {
                 if (Random.nextBoolean())
                     disruptiveXeque() else
-                    xeque(double = true)
+                    xeque(double = Random.nextBoolean())
             } ?: random()
     }
 
