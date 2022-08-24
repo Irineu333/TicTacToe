@@ -21,6 +21,8 @@ import com.google.android.gms.ads.FullScreenContentCallback
 import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.activity.viewModel.MainViewModel
 import com.neo.hash.singleton.GlobalFlow
@@ -78,6 +80,16 @@ class MainActivity : ComponentActivity() {
                     UpdateScreen()
                 }
             }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        if (Firebase.auth.currentUser == null) {
+
+            //anonymous firebase login
+            Firebase.auth.signInAnonymously()
         }
     }
 

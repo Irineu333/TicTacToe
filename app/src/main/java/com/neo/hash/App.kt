@@ -34,11 +34,10 @@ class App : Application() {
         //singleton data store repository
         dataStoreRepository = DataStoreRepositoryImpl(applicationContext)
 
-        //firebase offline mode
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true)
-
-        //anonymous firebase login
-        Firebase.auth.signInAnonymously()
+        if (Firebase.auth.currentUser == null) {
+            //anonymous firebase login
+            Firebase.auth.signInAnonymously()
+        }
     }
 }
 
