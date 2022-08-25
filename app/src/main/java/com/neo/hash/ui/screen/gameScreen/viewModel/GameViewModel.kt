@@ -184,9 +184,7 @@ class GameViewModel : ViewModel() {
                     with(state.playerTurn) {
                         when (difficulty) {
                             Difficulty.EASY -> intelligent.easy(state.hash)
-                            Difficulty.MEDIUM -> if (isCoclewMode)
-                                intelligent.mediumCoclew(state.hash) else
-                                intelligent.medium(state.hash)
+                            Difficulty.MEDIUM -> intelligent.medium(state.hash)
                             Difficulty.HARD -> intelligent.hard(state.hash)
                         }
                     }.also {

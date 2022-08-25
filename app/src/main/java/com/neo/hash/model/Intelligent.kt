@@ -25,20 +25,15 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: winOrBlock(block = true)
-            ?: xeque(double = true)
-            ?: random()
-    }
-
-    fun mediumCoclew(hash: Hash): Hash.Block = with(hash) {
-        firstRandom()
-            ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
             ?: run {
                 if (Random.nextBoolean())
-                    disruptiveXeque() else
-                    xeque(double = Random.nextBoolean())
+                    centerIsRight() else null
+            }
+            ?: run {
+                if (Random.nextBoolean())
+                    disruptiveXeque() else xeque(double = true)
             } ?: random()
     }
 
@@ -47,8 +42,20 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
+            ?: centerIsRight()
             ?: disruptiveXeque()
             ?: random()
+    }
+
+    private fun Hash.centerIsRight(): Hash.Block? {
+
+        if (!hasCenter) {
+            Timber.i("centerIsRight: center")
+
+            return center
+        }
+
+        return null;
     }
 
     /**
@@ -125,13 +132,6 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             }.randomOrNull()?.also {
                 Timber.i("perfectThird: $it")
             }
-        }
-
-        //center is winner
-        if (!hasCenter) {
-            Timber.i("perfectThird: center")
-
-            return center
         }
 
         return null
