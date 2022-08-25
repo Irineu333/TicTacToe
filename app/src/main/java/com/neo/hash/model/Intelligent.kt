@@ -36,7 +36,10 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
-            ?: centerIsRight()
+            ?: run {
+                if (Random.nextBoolean())
+                    centerIsRight() else null
+            }
             ?: run {
                 if (Random.nextBoolean())
                     disruptiveXeque() else xeque(double = true)

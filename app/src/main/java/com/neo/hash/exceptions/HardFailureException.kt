@@ -1,6 +1,5 @@
 package com.neo.hash.exceptions
 
-import androidx.annotation.Keep
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 
