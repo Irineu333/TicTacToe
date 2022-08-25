@@ -43,11 +43,7 @@ import com.neo.hash.ui.screen.HomeScreen
 import com.neo.hash.ui.screen.gameScreen.GameScreen
 import com.neo.hash.ui.theme.Coclew
 import com.neo.hash.ui.theme.CoclewDark
-import com.neo.hash.util.extensions.enterToLeftTransition
-import com.neo.hash.util.extensions.enterToRightTransition
-import com.neo.hash.util.extensions.exitToLeftTransition
-import com.neo.hash.util.extensions.exitToRightTransition
-import com.neo.hash.util.extensions.isCurrent
+import com.neo.hash.util.extensions.*
 
 @Composable
 fun MainScreen(
@@ -72,12 +68,12 @@ fun MainScreen(
     var showMaintenance by rememberSaveable { mutableStateOf(false) }
 
     val primaryColor by animateColorAsState(
-        if (!referenceCode.isNullOrEmpty())
+        if (referenceCode.isUid())
             Color.Coclew else colors.primary
     )
 
     val primaryVariantColor by animateColorAsState(
-        if (!referenceCode.isNullOrEmpty())
+        if (referenceCode.isUid())
             Color.CoclewDark else colors.primaryVariant
     )
 
@@ -171,7 +167,7 @@ fun MainScreen(
                     isCoclewMode = !referenceCode.isNullOrEmpty(),
                     showInterstitial = { ignoreSkip, onSuccess ->
                         when {
-                            referenceCode!!.isEmpty() || coclewEnabled == null -> onSuccess()
+                            !referenceCode!!.isUid() || coclewEnabled == null -> onSuccess()
                             !coclewEnabled -> showMaintenance = true
                             ignoreSkip -> showInterstitial(onSuccess)
                             viewModel.isSkipInterstitial() -> onSuccess()

@@ -11,6 +11,7 @@ import com.neo.hash.data.response.Points
 import com.neo.hash.dataStoreRepository
 import com.neo.hash.model.Difficulty
 import com.neo.hash.singleton.Coclew
+import com.neo.hash.util.extensions.isUid
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -75,7 +76,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun addPoints(difficulty: Difficulty) {
-        if (referenceCode.isEmpty()) return
+        if (!referenceCode.isUid()) return
         if (Coclew.enabled.value != true) return
 
         if (Firebase.auth.currentUser == null) {

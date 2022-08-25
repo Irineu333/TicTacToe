@@ -14,6 +14,7 @@ import com.neo.hash.model.Player
 import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
 import com.neo.hash.util.extensions.findType
+import com.neo.hash.util.extensions.isUid
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +39,7 @@ class GameViewModel : ViewModel() {
     private var referenceCode: String = ""
 
     private val isCoclewMode
-        get() = referenceCode.isNotEmpty() &&
+        get() = referenceCode.isUid() &&
                 Coclew.enabled.value == true
 
     init {
