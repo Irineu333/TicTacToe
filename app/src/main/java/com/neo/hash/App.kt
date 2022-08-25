@@ -11,7 +11,6 @@ import com.neo.hash.data.DataStoreRepository
 import com.neo.hash.data.DataStoreRepositoryImpl
 import timber.log.Timber
 
-
 lateinit var dataStoreRepository: DataStoreRepository
 
 class App : Application() {
