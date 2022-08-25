@@ -35,10 +35,10 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
+            ?: centerIsRight()
             ?: run {
                 if (Random.nextBoolean())
-                    disruptiveXeque() else
-                    xeque(double = Random.nextBoolean())
+                    disruptiveXeque() else xeque(double = true)
             } ?: random()
     }
 
@@ -47,8 +47,20 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
+            ?: centerIsRight()
             ?: disruptiveXeque()
             ?: random()
+    }
+
+    private fun Hash.centerIsRight(): Hash.Block? {
+
+        if (!hasCenter) {
+            Timber.i("centerIsRight: center")
+
+            return center
+        }
+
+        return null;
     }
 
     /**
@@ -125,13 +137,6 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
             }.randomOrNull()?.also {
                 Timber.i("perfectThird: $it")
             }
-        }
-
-        //center is winner
-        if (!hasCenter) {
-            Timber.i("perfectThird: center")
-
-            return center
         }
 
         return null
