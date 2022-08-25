@@ -26,6 +26,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
         firstRandom()
             ?: blockOnSecond()
             ?: winOrBlock(block = true)
+            ?: centerIsRight()
             ?: xeque(double = true)
             ?: random()
     }
