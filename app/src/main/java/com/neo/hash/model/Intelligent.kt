@@ -25,15 +25,6 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: winOrBlock(block = true)
-            ?: centerIsRight()
-            ?: xeque(double = true)
-            ?: random()
-    }
-
-    fun mediumCoclew(hash: Hash): Hash.Block = with(hash) {
-        firstRandom()
-            ?: blockOnSecond()
             ?: perfectThird()
             ?: winOrBlock(block = true)
             ?: run {
