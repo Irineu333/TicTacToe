@@ -25,7 +25,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: perfectThird()
+            ?: blockOnThird(perfect = false)
             ?: winOrBlock(block = true)
             ?: run {
                 if (Random.nextBoolean())
@@ -36,7 +36,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun hard(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: perfectThird()
+            ?: blockOnThird(perfect = true)
             ?: winOrBlock(block = true)
             ?: centerIsRight()
             ?: disruptiveXeque()
@@ -116,15 +116,18 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
      * action: Best plays when I'm third to play
      * requirement: Be the third to play
      */
-    private fun Hash.perfectThird(
-        symbols: List<Hash.Block> = getAllSymbols()
+    private fun Hash.blockOnThird(
+        symbols: List<Hash.Block> = getAllSymbols(),
+        perfect: Boolean
     ): Hash.Block? {
         if (symbols.size != 2) return null
 
         //only corners
         if (hasCorners && !hasSides && !hasCenter) {
-            return corners.filter {
-                get(it.row, it.column) == null
+            return run {
+                corners.filter {
+                    get(it.row, it.column) == null
+                } + if (perfect) listOf() else listOf(center)
             }.randomOrNull()?.also {
                 Timber.i("perfectThird: $it")
             }
