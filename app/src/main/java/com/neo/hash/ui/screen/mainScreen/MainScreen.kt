@@ -140,7 +140,8 @@ fun MainScreen(
                         if (controller isCurrent backStackEntry) {
                             controller.navigate(Screen.GameScreen.getRoute(vsPhone))
                         }
-                    }
+                    },
+                    isCoclewMode = referenceCode.isUid() && Coclew.enabled.value == true
                 )
             }
 
