@@ -1,5 +1,6 @@
 package com.neo.hash.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,8 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun HomeScreen(
     onPlayClick: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isCoclewMode : Boolean = false
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
@@ -92,19 +94,21 @@ fun HomeScreen(
         )
     }
 
-    GameButton(onClick = { onPlayClick(false) }) {
-        Icon(
-            imageVector = Icons.Rounded.Person,
-            contentDescription = null,
-        )
+   AnimatedVisibility(visible = !isCoclewMode) {
+       GameButton(onClick = { onPlayClick(false) }) {
+           Icon(
+               imageVector = Icons.Rounded.Person,
+               contentDescription = null,
+           )
 
-        Text(text = "vs", fontSize = 16.sp)
+           Text(text = "vs", fontSize = 16.sp)
 
-        Icon(
-            imageVector = Icons.Rounded.Person,
-            contentDescription = null,
-        )
-    }
+           Icon(
+               imageVector = Icons.Rounded.Person,
+               contentDescription = null,
+           )
+       }
+   }
 }
 
 @Preview(showBackground = true)
