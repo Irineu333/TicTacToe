@@ -23,9 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -41,6 +39,8 @@ import com.neo.hash.singleton.Coclew
 import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.screen.HomeScreen
 import com.neo.hash.ui.screen.gameScreen.GameScreen
+import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
+import com.neo.hash.ui.screen.gameScreen.viewModel.Match
 import com.neo.hash.ui.theme.Coclew
 import com.neo.hash.ui.theme.CoclewDark
 import com.neo.hash.util.extensions.*
@@ -120,6 +120,8 @@ fun MainScreen(
             )
         }
 
+        val isCoclewMode = referenceCode.isUid() && coclewEnabled == true
+
         AnimatedNavHost(
             navController = controller,
             startDestination = Screen.HomeScreen.route,
@@ -127,6 +129,20 @@ fun MainScreen(
                 .weight(weight = 1f)
                 .verticalScroll(rememberScrollState())
         ) {
+
+            fun mustShowInterstitial(
+                ignoreSkip: Boolean,
+                onSuccess: () -> Unit
+            ) {
+                when {
+                    !referenceCode!!.isUid() || coclewEnabled == null -> onSuccess()
+                    !coclewEnabled -> showMaintenance = true
+                    ignoreSkip -> showInterstitial(onSuccess)
+                    viewModel.isSkipInterstitial() -> onSuccess()
+                    else -> showInterstitial(onSuccess)
+                }
+            }
+
             composable(
                 route = Screen.HomeScreen.route,
                 enterTransition = {
@@ -136,25 +152,28 @@ fun MainScreen(
                 popEnterTransition = { enterToRightTransition }
             ) { backStackEntry ->
                 HomeScreen(
-                    onPlayClick = { vsPhone ->
-                        if (controller isCurrent backStackEntry) {
-                            controller.navigate(Screen.GameScreen.getRoute(vsPhone))
+                    onStartMatch = { match, onSuccess ->
+                        mustShowInterstitial(
+                            false
+                        ) {
+                            if (controller isCurrent backStackEntry) {
+                                Match.match = match
+                                controller.navigate(Screen.GameScreen.route)
+                                onSuccess()
+                            }
                         }
                     },
-                    isCoclewMode = referenceCode.isUid() && Coclew.enabled.value == true
+                    isCoclewMode = isCoclewMode
                 )
             }
 
             composable(
                 route = Screen.GameScreen.route,
-                arguments = listOf(
-                    navArgument(Screen.GameScreen.isPhone) {
-                        type = NavType.BoolType
-                    }
-                ),
                 enterTransition = { enterToLeftTransition },
                 popExitTransition = { exitToRightTransition }
             ) { backStackEntry ->
+
+                val match = Match.match ?: error("invalid match")
 
                 GameScreen(
                     onHomeClick = {
@@ -162,19 +181,16 @@ fun MainScreen(
                             controller.popBackStack()
                         }
                     },
-                    againstIntelligent = backStackEntry.arguments!!.getBoolean(
-                        Screen.GameScreen.isPhone
-                    ),
                     isCoclewMode = !referenceCode.isNullOrEmpty(),
                     showInterstitial = { ignoreSkip, onSuccess ->
-                        when {
-                            !referenceCode!!.isUid() || coclewEnabled == null -> onSuccess()
-                            !coclewEnabled -> showMaintenance = true
-                            ignoreSkip -> showInterstitial(onSuccess)
-                            viewModel.isSkipInterstitial() -> onSuccess()
-                            else -> showInterstitial(onSuccess)
-                        }
-                    }
+                        mustShowInterstitial(
+                            ignoreSkip,
+                            onSuccess
+                        )
+                    },
+                    viewModel = viewModel(
+                        factory = GameViewModel.Factory(match)
+                    )
                 )
             }
         }

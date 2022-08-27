@@ -4,10 +4,18 @@ import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
 
 data class GameUiState(
-    val players: List<Player> = listOf(),
+    val match: Match,
     val playerTurn: Player? = null,
     val playerWinner: Player? = null,
     val tied: Int = 0,
     val winner: Hash.Winner? = null,
     val hash: Hash = Hash()
 )
+
+data class Match(
+    val players: List<Player>
+) {
+    companion object {
+        var match: Match? = null
+    }
+}

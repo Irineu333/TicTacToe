@@ -1,14 +1,18 @@
 package com.neo.hash.model
 
+import android.os.Parcelable
 import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import timber.log.Timber
 import kotlin.random.Random
 
-@Suppress("UNUSED")
-class Intelligent(private val mySymbol: Hash.Symbol) {
+@Parcelize
+class Intelligent(private val mySymbol: Hash.Symbol) : Parcelable {
 
+    @IgnoredOnParcel
     private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
 
     private val Hash.hasCorners get() = corners.any { get(it.row, it.column) != null }
