@@ -173,8 +173,6 @@ fun MainScreen(
                 popExitTransition = { exitToRightTransition }
             ) { backStackEntry ->
 
-                val match = Match.match ?: error("invalid match")
-
                 GameScreen(
                     onHomeClick = {
                         if (controller isCurrent backStackEntry) {
@@ -187,10 +185,7 @@ fun MainScreen(
                             ignoreSkip,
                             onSuccess
                         )
-                    },
-                    viewModel = viewModel(
-                        factory = GameViewModel.Factory(match)
-                    )
+                    }
                 )
             }
         }
