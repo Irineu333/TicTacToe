@@ -124,10 +124,10 @@ class MainViewModel : ViewModel() {
                             .getTimesTamp { timestamp ->
                                 coclewRef.child("historic")
                                     .child(timestamp.getDateFormatted("MM-yyyy")).apply {
-                                        child("days")
+                                        child("total")
                                             .setValue(ServerValue.increment(addPoints))
                                     }
-                                    .child("users")
+                                    .child("days")
                                     .child(timestamp.getDateFormatted("dd-MM-yyyy")).apply {
                                         child("total")
                                             .setValue(ServerValue.increment(addPoints))
