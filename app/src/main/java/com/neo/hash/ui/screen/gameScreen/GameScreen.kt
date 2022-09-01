@@ -43,7 +43,7 @@ fun GameScreen(
     modifier: Modifier = Modifier,
     isCoclewMode: Boolean = false,
     onHomeClick: () -> Unit = {},
-    showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
+    showInterstitial: (() -> Unit) -> Unit = { },
     viewModel: GameViewModel =  viewModel(factory = GameViewModel.Factory())
 ) = Column(
     modifier = modifier
@@ -130,7 +130,7 @@ fun GameScreen(
             ) {
                 GameButton(
                     onClick = {
-                        showInterstitial(false) {
+                        showInterstitial {
                             viewModel.clear()
                         }
                     }

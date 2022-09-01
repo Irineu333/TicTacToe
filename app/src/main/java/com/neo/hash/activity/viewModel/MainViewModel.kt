@@ -56,6 +56,7 @@ class MainViewModel : ViewModel() {
     fun isSkipInterstitial(): Boolean {
 
         val value = Coclew.interstitialSkip.value
+
         if (interstitialSkippedCount >= value) {
             //don't skip
             return false
@@ -123,9 +124,10 @@ class MainViewModel : ViewModel() {
                             .getTimesTamp { timestamp ->
                                 coclewRef.child("historic")
                                     .child(timestamp.getDateFormatted("MM-yyyy")).apply {
-                                        child("total")
+                                        child("days")
                                             .setValue(ServerValue.increment(addPoints))
                                     }
+                                    .child("users")
                                     .child(timestamp.getDateFormatted("dd-MM-yyyy")).apply {
                                         child("total")
                                             .setValue(ServerValue.increment(addPoints))

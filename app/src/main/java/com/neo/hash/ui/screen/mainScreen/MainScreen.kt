@@ -135,8 +135,7 @@ fun MainScreen(
                 onSuccess: () -> Unit
             ) {
                 when {
-                    !referenceCode!!.isUid() || coclewEnabled == null -> onSuccess()
-                    !coclewEnabled -> showMaintenance = true
+                    coclewEnabled == false -> showMaintenance = true
                     ignoreSkip -> showInterstitial(onSuccess)
                     viewModel.isSkipInterstitial() -> onSuccess()
                     else -> showInterstitial(onSuccess)
@@ -153,9 +152,7 @@ fun MainScreen(
             ) { backStackEntry ->
                 HomeScreen(
                     onStartMatch = { match, onSuccess ->
-                        mustShowInterstitial(
-                            false
-                        ) {
+                        mustShowInterstitial(ignoreSkip = true) {
                             if (controller isCurrent backStackEntry) {
                                 Match.match = match
                                 controller.navigate(Screen.GameScreen.route)
@@ -180,9 +177,9 @@ fun MainScreen(
                         }
                     },
                     isCoclewMode = !referenceCode.isNullOrEmpty(),
-                    showInterstitial = { ignoreSkip, onSuccess ->
+                    showInterstitial = { onSuccess ->
                         mustShowInterstitial(
-                            ignoreSkip,
+                            ignoreSkip = false,
                             onSuccess
                         )
                     }
