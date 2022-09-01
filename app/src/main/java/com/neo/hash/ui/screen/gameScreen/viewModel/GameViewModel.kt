@@ -309,6 +309,7 @@ class GameViewModel(match: Match) : ViewModel() {
     }
 
     private fun phoneFinishEvent(phone: Player.Phone, phoneWin: Boolean?) {
+
         Firebase.analytics.logEvent(
             "${
                 when (phoneWin) {
