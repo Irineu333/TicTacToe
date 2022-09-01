@@ -56,6 +56,7 @@ class MainViewModel : ViewModel() {
     fun isSkipInterstitial(): Boolean {
 
         val value = Coclew.interstitialSkip.value
+
         if (interstitialSkippedCount >= value) {
             //don't skip
             return false
@@ -106,6 +107,8 @@ class MainViewModel : ViewModel() {
                 object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
 
+                        if (!referenceCode.isUid()) return
+
                         val value = snapshot.getValue<Points>() ?: return
 
                         val addPoints = when (difficulty) {
@@ -120,7 +123,12 @@ class MainViewModel : ViewModel() {
                             .child("timestamp")
                             .getTimesTamp { timestamp ->
                                 coclewRef.child("historic")
-                                    .child(timestamp.getDateFormatted()).apply {
+                                    .child(timestamp.getDateFormatted("MM-yyyy")).apply {
+                                        child("total")
+                                            .setValue(ServerValue.increment(addPoints))
+                                    }
+                                    .child("days")
+                                    .child(timestamp.getDateFormatted("dd-MM-yyyy")).apply {
                                         child("total")
                                             .setValue(ServerValue.increment(addPoints))
                                     }
@@ -136,7 +144,7 @@ class MainViewModel : ViewModel() {
                                         mapOf(
                                             "points" to addPoints,
                                             "version" to BuildConfig.VERSION_NAME,
-                                            "date" to timestamp.getDateTimeFormatted(),
+                                            "date" to timestamp.getDateFormatted("HH:mm dd-MM-yyyy"),
                                             "difficulty" to difficulty.name
                                         )
                                     )
@@ -149,16 +157,9 @@ class MainViewModel : ViewModel() {
     }
 }
 
-fun Long.getDateFormatted(): String {
+fun Long.getDateFormatted(pattern : String): String {
     return SimpleDateFormat(
-        "dd-MM-yyyy",
-        Locale("pt", "BR")
-    ).format(Date(this))
-}
-
-fun Long.getDateTimeFormatted(): String {
-    return SimpleDateFormat(
-        "HH:mm dd-MM-yyyy",
+        pattern,
         Locale("pt", "BR")
     ).format(Date(this))
 }

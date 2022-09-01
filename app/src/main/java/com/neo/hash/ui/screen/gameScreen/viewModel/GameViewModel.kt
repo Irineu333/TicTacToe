@@ -2,6 +2,7 @@ package com.neo.hash.ui.screen.gameScreen.viewModel
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -22,12 +23,19 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
-class GameViewModel : ViewModel() {
+class GameViewModel(match: Match) : ViewModel() {
 
-    private var _uiState = MutableStateFlow(GameUiState())
+    private var lastStatedPlayer: Player = match.players.random()
+
+    private var _uiState = MutableStateFlow(
+        GameUiState(
+            match = match,
+            playerTurn = lastStatedPlayer
+        )
+    )
+
     val uiState = _uiState.asStateFlow()
 
-    private var lastStatedPlayer: Player? = null
     private var aiJob: Job? = null
 
     private val canRunIntelligent: Boolean
@@ -44,6 +52,10 @@ class GameViewModel : ViewModel() {
 
     init {
         setupListener()
+
+        playIntelligent()
+
+        newGameEvent(match.players)
     }
 
     private fun setupListener() = viewModelScope.launch {
@@ -92,14 +104,14 @@ class GameViewModel : ViewModel() {
                     )
                 }
 
-                val players = state.players.map {
+                val players = state.match.players.map {
                     if (it == winner.first) playerWinner else it
                 }
 
                 val hashWinner = winner.second
 
                 state.copy(
-                    players = players,
+                    match = state.match.copy(players = players),
                     playerWinner = playerWinner,
                     hash = newHash,
                     winner = hashWinner,
@@ -107,7 +119,7 @@ class GameViewModel : ViewModel() {
                 )
             }
 
-            state.players.findType<Player.Phone>()?.let { phone ->
+            state.match.players.findType<Player.Phone>()?.let { phone ->
                 if (winner.first is Player.Person) {
                     // count points
                     if (isCoclewMode) {
@@ -143,7 +155,7 @@ class GameViewModel : ViewModel() {
         if (newHash.isTie()) {
             _uiState.update {
 
-                it.players.findType<Player.Phone>()?.let { phone ->
+                it.match.players.findType<Player.Phone>()?.let { phone ->
                     phoneFinishEvent(phone = phone, null)
                 }
 
@@ -156,7 +168,7 @@ class GameViewModel : ViewModel() {
             return
         }
 
-        val newPlayerTurn = state.players.first {
+        val newPlayerTurn = state.match.players.first {
             it != playerTurn
         }
 
@@ -239,7 +251,7 @@ class GameViewModel : ViewModel() {
             }
         }
 
-        val players = uiState.value.players
+        val players = uiState.value.match.players
 
         for (row in Hash.KEY_RANGE) {
             val rowWinner = getRowWinner(row)
@@ -280,27 +292,6 @@ class GameViewModel : ViewModel() {
         return null
     }
 
-    fun start(player1: Player.Person, player2: Player) {
-
-        val players = listOf(
-            player1,
-            player2
-        )
-
-        _uiState.update {
-            lastStatedPlayer = players.random()
-
-            it.copy(
-                players = players,
-                playerTurn = lastStatedPlayer
-            )
-        }
-
-        playIntelligent()
-
-        newGameEvent(players)
-    }
-
     private fun newGameEvent(players: List<Player>) {
         Firebase.analytics.logEvent(
             "new_game${
@@ -318,6 +309,7 @@ class GameViewModel : ViewModel() {
     }
 
     private fun phoneFinishEvent(phone: Player.Phone, phoneWin: Boolean?) {
+
         Firebase.analytics.logEvent(
             "${
                 when (phoneWin) {
@@ -353,7 +345,7 @@ class GameViewModel : ViewModel() {
 
         _uiState.update { state ->
 
-            lastStatedPlayer = state.players.first {
+            lastStatedPlayer = state.match.players.first {
                 it != lastStatedPlayer
             }
 
@@ -367,7 +359,7 @@ class GameViewModel : ViewModel() {
 
         playIntelligent()
 
-        newGameEvent(uiState.value.players)
+        newGameEvent(uiState.value.match.players)
     }
 
     fun onDebug(player: Player) {
@@ -384,12 +376,12 @@ class GameViewModel : ViewModel() {
                         windsCount = player.windsCount
                     )
 
-                    val newPlayers = state.players.map {
+                    val newPlayers = state.match.players.map {
                         if (player == it) newPlayerPhone else it
                     }
 
                     state.copy(
-                        players = newPlayers,
+                        match = state.match.copy(players = newPlayers),
                         playerTurn = state.playerTurn?.let { turn ->
                             newPlayers.first { it.symbol == turn.symbol }
                         },
@@ -409,12 +401,12 @@ class GameViewModel : ViewModel() {
 
                 _uiState.update { state ->
 
-                    val newPlayers = state.players.map {
+                    val newPlayers = state.match.players.map {
                         if (player == it) newPhone else it
                     }
 
                     state.copy(
-                        players = newPlayers,
+                        match = state.match.copy(players = newPlayers),
                         playerTurn = state.playerTurn?.let { turn ->
                             newPlayers.first { it.symbol == turn.symbol }
                         },
@@ -428,6 +420,16 @@ class GameViewModel : ViewModel() {
                     playIntelligent()
                 }
             }
+        }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    class Factory(
+        private val match: Match = Match.match ?: error("invalid match")
+    ) : ViewModelProvider.Factory {
+
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return GameViewModel(match) as T
         }
     }
 }

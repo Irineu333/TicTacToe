@@ -1,16 +1,15 @@
 package com.neo.hash.model
 
-sealed class Screen() {
+import android.net.Uri
+import com.neo.hash.ui.screen.gameScreen.viewModel.Match
+
+sealed class Screen {
 
     object HomeScreen : Screen() {
         const val route = "home_screen"
     }
 
     object GameScreen : Screen() {
-
-        const val isPhone = "vsPhone"
-        const val route = "game_screen/{$isPhone}"
-
-        fun getRoute(vsPhone: Boolean) = "game_screen/${vsPhone}"
+        const val route = "game_screen"
     }
 }

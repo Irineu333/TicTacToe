@@ -3,16 +3,13 @@ package com.neo.hash.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -20,7 +17,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.PhoneAndroid
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,31 +26,46 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.neo.hash.BuildConfig
 import com.neo.hash.model.Hash
+import com.neo.hash.model.StartDialog
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.SquareBox
+import com.neo.hash.ui.screen.gameScreen.PlayersInsertDialog
+import com.neo.hash.ui.screen.gameScreen.viewModel.Match
 import com.neo.hash.ui.theme.HashBackground
 import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun HomeScreen(
-    onPlayClick: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    isCoclewMode : Boolean = false
+    onStartMatch: (Match, () -> Unit) -> Unit = { _, _ -> },
+    isCoclewMode: Boolean = false
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
-    modifier = modifier
-        .fillMaxSize()
+    modifier = modifier.fillMaxSize()
 ) {
+
+    var startDialog by remember { mutableStateOf<StartDialog?>(null) }
+
+    if (startDialog != null) {
+        PlayersInsertDialog(
+            onStartMatch = onStartMatch,
+            startDialog = startDialog!!,
+            isCoclewMode = isCoclewMode,
+            onDismissRequest = {
+                startDialog = null
+            },
+        )
+    }
 
     BoxWithConstraints(Modifier.fillMaxWidth(0.5f)) {
         SquareBox(
             modifier = Modifier.border(
-                    width = 2.dp,
-                    color = MaterialTheme.colors.primary,
-                    shape = RoundedCornerShape(8.dp)
-                )
+                width = 2.dp,
+                color = MaterialTheme.colors.primary,
+                shape = RoundedCornerShape(8.dp)
+            )
         ) {
             HashTable(
                 hash = Hash().apply {
@@ -80,7 +93,9 @@ fun HomeScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    GameButton(onClick = { onPlayClick(true) }) {
+    GameButton(
+        onClick = { startDialog = StartDialog.VsIntelligent }
+    ) {
         Icon(
             imageVector = Icons.Rounded.Person,
             contentDescription = null,
@@ -94,21 +109,23 @@ fun HomeScreen(
         )
     }
 
-   AnimatedVisibility(visible = !isCoclewMode) {
-       GameButton(onClick = { onPlayClick(false) }) {
-           Icon(
-               imageVector = Icons.Rounded.Person,
-               contentDescription = null,
-           )
+    AnimatedVisibility(visible = !isCoclewMode) {
+        GameButton(
+            onClick = { startDialog = StartDialog.VsPerson }
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Person,
+                contentDescription = null,
+            )
 
-           Text(text = "vs", fontSize = 16.sp)
+            Text(text = "vs", fontSize = 16.sp)
 
-           Icon(
-               imageVector = Icons.Rounded.Person,
-               contentDescription = null,
-           )
-       }
-   }
+            Icon(
+                imageVector = Icons.Rounded.Person,
+                contentDescription = null,
+            )
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -116,7 +133,7 @@ fun HomeScreen(
 private fun HomeScreenPreview() {
     HashTheme {
         HashBackground {
-            HomeScreen(onPlayClick = {})
+            HomeScreen()
         }
     }
 }

@@ -22,23 +22,43 @@ import com.neo.hash.R
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
+import com.neo.hash.model.StartDialog
 import com.neo.hash.singleton.Coclew
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.components.Symbol
+import com.neo.hash.ui.screen.gameScreen.viewModel.Match
 import kotlin.random.Random
 
 @Composable
 fun PlayersInsertDialog(
-    onConfirm: (Player.Person, Player) -> Unit,
-    vsPhone: Boolean = false,
+    startDialog: StartDialog,
+    onStartMatch: (Match, () -> Unit) -> Unit = { _, _ -> },
     isCoclewMode: Boolean = false,
     onDismissRequest: () -> Unit = {}
+) = when (startDialog) {
+    StartDialog.Multiplayer -> TODO()
+    StartDialog.VsIntelligent, StartDialog.VsPerson -> {
+        OfflineMatch(
+            isVsIntelligent = startDialog is StartDialog.VsIntelligent,
+            onStartMatch = onStartMatch,
+            onDismissRequest = onDismissRequest,
+            isCoclewMode = isCoclewMode
+        )
+    }
+}
+
+@Composable
+private fun OfflineMatch(
+    isVsIntelligent: Boolean,
+    onStartMatch: (Match, () -> Unit) -> Unit,
+    onDismissRequest: () -> Unit,
+    isCoclewMode: Boolean
 ) {
-    val textSmartphone = stringResource(R.string.text_smartphone)
+    val textSmartphone = stringResource(R.string.text_artificial_intelligence)
 
     var player1 by rememberSaveable { mutableStateOf("") }
-    var player2 by rememberSaveable { mutableStateOf(if (vsPhone) textSmartphone else "") }
+    var player2 by rememberSaveable { mutableStateOf(if (isVsIntelligent) textSmartphone else "") }
 
     val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
     val isError = player1 == player2 && isNotBlank
@@ -60,22 +80,27 @@ fun PlayersInsertDialog(
     }
 
     fun confirm() {
-        onConfirm(
-            Player.Person(
-                name = player1,
-                symbol = symbols[0]
+        onStartMatch(
+            Match(
+                listOf(
+                    Player.Person(
+                        name = player1,
+                        symbol = symbols[0]
+                    ),
+                    if (isVsIntelligent) {
+                        Player.Phone(
+                            symbol = symbols[1],
+                            difficulty = difficultySelection
+                        )
+                    } else {
+                        Player.Person(
+                            name = player2,
+                            symbol = symbols[1]
+                        )
+                    }
+                )
             ),
-            if (vsPhone) {
-                Player.Phone(
-                    symbol = symbols[1],
-                    difficulty = difficultySelection
-                )
-            } else {
-                Player.Person(
-                    name = player2,
-                    symbol = symbols[1]
-                )
-            }
+            onDismissRequest
         )
     }
 
@@ -121,7 +146,7 @@ fun PlayersInsertDialog(
                         },
                         isError = isError,
                         singleLine = true,
-                        readOnly = vsPhone,
+                        readOnly = isVsIntelligent,
                         label = {
                             Text(text = stringResource(R.string.text_player, 2))
                         },
@@ -149,7 +174,7 @@ fun PlayersInsertDialog(
                 }
             }
 
-            if (vsPhone) {
+            if (isVsIntelligent) {
                 val points by Coclew.points.collectAsState()
 
                 LazyRow(
@@ -230,8 +255,7 @@ fun PlayersInsertDialog(
 @Composable
 private fun PlayersInsertDialogPreview() {
     PlayersInsertDialog(
-        onConfirm = { _, _ -> },
         onDismissRequest = {},
-        vsPhone = true
+        startDialog = StartDialog.VsIntelligent
     )
 }

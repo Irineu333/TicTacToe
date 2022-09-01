@@ -35,16 +35,16 @@ import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.HashTable
 import com.neo.hash.ui.components.SquareBox
 import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
+import com.neo.hash.ui.screen.gameScreen.viewModel.Match
 import com.neo.hash.ui.theme.HashTheme
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    againstIntelligent: Boolean = false,
     isCoclewMode: Boolean = false,
     onHomeClick: () -> Unit = {},
-    showInterstitial: (Boolean, () -> Unit) -> Unit = { _, _ -> },
-    viewModel: GameViewModel = viewModel(),
+    showInterstitial: (() -> Unit) -> Unit = { },
+    viewModel: GameViewModel =  viewModel(factory = GameViewModel.Factory())
 ) = Column(
     modifier = modifier
         .padding(top = 16.dp)
@@ -82,13 +82,15 @@ fun GameScreen(
         }
     }
 
+    val players = state.match.players
+
     AnimatedVisibility(
-        visible = state.players.isNotEmpty(),
+        visible = players.isNotEmpty(),
         modifier = Modifier
             .padding(bottom = 16.dp)
     ) {
         Players(
-            players = state.players,
+            players = players,
             playing = state.playerTurn,
             onDebugClick = {
                 if (it is Player.Phone) {
@@ -121,12 +123,14 @@ fun GameScreen(
 
     Spacer(modifier = Modifier.height(16.dp))
 
-    AnimatedVisibility(visible = state.players.isNotEmpty()) {
+    AnimatedVisibility(visible = players.isNotEmpty()) {
         Row {
-            AnimatedVisibility(visible = !isCoclewMode || state.playerTurn == null) {
+            AnimatedVisibility(
+                visible = !isCoclewMode || state.playerTurn == null
+            ) {
                 GameButton(
                     onClick = {
-                        showInterstitial(false) {
+                        showInterstitial {
                             viewModel.clear()
                         }
                     }
@@ -142,28 +146,6 @@ fun GameScreen(
             }
         }
     }
-
-    var finishing by remember { mutableStateOf(false) }
-
-    if (state.players.isEmpty() && !finishing) {
-        PlayersInsertDialog(
-            onConfirm = { player1, player2 ->
-                if (player2 is Player.Phone) {
-                    showInterstitial(true) {
-                        viewModel.start(player1, player2)
-                    }
-                } else {
-                    viewModel.start(player1, player2)
-                }
-            },
-            vsPhone = againstIntelligent,
-            isCoclewMode = isCoclewMode,
-            onDismissRequest = {
-                finishing = true
-                onHomeClick()
-            },
-        )
-    }
 }
 
 @Preview(showBackground = true)
@@ -171,15 +153,16 @@ fun GameScreen(
 private fun GameScreenPreview() {
     HashTheme {
         GameScreen(
-            viewModel = (viewModel() as GameViewModel).apply {
-                start(
-                    Player.Person(Hash.Symbol.O, "Irineu"),
-                    Player.Phone(
-                        Hash.Symbol.X,
-                        difficulty = Difficulty.HARD
-                    ),
+            viewModel = viewModel(
+                factory = GameViewModel.Factory(
+                    Match(
+                        players = listOf(
+                            Player.Phone(Hash.Symbol.O),
+                            Player.Person(Hash.Symbol.X, "Irineu")
+                        )
+                    )
                 )
-            }
+            )
         )
     }
 }

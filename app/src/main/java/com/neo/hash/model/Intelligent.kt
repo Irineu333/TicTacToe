@@ -6,7 +6,6 @@ import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
 import kotlin.random.Random
 
-@Suppress("UNUSED")
 class Intelligent(private val mySymbol: Hash.Symbol) {
 
     private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
@@ -14,6 +13,8 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private val Hash.hasCorners get() = corners.any { get(it.row, it.column) != null }
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
+
+    private val hardCanWin get() = (1..5).random() == 1
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
@@ -34,6 +35,11 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
+
+        if (hardCanWin) {
+            return medium(hash = hash)
+        }
+
         firstRandom()
             ?: blockOnSecond()
             ?: blockOnThird(perfect = true)
