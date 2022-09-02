@@ -14,7 +14,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
-    private val hardCanWin get() = (1..5).random() == 1
+    private val hardCanWin get() = (1..100).random() == 10
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
@@ -37,7 +37,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun hard(hash: Hash): Hash.Block = with(hash) {
 
         if (hardCanWin) {
-            return medium(hash = hash)
+            return easy(hash = hash)
         }
 
         firstRandom()
