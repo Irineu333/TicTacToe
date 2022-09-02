@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -25,6 +26,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
 import com.neo.hash.activity.viewModel.MainViewModel
+import com.neo.hash.singleton.Coclew
 import com.neo.hash.singleton.GlobalFlow
 import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.screen.mainScreen.MainScreen

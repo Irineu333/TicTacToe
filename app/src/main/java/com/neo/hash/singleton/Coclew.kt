@@ -9,10 +9,12 @@ import com.neo.hash.data.response.Points
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 object Coclew {
 
@@ -24,7 +26,7 @@ object Coclew {
         coclewRef.child("enabled").addValueEventListener(
             object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    value = snapshot.getValue<Boolean>() ?: return
+                    value = snapshot.getValue<Boolean>() ?: false
                 }
 
                 override fun onCancelled(error: DatabaseError) = Unit
@@ -47,17 +49,21 @@ object Coclew {
     val points = MutableStateFlow<Points?>(value = null).apply {
 
         var showPoints = false
-        var points : Points? = null
+        var points: Points? = null
 
         fun update() {
-            value = if (showPoints) { points } else { null }
+            value = if (showPoints) {
+                points
+            } else {
+                null
+            }
         }
 
         coclewRef
             .child("show_points")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    showPoints = snapshot.getValue<Boolean>() ?: return
+                    showPoints = snapshot.getValue<Boolean>() ?: false
 
                     update()
                 }
