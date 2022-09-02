@@ -37,7 +37,7 @@ class Intelligent(private val mySymbol: Hash.Symbol) {
     fun hard(hash: Hash): Hash.Block = with(hash) {
 
         if (hardCanWin) {
-            return easy(hash = hash)
+            return medium(hash = hash)
         }
 
         firstRandom()
