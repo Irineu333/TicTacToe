@@ -109,7 +109,6 @@ fun MainScreen(
             )
         }
 
-
         if (showMaintenance) {
             ErrorDialog(
                 onDismiss = {

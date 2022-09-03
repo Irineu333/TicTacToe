@@ -14,8 +14,4 @@ data class GameUiState(
 
 data class Match(
     val players: List<Player>
-) {
-    companion object {
-        var match: Match? = null
-    }
-}
+)
