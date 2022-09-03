@@ -425,7 +425,7 @@ class GameViewModel(match: Match) : ViewModel() {
 
     @Suppress("UNCHECKED_CAST")
     class Factory(
-        private val match: Match = Match.match ?: error("invalid match")
+        private val match: Match
     ) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
