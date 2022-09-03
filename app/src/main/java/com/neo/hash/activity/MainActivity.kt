@@ -73,7 +73,8 @@ class MainActivity : ComponentActivity() {
                             showInterstitial(
                                 onSuccess = onSuccess,
                                 onError = {
-                                    errorMessage = it
+                                    if (onSuccess != null)
+                                        errorMessage = it
                                 }
                             )
                         }
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
         if (onSuccess != null) {
             Toast.makeText(
                 this,
-                "Carregando anúncio",
+                "Carregando anúncio.",
                 Toast.LENGTH_SHORT
             ).show()
         }

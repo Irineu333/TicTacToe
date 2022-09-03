@@ -49,7 +49,7 @@ import com.neo.hash.util.extensions.*
 fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel(),
-    showInterstitial: (() -> Unit) -> Unit = { }
+    showInterstitial: ((() -> Unit)?) -> Unit = { }
 ) = Column(
     modifier = modifier
         .fillMaxSize(),
@@ -122,6 +122,8 @@ fun MainScreen(
 
         val isCoclewMode = referenceCode.isUid() && coclewEnabled == true
 
+        var matchState by rememberSaveable { mutableStateOf<Match?>(null) }
+
         AnimatedNavHost(
             navController = controller,
             startDestination = Screen.HomeScreen.route,
@@ -135,6 +137,10 @@ fun MainScreen(
                 onSuccess: () -> Unit
             ) {
                 when {
+                    !referenceCode!!.isUid() || coclewEnabled == null -> {
+                        onSuccess()
+                        showInterstitial(null)
+                    }
                     coclewEnabled == false -> showMaintenance = true
                     ignoreSkip -> showInterstitial(onSuccess)
                     viewModel.isSkipInterstitial() -> onSuccess()
@@ -150,11 +156,12 @@ fun MainScreen(
                 exitTransition = { exitToLeftTransition },
                 popEnterTransition = { enterToRightTransition }
             ) { backStackEntry ->
+
                 HomeScreen(
                     onStartMatch = { match, onSuccess ->
                         mustShowInterstitial(ignoreSkip = true) {
                             if (controller isCurrent backStackEntry) {
-                                Match.match = match
+                                matchState = match
                                 controller.navigate(Screen.GameScreen.route)
                                 onSuccess()
                             }
@@ -182,7 +189,12 @@ fun MainScreen(
                             ignoreSkip = false,
                             onSuccess
                         )
-                    }
+                    },
+                    viewModel = viewModel(
+                        factory = GameViewModel.Factory(
+                            match = matchState ?: error("invalid match")
+                        )
+                    )
                 )
             }
         }

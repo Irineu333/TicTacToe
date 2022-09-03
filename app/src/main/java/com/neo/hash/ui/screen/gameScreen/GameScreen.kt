@@ -44,7 +44,7 @@ fun GameScreen(
     isCoclewMode: Boolean = false,
     onHomeClick: () -> Unit = {},
     showInterstitial: (() -> Unit) -> Unit = { },
-    viewModel: GameViewModel =  viewModel(factory = GameViewModel.Factory())
+    viewModel: GameViewModel
 ) = Column(
     modifier = modifier
         .padding(top = 16.dp)
