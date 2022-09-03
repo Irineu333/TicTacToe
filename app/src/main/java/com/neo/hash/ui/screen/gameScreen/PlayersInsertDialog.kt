@@ -12,6 +12,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +61,7 @@ private fun OfflineMatch(
     var player1 by rememberSaveable { mutableStateOf("") }
     var player2 by rememberSaveable { mutableStateOf(if (isVsIntelligent) textSmartphone else "") }
 
-    val isNotBlank = player1.isNotBlank() && player2.isNotBlank()
+    val isNotBlank = (player1.isNotBlank() || isVsIntelligent) && player2.isNotBlank()
     val isError = player1 == player2 && isNotBlank
 
     var difficultySelection by rememberSaveable {
@@ -79,12 +80,14 @@ private fun OfflineMatch(
         mutableStateOf(listOf(symbol1, symbol2))
     }
 
+    val context = LocalContext.current
+
     fun confirm() {
         onStartMatch(
             Match(
                 listOf(
                     Player.Person(
-                        name = player1,
+                        name = player1.ifBlank { context.getString(R.string.text_person) },
                         symbol = symbols[0]
                     ),
                     if (isVsIntelligent) {

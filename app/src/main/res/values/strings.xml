@@ -24,4 +24,5 @@
     <string name="btn_cancel" tools:ignore="ButtonCase">CANCEL</string>
     <string name="title_refeence_code">REFERENCE CODE</string>
     <string name="text_maintenance">We are under maintenance.</string>
+    <string name="text_person">You</string>
 </resources>
