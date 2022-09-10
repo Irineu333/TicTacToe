@@ -1,5 +1,7 @@
 package com.neo.hash.ui.screen.gameScreen.viewModel
 
+import androidx.annotation.Keep
+import com.google.gson.annotations.SerializedName
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
@@ -14,14 +16,21 @@ data class GameUiState(
 )
 
 data class Match(
+    @SerializedName("players")
     val players: List<Player>
 ) {
     data class Player(
+        @SerializedName("name")
         val name: String,
+        @SerializedName("symbol")
         val symbol: Hash.Symbol,
+        @SerializedName("type")
         val type: Type,
+        @SerializedName("difficulty")
         val difficulty: Difficulty? = null
     ) {
+
+        @Keep
         enum class Type {
             PERSON,
             PHONE
