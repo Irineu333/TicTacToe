@@ -82,7 +82,7 @@ fun GameScreen(
         }
     }
 
-    val players = state.match.players
+    val players = state.players
 
     AnimatedVisibility(
         visible = players.isNotEmpty(),
@@ -157,8 +157,17 @@ private fun GameScreenPreview() {
                 factory = GameViewModel.Factory(
                     Match(
                         players = listOf(
-                            Player.Phone(Hash.Symbol.O),
-                            Player.Person(Hash.Symbol.X, "Irineu")
+                            Match.Player(
+                                symbol = Hash.Symbol.O,
+                                name = "AI",
+                                type = Match.Player.Type.PHONE,
+                                difficulty = Difficulty.HARD
+                            ),
+                            Match.Player(
+                                symbol = Hash.Symbol.X,
+                                name = "IRINEU",
+                                type = Match.Player.Type.PERSON
+                            )
                         )
                     )
                 )

@@ -4,9 +4,12 @@ import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
+import java.io.Serializable
 import kotlin.random.Random
 
-class Intelligent(private val mySymbol: Hash.Symbol) {
+class Intelligent(
+    private val mySymbol: Hash.Symbol
+) {
 
     private val enemySymbol = Hash.Symbol.values().first { it != mySymbol }
 

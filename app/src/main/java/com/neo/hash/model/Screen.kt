@@ -1,6 +1,6 @@
 package com.neo.hash.model
 
-import android.net.Uri
+import com.google.gson.Gson
 import com.neo.hash.ui.screen.gameScreen.viewModel.Match
 
 sealed class Screen {
@@ -10,6 +10,9 @@ sealed class Screen {
     }
 
     object GameScreen : Screen() {
-        const val route = "game_screen"
+
+        fun route(match: Match) = "game_screen/${Gson().toJson(match)}"
+
+        const val route = "game_screen/{match}"
     }
 }

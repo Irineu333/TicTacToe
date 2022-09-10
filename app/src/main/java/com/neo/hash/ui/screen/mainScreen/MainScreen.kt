@@ -23,7 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavArgument
+import androidx.navigation.NavType
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -31,6 +34,7 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
+import com.google.gson.Gson
 import com.neo.hash.BuildConfig
 import com.neo.hash.R
 import com.neo.hash.activity.viewModel.MainViewModel
@@ -109,7 +113,6 @@ fun MainScreen(
             )
         }
 
-
         if (showMaintenance) {
             ErrorDialog(
                 onDismiss = {
@@ -121,8 +124,6 @@ fun MainScreen(
         }
 
         val isCoclewMode = referenceCode.isUid() && coclewEnabled == true
-
-        var matchState by rememberSaveable { mutableStateOf<Match?>(null) }
 
         AnimatedNavHost(
             navController = controller,
@@ -150,9 +151,8 @@ fun MainScreen(
 
             composable(
                 route = Screen.HomeScreen.route,
-                enterTransition = {
-                    fadeIn()
-                },
+                enterTransition = { fadeIn() },
+                arguments = listOf(navArgument("match") { type = NavType.StringType }),
                 exitTransition = { exitToLeftTransition },
                 popEnterTransition = { enterToRightTransition }
             ) { backStackEntry ->
@@ -161,8 +161,7 @@ fun MainScreen(
                     onStartMatch = { match, onSuccess ->
                         mustShowInterstitial(ignoreSkip = true) {
                             if (controller isCurrent backStackEntry) {
-                                matchState = match
-                                controller.navigate(Screen.GameScreen.route)
+                                controller.navigate(Screen.GameScreen.route(match))
                                 onSuccess()
                             }
                         }
@@ -176,6 +175,9 @@ fun MainScreen(
                 enterTransition = { enterToLeftTransition },
                 popExitTransition = { exitToRightTransition }
             ) { backStackEntry ->
+
+                val match = backStackEntry.arguments!!.getString("match")
+                    .let { Gson().fromJson(it, Match::class.java) }
 
                 GameScreen(
                     onHomeClick = {
@@ -192,7 +194,7 @@ fun MainScreen(
                     },
                     viewModel = viewModel(
                         factory = GameViewModel.Factory(
-                            match = matchState ?: error("invalid match")
+                            match = match
                         )
                     )
                 )
