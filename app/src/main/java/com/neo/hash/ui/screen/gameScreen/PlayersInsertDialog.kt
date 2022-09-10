@@ -86,19 +86,23 @@ private fun OfflineMatch(
         onStartMatch(
             Match(
                 listOf(
-                    Player.Person(
+                    Match.Player(
                         name = player1.ifBlank { context.getString(R.string.text_person) },
-                        symbol = symbols[0]
+                        symbol = symbols[0],
+                        type = Match.Player.Type.PERSON
                     ),
                     if (isVsIntelligent) {
-                        Player.Phone(
+                        Match.Player(
                             symbol = symbols[1],
-                            difficulty = difficultySelection
+                            difficulty = difficultySelection,
+                            type = Match.Player.Type.PHONE,
+                            name =  context.getString(R.string.text_artificial_intelligence)
                         )
                     } else {
-                        Player.Person(
+                        Match.Player(
                             name = player2,
-                            symbol = symbols[1]
+                            symbol = symbols[1],
+                            type = Match.Player.Type.PERSON
                         )
                     }
                 )

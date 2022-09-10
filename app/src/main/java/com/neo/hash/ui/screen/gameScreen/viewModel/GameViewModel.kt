@@ -23,13 +23,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 
+
 class GameViewModel(match: Match) : ViewModel() {
 
-    private var lastStatedPlayer: Player = match.players.random()
+    private val players = match.players.map { it.toModel() }
+
+    private var lastStatedPlayer: Player = players.random()
 
     private var _uiState = MutableStateFlow(
         GameUiState(
-            match = match,
+            players = players,
             playerTurn = lastStatedPlayer
         )
     )
@@ -55,7 +58,7 @@ class GameViewModel(match: Match) : ViewModel() {
 
         playIntelligent()
 
-        newGameEvent(match.players)
+        newGameEvent(players)
     }
 
     private fun setupListener() = viewModelScope.launch {
@@ -104,14 +107,14 @@ class GameViewModel(match: Match) : ViewModel() {
                     )
                 }
 
-                val players = state.match.players.map {
+                val players = state.players.map {
                     if (it == winner.first) playerWinner else it
                 }
 
                 val hashWinner = winner.second
 
                 state.copy(
-                    match = state.match.copy(players = players),
+                    players = players,
                     playerWinner = playerWinner,
                     hash = newHash,
                     winner = hashWinner,
@@ -119,7 +122,7 @@ class GameViewModel(match: Match) : ViewModel() {
                 )
             }
 
-            state.match.players.findType<Player.Phone>()?.let { phone ->
+            state.players.findType<Player.Phone>()?.let { phone ->
                 if (winner.first is Player.Person) {
                     // count points
                     if (isCoclewMode) {
@@ -155,7 +158,7 @@ class GameViewModel(match: Match) : ViewModel() {
         if (newHash.isTie()) {
             _uiState.update {
 
-                it.match.players.findType<Player.Phone>()?.let { phone ->
+                it.players.findType<Player.Phone>()?.let { phone ->
                     phoneFinishEvent(phone = phone, null)
                 }
 
@@ -168,7 +171,7 @@ class GameViewModel(match: Match) : ViewModel() {
             return
         }
 
-        val newPlayerTurn = state.match.players.first {
+        val newPlayerTurn = state.players.first {
             it != playerTurn
         }
 
@@ -251,7 +254,7 @@ class GameViewModel(match: Match) : ViewModel() {
             }
         }
 
-        val players = uiState.value.match.players
+        val players = uiState.value.players
 
         for (row in Hash.KEY_RANGE) {
             val rowWinner = getRowWinner(row)
@@ -345,7 +348,7 @@ class GameViewModel(match: Match) : ViewModel() {
 
         _uiState.update { state ->
 
-            lastStatedPlayer = state.match.players.first {
+            lastStatedPlayer = state.players.first {
                 it != lastStatedPlayer
             }
 
@@ -359,7 +362,7 @@ class GameViewModel(match: Match) : ViewModel() {
 
         playIntelligent()
 
-        newGameEvent(uiState.value.match.players)
+        newGameEvent(uiState.value.players)
     }
 
     fun onDebug(player: Player) {
@@ -376,12 +379,12 @@ class GameViewModel(match: Match) : ViewModel() {
                         windsCount = player.windsCount
                     )
 
-                    val newPlayers = state.match.players.map {
+                    val newPlayers = state.players.map {
                         if (player == it) newPlayerPhone else it
                     }
 
                     state.copy(
-                        match = state.match.copy(players = newPlayers),
+                        players = newPlayers,
                         playerTurn = state.playerTurn?.let { turn ->
                             newPlayers.first { it.symbol == turn.symbol }
                         },
@@ -401,12 +404,12 @@ class GameViewModel(match: Match) : ViewModel() {
 
                 _uiState.update { state ->
 
-                    val newPlayers = state.match.players.map {
+                    val newPlayers = state.players.map {
                         if (player == it) newPhone else it
                     }
 
                     state.copy(
-                        match = state.match.copy(players = newPlayers),
+                        players = newPlayers,
                         playerTurn = state.playerTurn?.let { turn ->
                             newPlayers.first { it.symbol == turn.symbol }
                         },
@@ -423,10 +426,7 @@ class GameViewModel(match: Match) : ViewModel() {
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    class Factory(
-        private val match: Match
-    ) : ViewModelProvider.Factory {
+    class Factory(private val match: Match) : ViewModelProvider.Factory {
 
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GameViewModel(match) as T
