@@ -4,7 +4,6 @@ import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
-import java.io.Serializable
 import kotlin.random.Random
 
 class Intelligent(
@@ -17,7 +16,7 @@ class Intelligent(
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
-    private val hardCanWin get() = (1..50).random() == 25
+    private val hardCanWin get() = (1..40).random() == 20
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
@@ -31,10 +30,8 @@ class Intelligent(
             ?: blockOnSecond()
             ?: blockOnThird(perfect = false)
             ?: winOrBlock(block = true)
-            ?: run {
-                if (Random.nextBoolean())
-                    disruptiveXeque() else xeque(double = true)
-            } ?: random()
+            ?: xeque(double = true)
+            ?: random()
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
