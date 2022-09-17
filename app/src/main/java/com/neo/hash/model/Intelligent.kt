@@ -37,8 +37,7 @@ class Intelligent(
                 } else {
                     disruptiveXeque()
                 }
-            }
-            ?: random()
+            } ?: random()
     }
 
     fun hardCoclew(hash: Hash) = if (hardCanWin) {
