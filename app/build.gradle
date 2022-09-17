@@ -30,8 +30,8 @@ android {
         applicationId "com.neo.hash"
         minSdk 21
         targetSdk 33
-        versionCode 16
-        versionName "1.9.4"
+        versionCode 17
+        versionName "1.9.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
