@@ -4,7 +4,6 @@ import com.neo.hash.util.extensions.recurring
 import com.neo.hash.util.extensions.tryFilter
 import com.neo.hash.util.extensions.tryRecurring
 import timber.log.Timber
-import java.io.Serializable
 import kotlin.random.Random
 
 class Intelligent(
@@ -29,20 +28,19 @@ class Intelligent(
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: blockOnThird(perfect = false)
+            ?: blockOnThird(perfect = Random.nextBoolean())
             ?: winOrBlock(block = true)
-            ?: run {
-                if (Random.nextBoolean())
-                    disruptiveXeque() else xeque(double = true)
-            } ?: random()
+            ?: xeque(double = true)
+            ?: random()
+    }
+
+    fun hardCoclew(hash: Hash) = if (hardCanWin) {
+        medium(hash = hash)
+    } else {
+        hard(hash = hash)
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-
-        if (hardCanWin) {
-            return medium(hash = hash)
-        }
-
         firstRandom()
             ?: blockOnSecond()
             ?: blockOnThird(perfect = true)
