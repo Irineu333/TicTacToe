@@ -30,7 +30,7 @@ class Intelligent(
             ?: blockOnSecond()
             ?: blockOnThird(perfect = Random.nextBoolean())
             ?: winOrBlock(block = true)
-            ?: xeque(double = Random.nextBoolean())
+            ?: xeque(double = true)
             ?: random()
     }
 
