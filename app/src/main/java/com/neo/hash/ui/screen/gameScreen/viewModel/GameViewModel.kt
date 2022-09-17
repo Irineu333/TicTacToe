@@ -201,7 +201,10 @@ class GameViewModel(match: Match) : ViewModel() {
                         when (difficulty) {
                             Difficulty.EASY -> intelligent.easy(state.hash)
                             Difficulty.MEDIUM -> intelligent.medium(state.hash)
-                            Difficulty.HARD -> intelligent.hard(state.hash)
+                            Difficulty.HARD -> {
+                                if (isCoclewMode) intelligent.hardCoclew(state.hash)
+                                else intelligent.hard(state.hash)
+                            }
                         }
                     }.also {
                         delay.join()
@@ -426,8 +429,11 @@ class GameViewModel(match: Match) : ViewModel() {
         }
     }
 
-    class Factory(private val match: Match) : ViewModelProvider.Factory {
+    class Factory(
+        private val match: Match
+    ) : ViewModelProvider.NewInstanceFactory() {
 
+        @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return GameViewModel(match) as T
         }

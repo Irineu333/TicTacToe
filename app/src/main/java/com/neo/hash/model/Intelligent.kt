@@ -16,7 +16,7 @@ class Intelligent(
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
-    private val hardCanWin get() = (1..40).random() == 20
+    private val hardCanWin get() = (1..50).random() == 25
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
@@ -28,18 +28,19 @@ class Intelligent(
     fun medium(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
             ?: blockOnSecond()
-            ?: blockOnThird(perfect = false)
+            ?: blockOnThird(perfect = Random.nextBoolean())
             ?: winOrBlock(block = true)
-            ?: xeque(double = true)
+            ?: xeque(double = Random.nextBoolean())
             ?: random()
     }
 
+    fun hardCoclew(hash: Hash) = if (hardCanWin) {
+        medium(hash = hash)
+    } else {
+        hard(hash = hash)
+    }
+
     fun hard(hash: Hash): Hash.Block = with(hash) {
-
-        if (hardCanWin) {
-            return medium(hash = hash)
-        }
-
         firstRandom()
             ?: blockOnSecond()
             ?: blockOnThird(perfect = true)
