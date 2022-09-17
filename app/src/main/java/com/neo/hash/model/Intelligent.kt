@@ -17,6 +17,7 @@ class Intelligent(
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
     private val hardCanWin get() = (1..50).random() == 25
+    private val hardCanMedium get() = (1..3).random() in 1..2
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
         firstRandom()
@@ -30,7 +31,13 @@ class Intelligent(
             ?: blockOnSecond()
             ?: blockOnThird(perfect = Random.nextBoolean())
             ?: winOrBlock(block = true)
-            ?: xeque(double = true)
+            ?: run {
+                if (hardCanMedium) {
+                    xeque(double = true)
+                } else {
+                    disruptiveXeque()
+                }
+            }
             ?: random()
     }
 
