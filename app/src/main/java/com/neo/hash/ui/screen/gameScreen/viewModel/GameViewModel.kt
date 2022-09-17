@@ -28,12 +28,12 @@ class GameViewModel(match: Match) : ViewModel() {
 
     private val players = match.players.map { it.toModel() }
 
-    private var lastStatedPlayer: Player = players.random()
+    private var lastStartedPlayer: Player = players.random()
 
     private var _uiState = MutableStateFlow(
         GameUiState(
             players = players,
-            playerTurn = lastStatedPlayer
+            playerTurn = lastStartedPlayer
         )
     )
 
@@ -351,14 +351,14 @@ class GameViewModel(match: Match) : ViewModel() {
 
         _uiState.update { state ->
 
-            lastStatedPlayer = state.players.first {
-                it != lastStatedPlayer
+            lastStartedPlayer = state.players.first {
+                it.symbol != lastStartedPlayer.symbol
             }
 
             state.copy(
                 hash = Hash(),
                 playerWinner = null,
-                playerTurn = lastStatedPlayer,
+                playerTurn = lastStartedPlayer,
                 winner = null
             )
         }
