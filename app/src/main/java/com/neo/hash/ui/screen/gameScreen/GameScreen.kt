@@ -41,9 +41,7 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
-    isCoclewMode: Boolean = false,
     onHomeClick: () -> Unit = {},
-    showInterstitial: (() -> Unit) -> Unit = { },
     viewModel: GameViewModel
 ) = Column(
     modifier = modifier
@@ -126,13 +124,11 @@ fun GameScreen(
     AnimatedVisibility(visible = players.isNotEmpty()) {
         Row {
             AnimatedVisibility(
-                visible = !isCoclewMode || state.playerTurn == null
+                visible = state.playerTurn == null
             ) {
                 GameButton(
                     onClick = {
-                        showInterstitial {
-                            viewModel.clear()
-                        }
+                        viewModel.clear()
                     }
                 ) {
                     Text(text = stringResource(R.string.btn_clean).uppercase())

@@ -30,8 +30,7 @@ import com.neo.hash.ui.theme.HashTheme
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    onStartMatch: (Match, () -> Unit) -> Unit = { _, _ -> },
-    isCoclewMode: Boolean = false
+    onStartMatch: (Match) -> Unit = { _ -> },
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalArrangement = Arrangement.Center,
@@ -44,7 +43,6 @@ fun HomeScreen(
         PlayersInsertDialog(
             onStartMatch = onStartMatch,
             startDialog = startDialog!!,
-            isCoclewMode = isCoclewMode,
             onDismissRequest = {
                 startDialog = null
             },
@@ -60,14 +58,16 @@ fun HomeScreen(
             )
         ) {
             HashTable(
-                hash = Hash().apply {
-                    set(Hash.Symbol.X, 1, 3)
-                    set(Hash.Symbol.X, 2, 2)
-                    set(Hash.Symbol.X, 3, 1)
+                hash = remember {
+                    Hash().apply {
+                        set(Hash.Symbol.X, 1, 3)
+                        set(Hash.Symbol.X, 2, 2)
+                        set(Hash.Symbol.X, 3, 1)
 
-                    set(Hash.Symbol.O, 1, 2)
-                    set(Hash.Symbol.O, 2, 1)
-                    set(Hash.Symbol.O, 3, 3)
+                        set(Hash.Symbol.O, 1, 2)
+                        set(Hash.Symbol.O, 2, 1)
+                        set(Hash.Symbol.O, 3, 3)
+                    }
                 },
                 winner = Hash.Winner.Diagonal.Inverted,
                 modifier = Modifier
@@ -101,22 +101,20 @@ fun HomeScreen(
         )
     }
 
-    AnimatedVisibility(visible = !isCoclewMode) {
-        GameButton(
-            onClick = { startDialog = StartDialog.VsPerson }
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
-            )
+    GameButton(
+        onClick = { startDialog = StartDialog.VsPerson }
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
 
-            Text(text = "vs", fontSize = 16.sp)
+        Text(text = "vs", fontSize = 16.sp)
 
-            Icon(
-                imageVector = Icons.Rounded.Person,
-                contentDescription = null,
-            )
-        }
+        Icon(
+            imageVector = Icons.Rounded.Person,
+            contentDescription = null,
+        )
     }
 }
 

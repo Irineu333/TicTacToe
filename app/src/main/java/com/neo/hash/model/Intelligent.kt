@@ -16,7 +16,6 @@ class Intelligent(
     private val Hash.hasSides get() = sides.any { get(it.row, it.column) != null }
     private val Hash.hasCenter get() = get(center.row, center.column) != null
 
-    private val hardCanWin get() = (1..50).random() == 25
     private val hardCanMedium get() = (1..3).random() in 1..2
 
     fun easy(hash: Hash): Hash.Block = with(hash) {
@@ -38,12 +37,6 @@ class Intelligent(
                     disruptiveXeque()
                 }
             } ?: random()
-    }
-
-    fun hardCoclew(hash: Hash) = if (hardCanWin) {
-        medium(hash = hash)
-    } else {
-        hard(hash = hash)
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {

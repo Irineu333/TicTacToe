@@ -1,14 +1,30 @@
 package com.neo.hash.ui.screen.gameScreen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.SyncAlt
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -22,9 +38,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.neo.hash.R
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
-import com.neo.hash.model.Player
 import com.neo.hash.model.StartDialog
-import com.neo.hash.singleton.Coclew
 import com.neo.hash.ui.components.GameButton
 import com.neo.hash.ui.components.GameDialog
 import com.neo.hash.ui.components.Symbol
@@ -34,8 +48,7 @@ import kotlin.random.Random
 @Composable
 fun PlayersInsertDialog(
     startDialog: StartDialog,
-    onStartMatch: (Match, () -> Unit) -> Unit = { _, _ -> },
-    isCoclewMode: Boolean = false,
+    onStartMatch: (Match) -> Unit = { _ -> },
     onDismissRequest: () -> Unit = {}
 ) = when (startDialog) {
     StartDialog.Multiplayer -> TODO()
@@ -44,7 +57,6 @@ fun PlayersInsertDialog(
             isVsIntelligent = startDialog is StartDialog.VsIntelligent,
             onStartMatch = onStartMatch,
             onDismissRequest = onDismissRequest,
-            isCoclewMode = isCoclewMode
         )
     }
 }
@@ -52,9 +64,8 @@ fun PlayersInsertDialog(
 @Composable
 private fun OfflineMatch(
     isVsIntelligent: Boolean,
-    onStartMatch: (Match, () -> Unit) -> Unit,
+    onStartMatch: (Match) -> Unit,
     onDismissRequest: () -> Unit,
-    isCoclewMode: Boolean
 ) {
     val textSmartphone = stringResource(R.string.text_artificial_intelligence)
 
@@ -96,7 +107,7 @@ private fun OfflineMatch(
                             symbol = symbols[1],
                             difficulty = difficultySelection,
                             type = Match.Player.Type.PHONE,
-                            name =  context.getString(R.string.text_artificial_intelligence)
+                            name = context.getString(R.string.text_artificial_intelligence)
                         )
                     } else {
                         Match.Player(
@@ -106,9 +117,9 @@ private fun OfflineMatch(
                         )
                     }
                 )
-            ),
-            onDismissRequest
+            )
         )
+        onDismissRequest()
     }
 
     GameDialog(
@@ -182,7 +193,6 @@ private fun OfflineMatch(
             }
 
             if (isVsIntelligent) {
-                val points by Coclew.points.collectAsState()
 
                 LazyRow(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -216,16 +226,6 @@ private fun OfflineMatch(
                                         Difficulty.HARD -> stringResource(R.string.text_hard)
                                     }
                                 )
-
-                                if (isCoclewMode && points != null) {
-                                    Text(
-                                        text = ":" + when (difficulty) {
-                                            Difficulty.EASY -> points!!.easy
-                                            Difficulty.MEDIUM -> points!!.medium
-                                            Difficulty.HARD -> points!!.hard
-                                        }
-                                    )
-                                }
                             }
                         }
 

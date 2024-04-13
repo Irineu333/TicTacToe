@@ -7,20 +7,19 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import com.neo.hash.BuildConfig
-import com.neo.hash.dataStoreRepository
 import com.neo.hash.exceptions.HardFailureException
 import com.neo.hash.model.Difficulty
 import com.neo.hash.model.Hash
 import com.neo.hash.model.Player
-import com.neo.hash.singleton.Coclew
-import com.neo.hash.singleton.GlobalFlow
 import com.neo.hash.util.extensions.findType
-import com.neo.hash.util.extensions.isUid
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 
@@ -47,25 +46,11 @@ class GameViewModel(match: Match) : ViewModel() {
                     && it.playerTurn.isEnabled
         }
 
-    private var referenceCode: String = ""
-
-    private val isCoclewMode
-        get() = referenceCode.isUid() &&
-                Coclew.enabled.value == true
-
     init {
-        setupListener()
-
         playIntelligent()
-
         newGameEvent(players)
     }
 
-    private fun setupListener() = viewModelScope.launch {
-        dataStoreRepository.referenceCodeFlow.collectLatest {
-            referenceCode = it
-        }
-    }
 
     fun select(row: Int, column: Int) {
         val state = uiState.value
@@ -76,6 +61,7 @@ class GameViewModel(match: Match) : ViewModel() {
             is Player.Person -> {
                 internalSelect(row, column)
             }
+
             is Player.Phone -> {
                 if (BuildConfig.DEBUG && !playerTurn.isEnabled) {
                     internalSelect(row, column)
@@ -102,6 +88,7 @@ class GameViewModel(match: Match) : ViewModel() {
                     is Player.Person -> first.copy(
                         windsCount = first.windsCount + 1
                     )
+
                     is Player.Phone -> first.copy(
                         windsCount = first.windsCount + 1
                     )
@@ -124,15 +111,6 @@ class GameViewModel(match: Match) : ViewModel() {
 
             state.players.findType<Player.Phone>()?.let { phone ->
                 if (winner.first is Player.Person) {
-                    // count points
-                    if (isCoclewMode) {
-
-                        Timber.i("reference code: $referenceCode")
-
-                        viewModelScope.launch {
-                            GlobalFlow.addPoints(phone.difficulty)
-                        }
-                    }
 
                     // report hard mode failure
                     if (phone.difficulty == Difficulty.HARD) {
@@ -201,10 +179,7 @@ class GameViewModel(match: Match) : ViewModel() {
                         when (difficulty) {
                             Difficulty.EASY -> intelligent.easy(state.hash)
                             Difficulty.MEDIUM -> intelligent.medium(state.hash)
-                            Difficulty.HARD -> {
-                                if (isCoclewMode) intelligent.hardCoclew(state.hash)
-                                else intelligent.hard(state.hash)
-                            }
+                            Difficulty.HARD -> intelligent.hard(state.hash)
                         }
                     }.also {
                         delay.join()
@@ -308,7 +283,7 @@ class GameViewModel(match: Match) : ViewModel() {
                             Difficulty.MEDIUM -> "medium"
                             Difficulty.HARD -> "hard"
                         }
-                    }${if (isCoclewMode) "_coclew" else ""}"
+                    }"
                 } ?: ""
             }", Bundle.EMPTY
         )
@@ -329,7 +304,7 @@ class GameViewModel(match: Match) : ViewModel() {
                     Difficulty.MEDIUM -> "medium"
                     Difficulty.HARD -> "hard"
                 }
-            }${if (isCoclewMode) "_coclew" else ""}", Bundle.EMPTY
+            }", Bundle.EMPTY
         )
     }
 
@@ -399,6 +374,7 @@ class GameViewModel(match: Match) : ViewModel() {
 
                 playIntelligent()
             }
+
             is Player.Phone -> {
 
                 val newPhone = player.copy(

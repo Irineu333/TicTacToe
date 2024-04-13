@@ -2,9 +2,7 @@
 
 package com.neo.hash.ui.screen.mainScreen
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,19 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MaterialTheme.colors
-import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavArgument
 import androidx.navigation.NavType
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -36,24 +28,20 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.gson.Gson
 import com.neo.hash.BuildConfig
-import com.neo.hash.R
-import com.neo.hash.activity.viewModel.MainViewModel
 import com.neo.hash.model.Screen
-import com.neo.hash.singleton.Coclew
-import com.neo.hash.ui.components.ErrorDialog
 import com.neo.hash.ui.screen.HomeScreen
 import com.neo.hash.ui.screen.gameScreen.GameScreen
 import com.neo.hash.ui.screen.gameScreen.viewModel.GameViewModel
 import com.neo.hash.ui.screen.gameScreen.viewModel.Match
-import com.neo.hash.ui.theme.Coclew
-import com.neo.hash.ui.theme.CoclewDark
-import com.neo.hash.util.extensions.*
+import com.neo.hash.util.extensions.enterToLeftTransition
+import com.neo.hash.util.extensions.enterToRightTransition
+import com.neo.hash.util.extensions.exitToLeftTransition
+import com.neo.hash.util.extensions.exitToRightTransition
+import com.neo.hash.util.extensions.isCurrent
 
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel(),
-    showInterstitial: ((() -> Unit)?) -> Unit = { }
 ) = Column(
     modifier = modifier
         .fillMaxSize(),
@@ -61,164 +49,72 @@ fun MainScreen(
 ) {
     val controller = rememberAnimatedNavController()
 
-    val currentDestination = controller.currentBackStackEntryAsState().value?.destination
-
-    val isHomeScreenCurrent = currentDestination?.route == Screen.HomeScreen.route
-
-    val referenceCode = viewModel.referenceCodeFlow.collectAsState(initial = null).value
-
-    val coclewEnabled = Coclew.enabled.collectAsState().value
-
-    var showMaintenance by rememberSaveable { mutableStateOf(false) }
-
-    val primaryColor by animateColorAsState(
-        if (referenceCode.isUid())
-            Color.Coclew else colors.primary
-    )
-
-    val primaryVariantColor by animateColorAsState(
-        if (referenceCode.isUid())
-            Color.CoclewDark else colors.primaryVariant
-    )
-
-    MaterialTheme(
-        colors.copy(
-            primary = primaryColor,
-            primaryVariant = primaryVariantColor
-        )
+    AnimatedNavHost(
+        navController = controller,
+        startDestination = Screen.HomeScreen.route,
+        modifier = Modifier
+            .weight(weight = 1f)
+            .verticalScroll(rememberScrollState())
     ) {
 
-        val showFeature = !referenceCode.isNullOrEmpty() ||
-                isHomeScreenCurrent &&
-                coclewEnabled == true
+        composable(
+            route = Screen.HomeScreen.route,
+            enterTransition = { fadeIn() },
+            arguments = listOf(navArgument("match") { type = NavType.StringType }),
+            exitTransition = { exitToLeftTransition },
+            popEnterTransition = { enterToRightTransition }
+        ) { backStackEntry ->
 
-        AnimatedVisibility(coclewEnabled != null && showFeature) {
-            CoclewIdentifier(
-                modifier = modifier.padding(
-                    horizontal = 16.dp,
-                    vertical = 12.dp
-                ),
-                referenceCode = referenceCode ?: "",
-                isMaintenance = coclewEnabled == false &&
-                        !referenceCode.isNullOrEmpty(),
-                showMaintenance = {
-                    showMaintenance = true
-                },
-                onAddReferenceCode = { code ->
-                    viewModel.setReferenceCode(code)
-                },
-                onRemoveReferenceCode = {
-                    viewModel.clearReferenceCode()
-                }
-            )
-        }
-
-        if (showMaintenance) {
-            ErrorDialog(
-                onDismiss = {
-                    showMaintenance = false
-                },
-                title = stringResource(R.string.title_warning),
-                message = stringResource(R.string.text_maintenance)
-            )
-        }
-
-        val isCoclewMode = referenceCode.isUid() && coclewEnabled == true
-
-        AnimatedNavHost(
-            navController = controller,
-            startDestination = Screen.HomeScreen.route,
-            modifier = Modifier
-                .weight(weight = 1f)
-                .verticalScroll(rememberScrollState())
-        ) {
-
-            fun mustShowInterstitial(
-                ignoreSkip: Boolean,
-                onSuccess: () -> Unit
-            ) {
-                when {
-                    !referenceCode!!.isUid() || coclewEnabled == null -> {
-                        onSuccess()
-                        showInterstitial(null)
+            HomeScreen(
+                onStartMatch = { match ->
+                    if (controller isCurrent backStackEntry) {
+                        controller.navigate(Screen.GameScreen.route(match))
                     }
-                    coclewEnabled == false -> showMaintenance = true
-                    ignoreSkip -> showInterstitial(onSuccess)
-                    viewModel.isSkipInterstitial() -> onSuccess()
-                    else -> showInterstitial(onSuccess)
-                }
-            }
+                },
+            )
+        }
 
-            composable(
-                route = Screen.HomeScreen.route,
-                enterTransition = { fadeIn() },
-                arguments = listOf(navArgument("match") { type = NavType.StringType }),
-                exitTransition = { exitToLeftTransition },
-                popEnterTransition = { enterToRightTransition }
-            ) { backStackEntry ->
+        composable(
+            route = Screen.GameScreen.route,
+            enterTransition = { enterToLeftTransition },
+            popExitTransition = { exitToRightTransition }
+        ) { backStackEntry ->
 
-                HomeScreen(
-                    onStartMatch = { match, onSuccess ->
-                        mustShowInterstitial(ignoreSkip = true) {
-                            if (controller isCurrent backStackEntry) {
-                                controller.navigate(Screen.GameScreen.route(match))
-                                onSuccess()
-                            }
-                        }
-                    },
-                    isCoclewMode = isCoclewMode
-                )
-            }
+            val match = backStackEntry.arguments!!.getString("match")
+                .let { Gson().fromJson(it, Match::class.java) }
 
-            composable(
-                route = Screen.GameScreen.route,
-                enterTransition = { enterToLeftTransition },
-                popExitTransition = { exitToRightTransition }
-            ) { backStackEntry ->
-
-                val match = backStackEntry.arguments!!.getString("match")
-                    .let { Gson().fromJson(it, Match::class.java) }
-
-                GameScreen(
-                    onHomeClick = {
-                        if (controller isCurrent backStackEntry) {
-                            controller.popBackStack()
-                        }
-                    },
-                    isCoclewMode = !referenceCode.isNullOrEmpty(),
-                    showInterstitial = { onSuccess ->
-                        mustShowInterstitial(
-                            ignoreSkip = false,
-                            onSuccess
-                        )
-                    },
-                    viewModel = viewModel(
-                        factory = GameViewModel.Factory(
-                            match = match
-                        )
+            GameScreen(
+                onHomeClick = {
+                    if (controller isCurrent backStackEntry) {
+                        controller.popBackStack()
+                    }
+                },
+                viewModel = viewModel(
+                    factory = GameViewModel.Factory(
+                        match = match
                     )
                 )
-            }
+            )
         }
+    }
 
-        val adRequest = remember { AdRequest.Builder().build() }
+    val adRequest = remember { AdRequest.Builder().build() }
 
-        AndroidView(
-            modifier = Modifier
-                .padding(vertical = 16.dp)
-                .fillMaxWidth(),
-            factory = { context ->
-                AdView(context).apply {
-                    adUnitId = BuildConfig.BANNER_ID
-                    setAdSize(AdSize.BANNER)
-                    loadAd(adRequest)
-                    adListener = object : AdListener() {
-                        override fun onAdLoaded() {
+    AndroidView(
+        modifier = Modifier
+            .padding(vertical = 16.dp)
+            .fillMaxWidth(),
+        factory = { context ->
+            AdView(context).apply {
+                adUnitId = BuildConfig.BANNER_ID
+                setAdSize(AdSize.BANNER)
+                loadAd(adRequest)
+                adListener = object : AdListener() {
+                    override fun onAdLoaded() {
 
-                        }
                     }
                 }
             }
-        )
-    }
+        }
+    )
 }
