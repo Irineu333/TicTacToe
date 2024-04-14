@@ -30,8 +30,8 @@ android {
         applicationId "com.neo.hash"
         minSdk 21
         targetSdk 33
-        versionCode 19
-        versionName "1.9.7"
+        versionCode 20
+        versionName "1.10.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -133,8 +133,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-crashlytics-ktx'
     implementation 'com.google.firebase:firebase-config-ktx'
-    implementation 'com.google.firebase:firebase-database-ktx'
-    implementation 'com.google.firebase:firebase-auth-ktx'
 
     //ads
     implementation 'com.google.android.gms:play-services-ads:21.2.0'

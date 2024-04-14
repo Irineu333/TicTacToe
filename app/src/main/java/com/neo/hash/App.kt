@@ -3,22 +3,10 @@ package com.neo.hash
 import android.app.Application
 import android.util.Log
 import com.google.android.gms.ads.MobileAds
-import com.google.firebase.auth.ktx.auth
 import com.google.firebase.crashlytics.ktx.crashlytics
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
-import com.neo.hash.data.DataStoreRepository
-import com.neo.hash.data.DataStoreRepositoryImpl
-import com.neo.hash.singleton.Coclew
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
-lateinit var dataStoreRepository: DataStoreRepository
 
 class App : Application() {
 
@@ -35,14 +23,6 @@ class App : Application() {
         //ads init
         MobileAds.initialize(this) {
             Timber.i("AdMob initialized")
-        }
-
-        //singleton data store repository
-        dataStoreRepository = DataStoreRepositoryImpl(applicationContext)
-
-        if (Firebase.auth.currentUser == null) {
-            //anonymous firebase login
-            Firebase.auth.signInAnonymously()
         }
     }
 }
