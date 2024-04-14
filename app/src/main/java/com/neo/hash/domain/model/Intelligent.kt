@@ -33,7 +33,7 @@ class Intelligent(
     }
 
     fun hard(hash: Hash): Hash.Block = with(hash) {
-        firstRandom()
+        perfectFirst()
             ?: blockOnSecond()
             ?: blockOnThird(perfect = true)
             ?: winOrBlock(block = true)
