@@ -45,6 +45,7 @@ class Intelligent(
     private fun Hash.centerIsRight(): Hash.Block? {
 
         if (!hasCenter) {
+
             Timber.i("centerIsRight: center")
 
             return center
@@ -53,11 +54,8 @@ class Intelligent(
         return null;
     }
 
-    /**
-     * action: A safer first move
-     * requirement: Be the first to play
-     */
     private fun Hash.perfectFirst(): Hash.Block? {
+
         if (isEmpty()) {
 
             return run {
@@ -66,13 +64,10 @@ class Intelligent(
                 Timber.i("perfectFirst: $it")
             }
         }
+
         return null
     }
 
-    /**
-     * action: Interrupts future enemy xeques
-     * requirement: Future enemy moves leading to xeques
-     */
     private fun Hash.disruptiveXeque(): Hash.Block? {
 
         val enemyXeques = xeques(
@@ -111,17 +106,14 @@ class Intelligent(
         }
     }
 
-    /**
-     * action: Best plays when I'm third to play
-     * requirement: Be the third to play
-     */
     private fun Hash.blockOnThird(
         symbols: List<Hash.Block> = getAllSymbols(),
         perfect: Boolean
     ): Hash.Block? {
+
         if (symbols.size != 2) return null
 
-        //only corners
+        // only corners
         if (hasCorners && !hasSides && !hasCenter) {
             return run {
                 corners.filter {
@@ -135,22 +127,21 @@ class Intelligent(
         return null
     }
 
-    /**
-     * action: Blocking the first movement of opponent
-     * requirement: Be the second to play
-     */
     private fun Hash.blockOnSecond(
         symbols: List<Hash.Block> = getAllSymbols()
     ): Hash.Block? {
+
         if (symbols.size != 1) return null
 
         if (hasCorners) {
+
             Timber.i("blockOnSecond: corners")
 
             return center
         }
 
         if (hasSides) {
+
             Timber.i("blockOnSecond: sides")
 
             val enemyBlock: Hash.Block = symbols[0]
@@ -161,6 +152,7 @@ class Intelligent(
         }
 
         if (hasCenter) {
+
             Timber.i("blockOnSecond: center")
 
             return corners.random()
@@ -169,12 +161,10 @@ class Intelligent(
         return null
     }
 
-    /**
-     * action: Complete own victory or block opponent's victory
-     * requirement: There are one or more segments about to be closed
-     */
     private fun Hash.winOrBlock(block: Boolean): Hash.Block? {
+
         fun rows() = buildList {
+
             for (row in Hash.KEY_RANGE) {
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
@@ -204,20 +194,20 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
-                        enemyBlocks.add(
-                            Hash.Block(
-                                row,
-                                column
-                            )
+                    enemyBlocks.add(
+                        Hash.Block(
+                            row,
+                            column
                         )
-                    }
+                    )
                 }
 
                 if (emptyBlocks.size == 1) {
+
                     if (myBlocks.size == 2) {
                         add(emptyBlocks[0] to myBlocks[0].symbol)
                     }
+
                     if (enemyBlocks.size == 2 && block) {
                         add(emptyBlocks[0] to enemyBlocks[0].symbol)
                     }
@@ -226,7 +216,9 @@ class Intelligent(
         }
 
         fun columns() = buildList {
+
             for (column in Hash.KEY_RANGE) {
+
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
                 val emptyBlocks = mutableListOf<Hash.Block>()
@@ -255,20 +247,20 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != mySymbol) {
-                        enemyBlocks.add(
-                            Hash.Block(
-                                row,
-                                column
-                            )
+                    enemyBlocks.add(
+                        Hash.Block(
+                            row,
+                            column
                         )
-                    }
+                    )
                 }
 
                 if (emptyBlocks.size == 1) {
+
                     if (myBlocks.size == 2) {
                         add(emptyBlocks[0] to myBlocks[0].symbol)
                     }
+
                     if (enemyBlocks.size == 2 && block) {
                         add(emptyBlocks[0] to enemyBlocks[0].symbol)
                     }
@@ -277,6 +269,7 @@ class Intelligent(
         }
 
         fun diagonal(): Pair<Hash.Block, Hash.Symbol?>? {
+
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -306,20 +299,20 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
-                    enemyBlocks.add(
-                        Hash.Block(
-                            index,
-                            index
-                        )
+                enemyBlocks.add(
+                    Hash.Block(
+                        index,
+                        index
                     )
-                }
+                )
             }
 
             if (emptyBlocks.size == 1) {
+
                 if (myBlocks.size == 2) {
                     return emptyBlocks[0] to myBlocks[0].symbol
                 }
+
                 if (enemyBlocks.size == 2 && block) {
                     return emptyBlocks[0] to enemyBlocks[0].symbol
                 }
@@ -360,15 +353,13 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != mySymbol) {
-                    enemyBlocks.add(
-                        Hash.Block(
-                            row,
-                            column,
-                            symbol
-                        )
+                enemyBlocks.add(
+                    Hash.Block(
+                        row,
+                        column,
+                        symbol
                     )
-                }
+                )
             }
 
             if (emptyBlocks.size == 1) {
@@ -405,11 +396,8 @@ class Intelligent(
         }
     }
 
-    /**
-     * action: Run the random first move
-     * requirement: Be the first to play
-     */
     private fun Hash.firstRandom(): Hash.Block? {
+
         if (isEmpty()) {
 
             return Hash.Block(
@@ -419,16 +407,15 @@ class Intelligent(
                 Timber.i("blockOnSecond: $it")
             }
         }
+
         return null
     }
 
-    /**
-     * action: Search for [targetSymbol] xeques that do not lead to [enemyBlockMoves] xeques
-     */
     private fun Hash.xeques(
         targetSymbol: Hash.Symbol,
         enemyBlockMoves: List<Hash.Block> = listOf()
     ): List<Hash.Block> {
+
         fun rows() = buildList {
             for (row in Hash.KEY_RANGE) {
 
@@ -460,15 +447,13 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != targetSymbol) {
-                        enemyBlocks.add(
-                            Hash.Block(
-                                row,
-                                column,
-                                symbol
-                            )
+                    enemyBlocks.add(
+                        Hash.Block(
+                            row,
+                            column,
+                            symbol
                         )
-                    }
+                    )
                 }
 
                 if (
@@ -483,7 +468,9 @@ class Intelligent(
         }
 
         fun columns() = buildList {
+
             for (column in Hash.KEY_RANGE) {
+
                 val myBlocks = mutableListOf<Hash.Block>()
                 val enemyBlocks = mutableListOf<Hash.Block>()
                 val emptyBlocks = mutableListOf<Hash.Block>()
@@ -512,15 +499,13 @@ class Intelligent(
                         continue
                     }
 
-                    if (symbol != targetSymbol) {
-                        enemyBlocks.add(
-                            Hash.Block(
-                                row,
-                                column,
-                                symbol
-                            )
+                    enemyBlocks.add(
+                        Hash.Block(
+                            row,
+                            column,
+                            symbol
                         )
-                    }
+                    )
                 }
 
                 if (
@@ -535,6 +520,7 @@ class Intelligent(
         }
 
         fun diagonal() = buildList {
+
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -564,15 +550,13 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != targetSymbol) {
-                    enemyBlocks.add(
-                        Hash.Block(
-                            index,
-                            index,
-                            symbol
-                        )
+                enemyBlocks.add(
+                    Hash.Block(
+                        index,
+                        index,
+                        symbol
                     )
-                }
+                )
             }
 
             if (
@@ -586,6 +570,7 @@ class Intelligent(
         }
 
         fun invertedDiagonal() = buildList {
+
             val myBlocks = mutableListOf<Hash.Block>()
             val enemyBlocks = mutableListOf<Hash.Block>()
             val emptyBlocks = mutableListOf<Hash.Block>()
@@ -616,15 +601,13 @@ class Intelligent(
                     continue
                 }
 
-                if (symbol != targetSymbol) {
-                    enemyBlocks.add(
-                        Hash.Block(
-                            row,
-                            column,
-                            symbol
-                        )
+                enemyBlocks.add(
+                    Hash.Block(
+                        row,
+                        column,
+                        symbol
                     )
-                }
+                )
             }
 
             if (
@@ -638,6 +621,7 @@ class Intelligent(
         }
 
         return buildList {
+
             addAll(rows())
             addAll(columns())
 
@@ -646,10 +630,6 @@ class Intelligent(
         }
     }
 
-    /**
-     * action: Threatens to close a segment
-     * requirement: A follow-up with a piece of mine
-     */
     private fun Hash.xeque(double: Boolean): Hash.Block? {
 
         val moves = xeques(targetSymbol = mySymbol)
@@ -661,10 +641,6 @@ class Intelligent(
         }
     }
 
-    /**
-     * action: Make a random move
-     * requirement: There is an empty block
-     */
     private fun Hash.random() = getAllEmpty().filter {
         it.symbol == null
     }.random().also {
@@ -672,6 +648,7 @@ class Intelligent(
     }
 
     companion object {
+
         val corners = listOf(
             Hash.Block(1, 1),
             Hash.Block(1, 3),
